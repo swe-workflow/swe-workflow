@@ -2,7 +2,7 @@
 
 Spec-by-example for the `log-decisions` skill. Each scenario maps a situation to the expected result in `DECISIONS.md`. These are the acceptance checks: following the skill's instructions for the situation must produce the expected entry. (Instructions-only skill — "tests" are behavioral, verified by reading the produced artifact.)
 
-Scope of this set: the entry **schema** + **direct-append** write path (issue 01), and the **decision bar + escalation + content discipline** (issue 02). Dedup/supersede/precedent (issue 03) and worktree staging→promotion (04) carry their own scenarios in those slices.
+Scope of this set: the entry **schema** + **direct-append** write path (issue 01), the **decision bar + escalation + content discipline** (issue 02), and **dedup/supersede/precedent** (issue 03). Worktree staging→promotion (issue 04) carries its own scenarios in that slice.
 
 ---
 
@@ -105,3 +105,27 @@ Scope of this set: the entry **schema** + **direct-append** write path (issue 01
 **Situation.** A decision involves an API key value and quotes from a long external doc.
 
 **Expected.** The entry **references** the secret by name/location (e.g. "the Stripe key in the deploy env") and **never reproduces its value**; external material is paraphrased and cited by reference, never pasted. No tokens, credentials, keys, or PII appear in `DECISIONS.md`.
+
+---
+
+## Scenario 11 — a retried decision is not logged twice
+
+**Situation.** A build phase fails and reruns under the 3-strike protocol. On the rerun the agent re-encounters the same decision — same `context` and `Question` — and makes the **same** choice it already logged.
+
+**Expected.** **No new entry.** The dedup check finds the existing entry with the same `(context, question)` and the same `Chosen`, so it's a no-op. The journal still holds exactly one entry for that decision.
+
+---
+
+## Scenario 12 — a revised decision supersedes the original
+
+**Situation.** The agent earlier logged "reset-token expiry = 1 hour." A later security review changes the call for the same `(context, question)` to 30 minutes.
+
+**Expected.** A **new** entry is appended with `Chosen: 30 minutes` and a `Supersedes:` line naming the original entry's timestamp and why it changed. The **original 1-hour entry is left byte-for-byte unchanged** — the revision is visible as history, not an edit.
+
+---
+
+## Scenario 13 — a settled question is reused via precedent, not re-decided
+
+**Situation.** A question the agent suspects was already decided comes up again in a later context.
+
+**Expected.** The agent does a **targeted `grep`** of `DECISIONS.md` for that specific question (it does **not** load the whole journal), finds the prior entry, and — if it still applies — **follows and cites it** as the `Justification` of the new entry ("consistent with the <timestamp> decision"). The journal is read narrowly, never bulk-ingested.

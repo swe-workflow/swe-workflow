@@ -46,6 +46,7 @@ One append-only `##` block per decision:
 **Justification:** <the artifact that justifies it, cited by reference — or the rationale>
 **Outcome:** applied | escalated
 **Ref:** <commit / PR / issue, or "(pending)">
+**Supersedes:** <prior entry's timestamp> — <why it changed>   (omit unless this entry revises an earlier decision)
 ```
 
 - **timestamp** — ISO 8601 with offset, e.g. `2026-05-22T13:40:00-07:00`.
@@ -55,6 +56,7 @@ One append-only `##` block per decision:
 - **Decided-by** — `human` if a person made the call (even when you surfaced the options); `agent` if you decided on your own.
 - **Justification** — see Content discipline below.
 - **Outcome** — `applied` (made and acted on) or `escalated` (paused for a human — see below).
+- **Supersedes** — include **only on a revision**: the timestamp of the entry this one replaces, and why it changed. The superseded entry is left untouched.
 
 ## Escalate when you can't decide
 
@@ -79,14 +81,28 @@ To escalate:
 - **Cite by reference, not payload** — point to the artifact (`PRD §Security`, `src/auth/tokens.ts`); never paste raw issue bodies, fetched web content, or untrusted text.
 - **Never log secrets** — no tokens, credentials, keys, or PII. Reference sensitive material; don't reproduce it.
 
-## Writing the entry (direct-append)
+## Writing the entry
 
-1. If `DECISIONS.md` does not exist at the repo root, **create it** with this header as the first line, followed by a blank line:
+**First, dedup by `(context, question)`** — checked when you *act on* the decision, so retries never duplicate:
+
+1. Look for an existing entry with the same `context` and `Question`:
+   - **Same `Chosen`** → already logged. **Do nothing** — no duplicate. (This makes 3-strike / TDD-loop retries safe.)
+   - **Different `Chosen`** → a **revision**: append a **new** entry with a `Supersedes:` line naming the prior entry's timestamp and why it changed. **Never edit the original.**
+   - **No match** → a new decision; continue.
+2. If `DECISIONS.md` does not exist at the repo root, **create it** with this header as the first line, followed by a blank line:
    ```
    <!-- Decision journal — consequential decisions made on the user's behalf. AI-maintained, append-only. -->
    ```
-2. **Append** the entry block to the end of the file, separated from the previous content by one blank line.
-3. **Append only.** Never edit, reorder, or delete existing entries — the journal is immutable history.
+3. **Append** the entry block to the end of the file, separated from the previous content by one blank line.
+4. **Append only.** Never edit, reorder, or delete existing entries — the journal is immutable history.
+
+## Reusing past decisions (precedent)
+
+Before deciding a question you suspect was settled before, you may look it up — to stay consistent and avoid re-deciding:
+
+- Do a **targeted search**: `grep` `DECISIONS.md` for the specific question or its key terms. **Never load the whole journal into context** — pull only the relevant entry. (The journal is a write-mostly audit record, not a context input.)
+- If a prior entry decided the same question and still applies, **follow it** and **cite it** as your `Justification` (e.g. "consistent with the 2026-05-22T13:40 decision"). A prior decision is itself a valid citation.
+- If the prior decision no longer applies, treat your new call as a **revision** — supersede it (above).
 
 ## Examples
 
@@ -105,6 +121,23 @@ An `applied` decision:
 **Justification:** PRD `.scratch/auth/PRD.md §Security` says "short-lived" without a number; took the 1h OWASP convention.
 **Outcome:** applied
 **Ref:** (pending)
+```
+
+A **revision** that supersedes it:
+
+```
+## 2026-05-22T16:05:00-07:00 — auth/02 — gate-resolution
+
+**Question:** How long should password-reset tokens stay valid?
+**Options considered:**
+- 1 hour (prior choice)
+- 30 minutes (tighter, after the security review)
+**Chosen:** 30 minutes.
+**Decided-by:** human
+**Justification:** Security review asked to tighten the window; supersedes the earlier 1h call.
+**Outcome:** applied
+**Ref:** (pending)
+**Supersedes:** 2026-05-22T13:40:00-07:00 — tightened after security review.
 ```
 
 An `escalated` decision:
