@@ -24,14 +24,11 @@ The full workflow — stages 0–7, the parallel `/triage` concern, and the desi
 
 ### Prerequisites
 
-`/ship` and `/ship-all` orchestrate skills that are **not bundled** — install these alongside the plugin:
+The workflow relies on several skills this plugin doesn't bundle — install the ones you need:
 
-- [`planning-with-files`](https://github.com/OthmanAdi/planning-with-files) — the `plan` / `plan-goal` / `status` engine that drives each issue.
-- `tdd` — the red → green → refactor inner loop.
-- `andrej-karpathy-skills:karpathy-guidelines` — code-quality guardrails (surgical, simple changes).
-- For the spec layer (stages 1–4): mattpocock's [`grill-with-docs`, `to-prd`, `to-issues`, `triage`](https://github.com/mattpocock/skills).
-
-`/to-features` and `/status` work on their own.
+- [`planning-with-files`](https://github.com/OthmanAdi/planning-with-files) — the `plan` / `plan-goal` / `status` engine `/ship` runs for each issue.
+- [`andrej-karpathy-skills:karpathy-guidelines`](https://github.com/multica-ai/andrej-karpathy-skills) — code-quality guardrails (surgical, simple changes).
+- [`mattpocock/skills`](https://github.com/mattpocock/skills) — `tdd` (the red → green → refactor inner loop) plus the upstream spec layer: `setup-matt-pocock-skills`, `grill-with-docs`, `to-prd`, `to-issues`, and `triage`.
 
 ## How it fits together
 
