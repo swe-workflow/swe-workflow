@@ -2,7 +2,7 @@
 
 Spec-by-example for the `log-decisions` skill. Each scenario maps a situation to the expected result in `DECISIONS.md`. These are the acceptance checks: following the skill's instructions for the situation must produce the expected entry. (Instructions-only skill — "tests" are behavioral, verified by reading the produced artifact.)
 
-Scope of this set: the entry **schema** and the **direct-append** write path. The decision bar + escalation (issue 02), dedup/supersede/precedent (03), and worktree staging→promotion (04) carry their own scenarios in those slices.
+Scope of this set: the entry **schema** + **direct-append** write path (issue 01), and the **decision bar + escalation + content discipline** (issue 02). Dedup/supersede/precedent (issue 03) and worktree staging→promotion (04) carry their own scenarios in those slices.
 
 ---
 
@@ -65,3 +65,43 @@ Scope of this set: the entry **schema** and the **direct-append** write path. Th
 **Situation.** The agent resolves a decision on its own, without asking.
 
 **Expected.** The entry records `Decided-by: agent`.
+
+---
+
+## Scenario 6 — a below-bar choice produces no entry
+
+**Situation.** The agent renames a local variable and extracts an obvious private helper — choices the spec already implies, fully reversible.
+
+**Expected.** **No entry** is written. Routine, reversible, already-authorized choices are below the bar (they belong in the ephemeral `task_plan.md` Decisions table, not the journal).
+
+---
+
+## Scenario 7 — a gate with nothing to cite escalates instead of guessing
+
+**Situation.** The agent must pick a behavior the spec left genuinely open, and **nothing** in the repo (PRD, ACs, ADRs, `CONTEXT.md`, code, convention) justifies any option.
+
+**Expected.** An `escalated` entry — `Chosen: —`, `Outcome: escalated`, `Justification` stating no artifact justifies the call — and the agent **pauses for a human** (HITL pause in a build; asks the user interactively). It does **not** guess and write `applied`.
+
+---
+
+## Scenario 8 — an irreversible action escalates even when the agent is confident
+
+**Situation.** The agent is confident that dropping a legacy column is the right move, but it's irreversible data loss and no artifact authorizes it.
+
+**Expected.** An `escalated` entry (category `irreversible-action`), **not** `applied` — confidence does not override the irreversibility trigger. The agent pauses for a human.
+
+---
+
+## Scenario 9 — a tradeoff logs with rationale, no forced citation
+
+**Situation.** The agent memoizes a hot path, accepting extra memory for speed — a judgment call with no single artifact dictating it.
+
+**Expected.** A `tradeoff` entry, `Outcome: applied`, with the reasoning in `Justification` (its own rationale — **no** repo-artifact citation is required for `tradeoff` / `deviation` / `FYI`).
+
+---
+
+## Scenario 10 — content discipline: secrets and raw payloads are never written
+
+**Situation.** A decision involves an API key value and quotes from a long external doc.
+
+**Expected.** The entry **references** the secret by name/location (e.g. "the Stripe key in the deploy env") and **never reproduces its value**; external material is paraphrased and cited by reference, never pasted. No tokens, credentials, keys, or PII appear in `DECISIONS.md`.
