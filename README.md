@@ -1,6 +1,6 @@
 # swe-workflow
 
-The idiomatic software-engineering workflow as a Claude Code plugin: **clarify → spec → slice → triage → ship.** A chain of small, observable steps connected by markdown files — not an opaque framework.
+The idiomatic software-engineering workflow: **idea → PRD → issues → ship.** A chain of small, observable steps connected by markdown files — not an opaque framework.
 
 ## Commands
 

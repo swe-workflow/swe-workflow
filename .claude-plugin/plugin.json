@@ -1,7 +1,7 @@
 {
   "name": "swe-workflow",
   "version": "0.1.0",
-  "description": "The idiomatic software-engineering workflow as a plugin: clarify -> spec -> slice -> triage -> ship. /ship runs plan->build->close-out for one issue; /ship-all batches it across a backlog.",
+  "description": "The idiomatic software-engineering workflow: idea → PRD → issues → ship — small, observable steps connected by markdown files, not an opaque framework. /ship one issue (plan→build→close-out), /ship-all a backlog, plus /to-features and /status.",
   "author": { "name": "soulmachine" },
   "homepage": "https://github.com/swe-workflow/swe-workflow",
   "repository": "https://github.com/swe-workflow/swe-workflow",
