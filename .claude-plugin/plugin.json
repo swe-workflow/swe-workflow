@@ -1,0 +1,10 @@
+{
+  "name": "swe-workflow",
+  "version": "0.1.0",
+  "description": "The idiomatic software-engineering workflow as a plugin: clarify -> spec -> slice -> triage -> ship. /ship runs plan->build->close-out for one issue; /ship-all batches it across a backlog.",
+  "author": { "name": "soulmachine" },
+  "homepage": "https://github.com/swe-workflow/swe-workflow",
+  "repository": "https://github.com/swe-workflow/swe-workflow",
+  "license": "MIT",
+  "keywords": ["workflow", "software-engineering", "planning", "tdd", "issues", "prd", "agents", "afk"]
+}

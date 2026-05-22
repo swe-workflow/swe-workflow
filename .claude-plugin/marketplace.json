@@ -1,0 +1,14 @@
+{
+  "name": "swe-workflow",
+  "owner": { "name": "soulmachine" },
+  "plugins": [
+    {
+      "name": "swe-workflow",
+      "source": ".",
+      "description": "Idiomatic SWE workflow: /ship one issue (plan->build->close-out) or /ship-all a backlog; plus /to-features and /status.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "keywords": ["workflow", "software-engineering", "tdd", "afk"]
+    }
+  ]
+}
