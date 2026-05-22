@@ -83,6 +83,8 @@ To escalate:
 
 ## Writing the entry
 
+**Which file?** In a `/ship` worktree build, append entry blocks to `DECISIONS.staged.md` — they're promoted into repo-root `DECISIONS.md` at close-out (see the swe-workflow REFERENCE). Otherwise (interactive / grill, no worktree) append to `DECISIONS.md` directly. The dedup, schema, and append-only rules below apply to whichever file you target; the header-comment step (2) is for `DECISIONS.md`.
+
 **First, dedup by `(context, question)`** — checked when you *act on* the decision, so retries never duplicate:
 
 1. Look for an existing entry with the same `context` and `Question`:

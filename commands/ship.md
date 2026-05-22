@@ -28,11 +28,11 @@ Full procedure, rationale, and per-tracker fetch commands live in the bundled sk
    > /planning-with-files:plan Interview me about this issue, then write task_plan.md to implement it. The plan must use /tdd (tests first: red → green → refactor) for writing code and tests, and apply /karpathy-guidelines (surgical, simple changes) for code quality — and it must name both skills explicitly in task_plan.md so they're used when the plan is executed.
 
 ## Stage 6 — Build
-7. **Invoke `/planning-with-files:plan-goal`** to execute. It reads `task_plan.md` and drives each sub-task as a goal. Because the plan names `/tdd` and `/karpathy-guidelines`, build test-first and keep changes surgical. Log each cycle to `progress.md`; record execution-time decisions and errors in `task_plan.md`.
+7. **Invoke `/planning-with-files:plan-goal`** to execute. It reads `task_plan.md` and drives each sub-task as a goal. Because the plan names `/tdd` and `/karpathy-guidelines`, build test-first and keep changes surgical. Log each cycle to `progress.md`; record execution-time decisions and errors in `task_plan.md`. When a **bar-crossing decision** arises mid-build, log it to `DECISIONS.staged.md` per the **`log-decisions`** skill — decide-and-log if a repo artifact justifies it, otherwise **escalate** (the HITL pause). Reversible, spec-authorized execution decisions stay in the `task_plan.md` Decisions table.
 
 ## Stage 7 — Close out
-8. Open the PR with the body drawn from `progress.md` highlights — the session log IS the narrative; don't rewrite it.
-9. After the PR merges, tear down **from the main checkout** (not inside the worktree): `git worktree remove ../<repo>-issue-<id>`, then delete the branch if it merged into the default branch.
+8. Open the PR with the body drawn from `progress.md` highlights — the session log IS the narrative; don't rewrite it. Include an **"Autonomy decisions"** section in the PR body, drawn from `DECISIONS.staged.md`, so the reviewer sees what was decided unattended.
+9. After the PR merges, **promote the journal, then tear down** — **from the main checkout** (not inside the worktree): first append any `DECISIONS.staged.md` entries to repo-root `DECISIONS.md` and commit them as their own `log:` commit (serialized by teardown → conflict-free across parallel worktrees); then `git worktree remove ../<repo>-issue-<id>` (which discards the staging file), and delete the branch if it merged into the default branch.
 
 ## HITL
 If the issue is `ready-for-human` or its AGENT-BRIEF flags HITL checkpoints: pause at the documented checkpoint, surface the decision, and wait for direction — do not let a Stop hook auto-finish. Resume by re-invoking `/planning-with-files:plan-goal` after the human responds.

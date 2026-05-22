@@ -173,9 +173,10 @@ Per-tracker fetch commands and conventions live in [`trackers/<name>.md`](tracke
 
 - **Not every phase needs `/tdd`.** Exploration, `.gitignore` updates, config tweaks, infra changes have no behavior to test — just do them and log.
 - **A single phase can contain multiple `/tdd` cycles** if the AC bundles sub-behaviors. Often a sign the AC was too coarse — note it in `task_plan.md` so the next `/to-issues` run can slice finer.
-- **Decisions discovered mid-`/tdd`** (e.g., the public interface needs to change) land in `task_plan.md`'s Decisions table before continuing.
+- **Decisions discovered mid-`/tdd`** split by the bar: reversible, spec-authorized ones (e.g., extracting a private helper) land in `task_plan.md`'s Decisions table; **bar-crossing** ones — and a public-interface change is a *deviation* — go to the **decision journal** (`DECISIONS.staged.md` → `DECISIONS.md`) per the `log-decisions` skill. If you can't justify a bar-crossing call from an artifact, **escalate**.
 - **Errors during RED or GREEN** go in `task_plan.md`'s Errors table — same 3-strike protocol as any other error. Never silently retry a failed test in the same form.
 - **`/tdd`'s own per-phase planning step is light** (interface confirmation, test list, prior-art lookup). It's not a duplicate of `/planning-with-files:plan`'s issue-level interview — just a quick check-in at the top of each phase.
+- **Compile vs runtime.** Stage 5 *compiles* the plan (the interview bakes `/tdd` + `/karpathy-guidelines` into `task_plan.md`); Stage 6 *runs* it. In **AFK** builds `/tdd` does **not** interview the human — mid-build decisions are logged (`log-decisions`) or escalated. **HITL** issues may pause at documented checkpoints.
 
 **Mental shorthand**: `/planning-with-files` is the project manager keeping the calendar; `/tdd` is the engineer at the keyboard. One PM, many keyboard sessions per issue.
 
@@ -211,6 +212,16 @@ fi
 Don't run this from inside the worktree being removed — git rejects that.
 
 If you want the planning files as a post-mortem record, commit them on the branch BEFORE the teardown — the PR will carry them. Default is to discard.
+
+### Decision journal (`DECISIONS.md`)
+
+Bar-crossing decisions made during a build — gate-resolutions, deviations, tradeoffs, irreversible-action calls, escalations — are recorded by the `log-decisions` skill, **not** in the ephemeral `task_plan.md` Decisions table (which keeps only reversible execution decisions). The flow:
+
+- **During the build (in the worktree):** append entries to `DECISIONS.staged.md` — plugin-owned, gitignored, ephemeral. Decide-and-log when a repo artifact justifies the call; otherwise **escalate** (the HITL pause).
+- **At close-out (Stage 7, from the main checkout):** promote the staged entries into repo-root `DECISIONS.md` and commit them as their own `log:` commit. Serialized by teardown, so parallel worktrees never conflict. The PR body also carries an "Autonomy decisions" section for pre-merge visibility.
+- `DECISIONS.md` is **settled history only** (append-only); open escalations are surfaced from live worktrees by `/status`.
+
+**Journal vs ADR.** The journal records *events* ("on this date, this was decided, by whom"); `docs/adr/` records *ratified architecture* ("this IS the decision now"). A journal entry that proves architecturally significant is **promoted to an ADR manually** — never automatically — and the entry notes the promotion. See the `log-decisions` skill for the entry schema and rules.
 
 ## Completion signals
 

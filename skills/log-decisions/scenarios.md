@@ -2,7 +2,7 @@
 
 Spec-by-example for the `log-decisions` skill. Each scenario maps a situation to the expected result in `DECISIONS.md`. These are the acceptance checks: following the skill's instructions for the situation must produce the expected entry. (Instructions-only skill — "tests" are behavioral, verified by reading the produced artifact.)
 
-Scope of this set: the entry **schema** + **direct-append** write path (issue 01), the **decision bar + escalation + content discipline** (issue 02), and **dedup/supersede/precedent** (issue 03). Worktree staging→promotion (issue 04) carries its own scenarios in that slice.
+Scope of this set: the entry **schema** + **direct-append** write path (issue 01), the **decision bar + escalation + content discipline** (issue 02), **dedup/supersede/precedent** (issue 03), and **worktree staging→promotion** (issue 04). S1–S13 are skill-direct behaviors; **S14–S17 are `/ship` integration** behaviors.
 
 ---
 
@@ -129,3 +129,35 @@ Scope of this set: the entry **schema** + **direct-append** write path (issue 01
 **Situation.** A question the agent suspects was already decided comes up again in a later context.
 
 **Expected.** The agent does a **targeted `grep`** of `DECISIONS.md` for that specific question (it does **not** load the whole journal), finds the prior entry, and — if it still applies — **follows and cites it** as the `Justification` of the new entry ("consistent with the <timestamp> decision"). The journal is read narrowly, never bulk-ingested.
+
+---
+
+## Scenario 14 — staged decisions are promoted at close-out
+
+**Situation.** During a `/ship` build the agent logs two bar-crossing decisions, then the issue closes out (PR merges, teardown).
+
+**Expected.** During the build the two decisions live in the worktree's `DECISIONS.staged.md`. At Stage-7 close-out they are **promoted** — appended to repo-root `DECISIONS.md` on the main checkout — and the staging file is gone after teardown.
+
+---
+
+## Scenario 15 — promotion auto-commits on the AFK path
+
+**Situation.** An AFK `/ship` closes out with staged decisions.
+
+**Expected.** Promotion appends the entries to `DECISIONS.md` on the main checkout and **commits them as their own `log:` commit**, with no human action. (Interactive/grill sessions append directly and leave the file uncommitted for the user's normal flow.)
+
+---
+
+## Scenario 16 — the PR body carries an "Autonomy decisions" section
+
+**Situation.** A `/ship` opens a PR after a build that logged decisions.
+
+**Expected.** The PR body contains an **"Autonomy decisions"** section summarizing the staged decisions — so a reviewer sees what was decided unattended **before** merge (pre-merge visibility), even though promotion to `DECISIONS.md` happens at teardown.
+
+---
+
+## Scenario 17 — `DECISIONS.md` stays settled-only; staging is gitignored
+
+**Situation.** Mid-build, before close-out, with in-flight decisions logged.
+
+**Expected.** `DECISIONS.md` contains only previously **promoted** (settled) entries — the in-flight ones are **not** there yet; they live only in `DECISIONS.staged.md`, which is **gitignored** (never committed) and discarded at teardown. Open escalations are surfaced from the worktree by `/status` (issue 05), not from `DECISIONS.md`.
