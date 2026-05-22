@@ -5,8 +5,8 @@
     {
       "name": "swe-workflow",
       "source": "./",
-      "description": "The idiomatic software-engineering workflow: idea → PRD → issues → ship — small, observable steps connected by markdown files, not an opaque framework. /ship one issue (plan→build→close-out), /ship-all a backlog, plus /to-features and /status.",
-      "version": "0.1.0",
+      "description": "The idiomatic software-engineering workflow: idea → PRD → issues → ship. A chain of small, observable steps connected by markdown files — not an opaque framework.",
+      "version": "1.0.0",
       "license": "MIT",
       "keywords": ["workflow", "software-engineering", "tdd", "afk"]
     }
