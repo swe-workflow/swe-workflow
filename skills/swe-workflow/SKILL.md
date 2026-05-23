@@ -154,12 +154,9 @@ The skill is **instructions-only** — there are no scripts. The agent performs 
 
 ### Bootstrap
 
-1. **Pick the tracker.** See [Tracker selection](REFERENCE.md#tracker-selection).
-2. **Fetch the issue** per [`trackers/<name>.md`](trackers/) — extract title, body, labels, AGENT-BRIEF.
-3. **Derive paths**:
-   - slug = title → lowercase → non-alphanumerics replaced with `-` → truncate to 40 chars
-   - branch = `issue-<id>-<slug>` (Linear's `TEAM-123` passes through literally)
-   - worktree = `../<repo>-issue-<id>/`
+1. **Pick the tracker** — [tracker selection](trackers/README.md#selection--which-adapter).
+2. **Fetch the issue** per [`trackers/<name>.md`](trackers/) → a [normalized issue](trackers/README.md#normalized-issue) (title, body, labels, AGENT-BRIEF).
+3. **Derive paths** — `slug`, `branch`, `worktree` per the [tracker contract](trackers/README.md#branch--worktree-naming).
 4. **Create the worktree**: `git worktree add ../<repo>-issue-<id> -b issue-<id>-<slug>`
 5. **`cd` in and seed** three planning files:
 

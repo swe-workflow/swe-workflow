@@ -1,43 +1,42 @@
 # Tracker: Local Markdown Files
 
+Satisfies the [tracker contract](README.md). File-based, so its deltas are larger than the CLI trackers.
+
 **CLI**: none — issues are markdown files on disk.
-**Convention**: mattpocock's `.scratch/<feature-slug>/` layout. mattpocock's [`issue-tracker-local.md`](https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/issue-tracker-local.md) is **authoritative** for the directory layout, issue file format, and triage `Status:` vocabulary; this doc covers only what swe-workflow's bootstrap adds on top — field extraction, ID handling, and branch/worktree naming.
-**ID format**: full path to the issue file, OR `<feature-slug>/<NN>` when context is unambiguous.
+**Convention**: mattpocock's `.scratch/<feature-slug>/` layout. mattpocock's [`issue-tracker-local.md`](https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/issue-tracker-local.md) is **authoritative** for the directory layout, issue file format, and triage `Status:` vocabulary.
+**ID format**: full path to the issue file, OR `<feature-slug>/<NN>` when unambiguous (e.g. `auth/01`). Accept both; resolve to a real path before reading.
 
 ## Layout (in brief)
 
-`.scratch/<feature-slug>/PRD.md` + `.scratch/<feature-slug>/issues/<NN>-<slug>.md` — one feature directory per PRD, issues numbered from `01`. Grouping by feature preserves the `/to-prd` → `/to-issues` parent/child link in the filesystem (`ls .scratch/` is the backlog view). Full tree and issue file format live in the [authoritative doc](https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/issue-tracker-local.md).
+`.scratch/<feature-slug>/PRD.md` + `.scratch/<feature-slug>/issues/<NN>-<slug>.md` — one feature directory per PRD, issues numbered from `01`. Full tree and file format live in the authoritative doc above.
 
-## Extracting fields
+## Fetch one
 
-| Normalized field | How to extract |
+Read the file and map to the [normalized issue](README.md#normalized-issue):
+
+| Field | From the file |
 |---|---|
-| title | First H1 (`# …`) in the file |
-| body | Everything between the H1 and `## Comments` (exclusive), minus the `Status:` line |
-| labels | The value on the `Status:` line (single label by convention; the role string) |
-| agent brief | The body itself IS the brief (the whole file is one well-structured issue). Return as `[{"body": "<entire body>"}]`. |
+| title | first H1 (`# …`) |
+| body | between the H1 and `## Comments` (exclusive), minus the `Status:` line |
+| labels | the `Status:` line value (the triage role string) |
+| agent-brief | the body IS the brief (the whole file is one structured issue) |
 
-If a file carries additional label-like lines (e.g. `Type:`, `Priority:`), extract them too — but `Status:` is the only one mattpocock's chain reads. Its values use mattpocock's canonical triage vocabulary (see [`triage-labels.md`](https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/triage-labels.md)).
+`Status:` values use mattpocock's canonical triage vocabulary (see [`triage-labels.md`](https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/triage-labels.md)). Extra label-like lines (`Type:`, `Priority:`) may be extracted too, but `Status:` is the only one the chain reads.
 
-## ID handling
+## List ready
 
-The user typically passes either:
+Glob the issue files and filter on the `Status:` line:
 
-- A **full path** to the issue file: `.scratch/auth/issues/01-add-login.md`
-- The **`<feature>/<NN>`** form: `auth/01` (when unambiguous)
+```bash
+grep -lE '^Status:[[:space:]]*ready-for-agent' .scratch/<feature-slug>/issues/*.md
+```
 
-The bootstrap should accept both forms; resolve to a real path before reading.
+(Omit the feature path to scan all features.)
 
-Branch and worktree naming:
+## Branch & worktree naming
 
-- Branch: `issue-<feature-slug>-<NN>-<slug>` (e.g., `issue-auth-01-add-login`)
-- Worktree: `../<repo>-issue-<feature-slug>-<NN>/`
+The `<id>` is the compound `<feature-slug>-<NN>`, so per the contract: branch `issue-<feature-slug>-<NN>-<slug>` (e.g. `issue-auth-01-add-login`); worktree `../<repo>-issue-<feature-slug>-<NN>/`.
 
 ## Auto-detect signal
 
 A `.scratch/` directory exists at the repo root.
-
-## See also
-
-- [setup-matt-pocock-skills/issue-tracker-local.md](https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/issue-tracker-local.md) — authoritative layout, file format, and conventions
-- [setup-matt-pocock-skills/triage-labels.md](https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/triage-labels.md) — canonical triage role vocabulary

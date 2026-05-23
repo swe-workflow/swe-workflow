@@ -1,29 +1,24 @@
 # Tracker: GitHub Issues
 
-**CLI**: [`gh`](https://cli.github.com/) — requires `gh auth login` once.
+Satisfies the [tracker contract](README.md) — GitHub-specific bits only.
+
+**CLI**: [`gh`](https://cli.github.com/) — `gh auth login` once.
 **ID format**: integer (e.g., `123`).
 
-## Fetch the issue
+## Fetch one
 
 ```bash
 gh issue view <id> --json title,body,labels,comments
 ```
 
-From the returned JSON, extract:
+Field deltas from the [normalized issue](README.md#normalized-issue): `labels` = `[.labels[].name]`; everything else maps directly. AGENT-BRIEF: standard.
 
-| Normalized field | jq expression |
-|---|---|
-| title | `.title` |
-| body | `.body` |
-| labels | `[.labels[].name]` |
-| agent brief | `[.comments[] \| select(.body \| test("## Agent Brief"; "i"))] \| last \| .body` |
+## List ready
 
-Last match wins — `/triage` may post multiple briefs on long-running issues.
-
-## Where the AGENT-BRIEF lives
-
-A comment with the `## Agent Brief` heading, posted by `/triage` when the issue moves to `ready-for-agent`. See mattpocock's `triage/AGENT-BRIEF.md` for the template.
+```bash
+gh issue list --label <ready-for-agent> --state open --json number,title
+```
 
 ## Auto-detect signal
 
-`gh` is in `PATH` **AND** `git config --get remote.origin.url` contains `github.com`.
+`gh` in `PATH` **AND** `git config --get remote.origin.url` contains `github.com`.

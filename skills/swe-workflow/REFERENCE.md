@@ -11,7 +11,7 @@ One-time per-repo bootstrap. It wires the toolchain into a specific repo by writ
 - `## Agent skills` block in `AGENTS.md` (or `CLAUDE.md` if that's where the team keeps agent instructions) — declares which skills this repo uses and points at their per-repo docs.
 - `docs/agents/` directory — repo-local agent documentation: which issue tracker is in use (GitHub or local markdown), the triage label vocabulary, and the layout for domain docs (`CONTEXT.md`, ADRs, `FEATURES.md`).
 
-Downstream skills read this to know the repo's conventions: `/triage` learns which labels are valid here, stage 5 bootstrap learns where to fetch issues from (overriding the auto-detect in [Tracker selection](#tracker-selection)), `/grill-with-docs` learns whether `CONTEXT.md` should live at the root or under `src/<bounded-context>/`.
+Downstream skills read this to know the repo's conventions: `/triage` learns which labels are valid here, stage 5 bootstrap learns where to fetch issues from (the canonical repo record at rung 3 of [tracker selection](trackers/README.md#selection--which-adapter)), `/grill-with-docs` learns whether `CONTEXT.md` should live at the root or under `src/<bounded-context>/`.
 
 **Skip this stage** when the repo already has the `## Agent skills` block and `docs/agents/` populated — running it again would clobber existing config. This is a *per-repo* bootstrap, not *per-feature*; once it's run, you don't run it again.
 
@@ -120,12 +120,9 @@ The skill is **instructions-only** — there are no scripts. The agent performs 
 
 ### Bootstrap procedure (the agent performs each step)
 
-1. **Pick a tracker** for this repo (see [Tracker selection](#tracker-selection)).
-2. **Fetch the issue** per the relevant `trackers/<name>.md` doc — extract title, body, labels, AGENT-BRIEF.
-3. **Derive paths**:
-   - slug = title → lowercase → non-alphanumerics → `-` → truncate to 40 chars
-   - branch = `issue-<id>-<slug>` (use the tracker's native ID format; Linear's `TEAM-123` passes through literally)
-   - worktree = `../<repo>-issue-<id>/`
+1. **Pick a tracker** — [tracker selection](trackers/README.md#selection--which-adapter).
+2. **Fetch the issue** per the relevant `trackers/<name>.md` doc → a [normalized issue](trackers/README.md#normalized-issue) (title, body, labels, AGENT-BRIEF).
+3. **Derive paths** — `slug`, `branch`, `worktree` per the [tracker contract](trackers/README.md#branch--worktree-naming).
 4. **Create the worktree**: `git worktree add ../<repo>-issue-<id> -b issue-<id>-<slug>`
 5. **`cd` in and seed** the three planning files:
    - `task_plan.md` — Goal = title; Phases = AC checkboxes. Structured fields only.
@@ -138,19 +135,7 @@ The split enforces the **security boundary**: `task_plan.md` is re-injected by h
 
 ### Tracker selection
 
-Priority order:
-
-1. `$SWE_WORKFLOW_TRACKER` env var (explicit override)
-2. `tracker=<name>` line in `.swe-workflow.conf` at the repo root
-3. Auto-detect from project signals:
-   - `.scratch/` directory → `local-markdown` (mattpocock's `.scratch/<feature>/` convention)
-   - github remote + `gh` installed → `github`
-   - gitlab remote + `glab` installed → `gitlab`
-   - `.linear/` directory → `linear`
-   - `$MULTICA_WORKSPACE_ID` set → `multica` (no project-level signal — Multica config is user-level)
-4. Still ambiguous → ask the user.
-
-Per-tracker fetch commands and conventions live in [`trackers/<name>.md`](trackers/) — one file per supported tracker. To add a new tracker, write a new doc following the same shape; nothing else changes.
+The selection algorithm (priority order), the normalized-issue schema, AGENT-BRIEF resolution, branch/worktree naming, and the per-adapter fetch/list operations all live in the **[tracker contract](trackers/README.md)** — the single interface every `trackers/<name>.md` adapter satisfies. Adding a tracker = one new adapter doc; nothing else changes.
 
 ### Inner loop: `/tdd` within each code-producing phase
 

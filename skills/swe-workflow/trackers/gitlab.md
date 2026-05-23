@@ -1,27 +1,24 @@
 # Tracker: GitLab Issues
 
-**CLI**: [`glab`](https://gitlab.com/gitlab-org/cli) — requires `glab auth login` once.
+Satisfies the [tracker contract](README.md) — GitLab-specific bits only.
+
+**CLI**: [`glab`](https://gitlab.com/gitlab-org/cli) — `glab auth login` once.
 **ID format**: integer (e.g., `123`).
 
-## Fetch the issue
+## Fetch one
 
 ```bash
 glab issue view <id> --output json
 ```
 
-Note: `glab` field names differ from `gh`. Map them carefully:
+Field deltas from the [normalized issue](README.md#normalized-issue): `body` = `.description` (**not** `.body`); `labels` = `.labels` (already a flat string array). AGENT-BRIEF lives in a **note** (GitLab's term for a comment) — fetch separately with `glab issue note list <id>` and filter for `## Agent Brief`.
 
-| Normalized field | glab field |
-|---|---|
-| title | `.title` |
-| body | `.description` (not `.body`) |
-| labels | `.labels` (already a flat string array) |
-| agent brief | Fetch separately: `glab issue note list <id>` then filter for `## Agent Brief` (case-insensitive) |
+## List ready
 
-## Where the AGENT-BRIEF lives
-
-Same `## Agent Brief` heading pattern as GitHub, but posted as an issue **note** (GitLab's term for a comment).
+```bash
+glab issue list --label <ready-for-agent> --output json
+```
 
 ## Auto-detect signal
 
-`glab` is in `PATH` **AND** `git config --get remote.origin.url` contains `gitlab.com`.
+`glab` in `PATH` **AND** `git config --get remote.origin.url` contains `gitlab.com`.

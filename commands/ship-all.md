@@ -11,7 +11,7 @@ Scope: **$ARGUMENTS** — optional. A feature directory (e.g. `.scratch/feature-
 Tracker selection and per-tracker enumeration: `${CLAUDE_PLUGIN_ROOT}/skills/swe-workflow/trackers/`.
 
 ## Procedure
-1. **Enumerate issues** in scope for the active tracker. For `local-markdown`, list the issue files under the feature's `issues/` directory; for other trackers, query `ready-for-agent` issues.
+1. **Enumerate issues** in scope via the active adapter's **list ready** operation — each `trackers/<name>.md` documents its `ready-for-agent` query (see the [tracker contract](../skills/swe-workflow/trackers/README.md#operations-every-adapter-implements)).
 2. **Order by dependency**: respect each issue's `blocked-by` chain — ship prerequisites first. Skip (for now) any issue whose blockers have not yet merged, and note it.
 3. **For each AFK issue, in order**: run the full `/swe-workflow:ship <issue-slug>` procedure to completion (plan -> build -> close out, including PR + worktree teardown) **before** starting the next. One worktree at a time — never two ships in the same worktree. If an AFK issue **escalates mid-build** (a `log-decisions` escalation — an *irreversible* call it can't ground that only a human can make; reversible-but-unsettled calls proceed as logged assumptions, no park), **park it**: leave its worktree + `DECISIONS.staged.md` intact, skip its dependents (step 2's `blocked-by` logic), and **continue with the next independent issue** — don't halt the batch.
 4. **At a HITL issue** (`ready-for-human`, or its AGENT-BRIEF flags HITL): **stop and surface it** — do not attempt it unattended. Report what shipped, what is blocked on a human decision, and what remains. Resume on the user's go-ahead.

@@ -16,7 +16,7 @@ Full procedure, rationale, and per-tracker fetch commands live in the bundled sk
 - `${CLAUDE_PLUGIN_ROOT}/skills/swe-workflow/trackers/` (one doc per tracker)
 
 ## Stage 5 — Plan
-1. **Resolve the tracker** from `$ARGUMENTS` and the repo: a path ending in `.md` (e.g. under `.scratch/`) -> `local-markdown`; a bare number -> `github`/`gitlab` (per remote); a `TEAM-123` key -> `linear`; else honor `$SWE_WORKFLOW_TRACKER` / `.swe-workflow.conf`, then auto-detect, then ask. See the tracker-selection rules in SKILL.md.
+1. **Resolve the tracker** per the [tracker contract](../skills/swe-workflow/trackers/README.md#selection--which-adapter) — the issue slug in `$ARGUMENTS` is the rung-1 arg form (a `.md` path, a `TEAM-NN` key, or a bare number).
 2. **Fetch the issue** per the matching `trackers/<name>.md`. For `local-markdown`, read the file at `$ARGUMENTS`. Extract: title, body, acceptance criteria, AGENT-BRIEF, blocked-by, and whether it is HITL or AFK.
 3. **Derive paths**: `slug` = title lowercased, non-alphanumerics -> `-`, truncated to 40 chars; `branch` = `issue-<id>-<slug>`; `worktree` = `../<repo>-issue-<id>/`.
 4. **Create the worktree**: `git worktree add ../<repo>-issue-<id> -b issue-<id>-<slug>`, then work inside it.
