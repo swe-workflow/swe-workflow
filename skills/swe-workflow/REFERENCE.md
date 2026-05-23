@@ -131,11 +131,7 @@ The skill is **instructions-only** — there are no scripts. The agent performs 
    - `task_plan.md` — Goal = title; Phases = AC checkboxes. Structured fields only.
    - `findings.md` — Raw issue body + AGENT-BRIEF pasted verbatim. Safe sink for external content.
    - `progress.md` — Initial session log entry.
-6. **Invoke `/planning-with-files:plan`** (Stage 5) with this prompt:
-
-   > /planning-with-files:plan Interview me about this issue, then write task_plan.md to implement it. The plan must use /tdd (tests first: red → green → refactor) for writing code and tests, and apply /karpathy-guidelines (surgical, simple changes) for code quality — and it must name both skills explicitly in task_plan.md so they're used when the plan is executed.
-
-   The interview refines the seeds into the real plan. `task_plan.md` is the **core artifact** — it's what `/planning-with-files:plan-goal` reads in Stage 6. The final clause matters: instructing the planner to **write `/tdd` and `/karpathy-guidelines` into `task_plan.md`** is what makes them survive into execution — `plan-goal` inherits "build test-first, keep changes surgical" from the plan itself rather than needing to be re-told.
+6. **Invoke `/planning-with-files:plan`** (Stage 5) with the exact prompt the `/swe-workflow:ship` command uses (see [`ship.md`](../../commands/ship.md), Stage 5 step 6) — kept there as the single source so it can't drift. Instructing the planner to **write `/tdd` and `andrej-karpathy-skills:karpathy-guidelines` as named rules into `task_plan.md`** is what makes them survive into execution — `plan-goal` re-reads the plan and applies the named skills rather than being re-told. `task_plan.md` is the **core artifact** `plan-goal` reads in Stage 6.
 7. **Invoke `/planning-with-files:plan-goal`** (Stage 6) to execute — reads `task_plan.md` and drives each phase as a goal via Claude Code's goal command. Because the plan already calls for `/tdd` and `/karpathy-guidelines`, `plan-goal` just carries them out.
 
 The split enforces the **security boundary**: `task_plan.md` is re-injected by hooks every tool call, so it gets only structured fields; raw external content (issue body, fetched docs) goes to `findings.md` instead.

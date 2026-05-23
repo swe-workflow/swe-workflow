@@ -154,7 +154,7 @@ The skill is **instructions-only** — there are no scripts. The agent performs 
 
 ### Bootstrap
 
-1. **Pick the tracker.** See [Tracker selection](#tracker-selection) below.
+1. **Pick the tracker.** See [Tracker selection](REFERENCE.md#tracker-selection).
 2. **Fetch the issue** per [`trackers/<name>.md`](trackers/) — extract title, body, labels, AGENT-BRIEF.
 3. **Derive paths**:
    - slug = title → lowercase → non-alphanumerics replaced with `-` → truncate to 40 chars
@@ -169,29 +169,9 @@ The skill is **instructions-only** — there are no scripts. The agent performs 
    | `findings.md` | Raw issue body + AGENT-BRIEF pasted verbatim. Safe sink for external content. |
    | `progress.md` | Initial session log entry with bootstrap timestamp. |
 
-6. **Invoke `/planning-with-files:plan`** (Stage 5) with this prompt:
-
-   > /planning-with-files:plan Interview me about this issue, then write task_plan.md to implement it. Write these two rules into task_plan.md, naming each skill explicitly so it activates when the plan is executed: (1) Use /tdd for all code and tests — tests first: red → green → refactor. (2) When writing or refactoring code, apply the andrej-karpathy-skills:karpathy-guidelines skill for code quality — surgical, simple changes.
-
-   The interview refines the seeds — sharpens phases, surfaces key questions, captures decisions to make. `task_plan.md` is the **core artifact** Stage 6 reads; `findings.md` holds the raw issue body. The prompt's last clause is load-bearing: telling the planner to **name `/tdd` and `/karpathy-guidelines` inside `task_plan.md`** is what carries the methodology into Stage 6 — `plan-goal` re-reads the plan, sees the skills called out per phase, and applies them instead of being re-told.
+6. **Invoke `/planning-with-files:plan`** (Stage 5) with the exact prompt the [`/swe-workflow:ship`](../../commands/ship.md) command uses (Stage 5, step 6) — kept there as the single source so it can't drift. That prompt has the planner **write `/tdd` and `andrej-karpathy-skills:karpathy-guidelines` as named rules into `task_plan.md`**, which carries the methodology into Stage 6: `plan-goal` re-reads the plan and applies the named skills instead of being re-told. The interview refines the AC seeds into real phases; `task_plan.md` is the **core artifact** Stage 6 reads, `findings.md` holds the raw issue body.
 7. **Invoke `/planning-with-files:plan-goal`** to execute (Stage 6) — reads `task_plan.md`, drives each phase as a goal via Claude Code's goal command; outer loop runs phases; `/tdd` is the inner loop for code-producing phases. Since the Stage 5 prompt already named `/tdd` and `/andrej-karpathy-skills:karpathy-guidelines`, the plan calls for them — `plan-goal` carries them out: test-first, surgical changes, simplicity first, no speculative abstractions, surfaced assumptions.
 8. **Close out** (Stage 7) — open the PR with the body drawn from `progress.md` highlights (the session log *is* the narrative; don't rewrite it). After it merges, [tear down](#teardown-after-pr-merges) the worktree and branch.
-
-### Tracker selection
-
-Priority order:
-
-1. **`$SWE_WORKFLOW_TRACKER`** env var (explicit override)
-2. **`tracker=<name>`** line in `.swe-workflow.conf` at the repo root
-3. **Auto-detect** from project signals:
-   - `.scratch/` directory → `local-markdown` (mattpocock's `.scratch/<feature>/` convention)
-   - github remote + `gh` installed → `github`
-   - gitlab remote + `glab` installed → `gitlab`
-   - `.linear/` directory → `linear`
-   - `$MULTICA_WORKSPACE_ID` set → `multica` (no project-level signal — Multica config is user-level)
-4. Still ambiguous → ask the user.
-
-Per-tracker fetch commands and conventions: [`trackers/<name>.md`](trackers/). To add a new tracker, write a new doc following the same shape — nothing else changes.
 
 ### Inner loop: `/tdd` for code-producing phases
 
@@ -205,21 +185,7 @@ Not every phase needs `/tdd` — exploration, config tweaks, and infra changes s
 
 ### Teardown (after PR merges)
 
-From the **main checkout** (NOT inside the worktree):
-
-```bash
-# Verify no uncommitted changes
-git -C ../<repo>-issue-<id> status --porcelain
-
-# Remove worktree
-git worktree remove ../<repo>-issue-<id>
-
-# Delete branch only if merged into the default branch
-default_branch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
-git branch --merged "$default_branch" \
-  | grep -qE "^[[:space:]]*\*?[[:space:]]*issue-<id>-<slug>$" \
-  && git branch -d "issue-<id>-<slug>"
-```
+From the **main checkout** (never inside the worktree): verify the worktree is clean, `git worktree remove`, then `git branch -d` only if it merged into the default branch. Exact commands: [REFERENCE.md](REFERENCE.md#teardown-after-pr-merge).
 
 ## Critical handoff rules
 
