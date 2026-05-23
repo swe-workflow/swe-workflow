@@ -49,9 +49,9 @@ When you make a decision on the user's behalf they'd want to review — auto-ans
 
 1. **Detect visibility**: `gh repo view --json visibility -q .visibility` (or infer from the remote).
 2. **If the repo is public**, surface the tradeoff: "`DECISIONS.md` will be committed and world-readable in git history; it records internal deliberation — keep it local-only?" — and let the user choose.
-3. **Record the choice** in `.swe-workflow.conf` at the repo root: `decisions=tracked` (default) or `decisions=local`.
-4. **On `decisions=local`**, add `DECISIONS.md` to `.gitignore`.
-5. **Always** add `DECISIONS.staged.md` to `.gitignore` (the ephemeral per-worktree staging file is never committed).
+3. **Record the choice** in `.swe-workflow.conf` at the repo root — set or **update** the `decisions=` line (`tracked` default, or `local`); don't append a duplicate if one is already present.
+4. **On `decisions=local`**, add `DECISIONS.md` to `.gitignore` **if not already listed**.
+5. **Always** add `DECISIONS.staged.md` to `.gitignore` **if not already listed** (the ephemeral per-worktree staging file is never committed).
 
 ## 5. Report
 

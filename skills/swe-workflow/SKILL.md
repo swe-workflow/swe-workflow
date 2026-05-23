@@ -5,7 +5,7 @@ description: Orchestrates the full five-stage flow from raw idea to shipped PR �
 
 # SWE Workflow
 
-The idiomatic software-engineer workflow: clarify the idea → spec it → slice it → triage it → ship it. Five stages, each with a dedicated skill and a durable artifact that feeds the next.
+The idiomatic software-engineer workflow: clarify the idea → spec it → slice it → triage it → ship it. Five stages, each with a dedicated skill and a durable artifact that feeds the next. Invoked end-to-end with no specific stage in mind, this skill is the **conductor** that drives the chain 0→7 — see [Driving the chain](#driving-the-chain-stages-07); invoked at a point, it's the map for that stage.
 
 ## Plugin commands
 
@@ -13,22 +13,29 @@ This skill ships as the **`swe-workflow` plugin**. Its actionable entry points a
 
 | Command | Stage(s) | What it does |
 |---|---|---|
+| `/swe-workflow:setup` | 0 | Bootstrap a repo: install prereqs, wrap stage-0, inject the decision-logging rule, set privacy. Idempotent. |
+| `/swe-workflow:spec [feature-or-idea]` | 1–4 | Grill → features → PRD → issues for ONE feature — leaves a `ready-for-agent` backlog. Interactive, idempotent. |
 | `/swe-workflow:ship <issue-slug>` | 5–7 | Plan → build → close out ONE issue (worktree, test-first build, PR, teardown). |
 | `/swe-workflow:ship-all [scope]` | 5–7 ×N | Run `/ship` over a backlog in dependency order — AFK issues only, pausing at HITL. |
-| `/swe-workflow:to-features` | 2 | Enumerate user-facing features into `FEATURES.md`. |
+| `/swe-workflow:to-features` | 2 | Enumerate user-facing features into `FEATURES.md` (the stage-2 step `spec` runs). |
 | `/swe-workflow:status` | — | Show planning status for the current issue. |
 
-The spec-layer stages (1 `grill-with-docs`, 3 `to-prd`, 4 `to-issues`, plus the parallel `/triage`) and the execution engine (`planning-with-files`, `tdd`, `karpathy-guidelines`) are **external skills this plugin orchestrates** — install them separately (see the plugin README). The diagram below is the conceptual chain; `/swe-workflow:ship` automates stages 5–7 of it.
+The spec-layer stages (1 `grill-with-docs`, 3 `to-prd`, 4 `to-issues`, plus the parallel `/triage`) and the execution engine (`planning-with-files`, `tdd`, `karpathy-guidelines`) are **external skills this plugin orchestrates** — install them separately (see the plugin README). The diagram below is the conceptual chain; `/swe-workflow:spec` automates stages 1–4 and `/swe-workflow:ship` stages 5–7 of it.
 
 ## The workflow
 
 ```
-┌────────────────────── SPEC LAYER (mattpocock) ──────────────────────┐
+┌──────────────── BOOTSTRAP — /swe-workflow:setup (0) ─────────────────┐
 │                                                                      │
 │  0. How is this repo set up?                                         │
 │     /setup-matt-pocock-skills ──► AGENTS.md, docs/agents/            │
 │              (one-time: tracker, triage labels, doc layout —         │
 │               wires this repo's conventions into the chain)          │
+│                                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌──────────────── SPEC LAYER — /swe-workflow:spec (1-4) ───────────────┐
 │                                                                      │
 │  1. What do I want?                                                  │
 │     /grill-with-docs ──► CONTEXT.md, ADRs                            │
@@ -56,7 +63,7 @@ The spec-layer stages (1 `grill-with-docs`, 3 `to-prd`, 4 `to-issues`, plus the 
                   (Agent grabs ONE `ready-for-agent` issue)
                                   │
                                   ▼
-┌────────── EXECUTION LAYER (worktree + planning-with-files) ──────────┐
+┌───────────── EXECUTION LAYER — /swe-workflow:ship (5-7) ─────────────┐
 │                                                                      │
 │  5. How do I plan each issue?                                        │
 │     Fetch issue (per tracker) ──► worktree + branch + seed files     │
@@ -128,6 +135,16 @@ Don't always start at stage 1 — jump to where the chain actually breaks.
 | `task_plan.md` refined, ready to implement | 6 |
 | Implementation committed, ready to open the PR + tear down | 7 |
 | External issue filed by a user, needs classification | (parallel: `/triage`) |
+
+## Driving the chain (stages 0→7)
+
+Invoked without a specific stage — *"plan this feature end-to-end," "how do I start on this idea?"* — act as the **conductor**. The chain packs into three **idempotent** building blocks; run them in order and let each skip whatever's already done:
+
+1. **`/swe-workflow:setup`** (stage 0) — only if the repo isn't bootstrapped; it skips itself otherwise.
+2. **`/swe-workflow:spec [feature-or-idea]`** (stages 1–4, *interactive*) — grill → features → PRD → issues, leaving a `ready-for-agent` backlog. Resumes from whatever specs already exist.
+3. **`/swe-workflow:ship-all`** (stages 5–7, *AFK*) — build and ship the backlog.
+
+Pause through `spec` (it interviews the human); go AFK once `ship-all` starts. A HITL issue still pauses `ship-all` and waits. **Re-invoking is safe** — each command self-detects state, so a re-run continues where the chain left off. To jump straight to a single stage instead of driving the whole thing, use [Where to enter the chain](#where-to-enter-the-chain). `/triage` stays a parallel concern — pull external issues into the backlog as needed.
 
 ## When is it done?
 
