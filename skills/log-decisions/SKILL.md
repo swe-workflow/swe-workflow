@@ -1,6 +1,6 @@
 ---
 name: log-decisions
-description: Record a consequential decision the spec didn't settle to the repo-root DECISIONS.md journal — decide-and-log when the repo grounds it, log a best-guess assumption when it's reversible, or escalate when only a human can decide. Use whenever you (or the user) make a non-trivial call worth a durable record: an under-specified requirement, a tradeoff, a deviation, a hard-to-undo action, or any call someone would want to review.
+description: Maintain a running DECISIONS.md markdown file at the repo root — an append-only journal of consequential calls the spec didn't settle. Decide-and-log when the repo grounds the call, log a best-guess assumption when it's reversible, or escalate when only a human can decide. Use whenever you (or the user) make a non-trivial call worth a durable record — an under-specified requirement, a tradeoff, a deviation, a hard-to-undo action, or any call someone would want to review.
 ---
 
 # log-decisions
@@ -48,7 +48,7 @@ One append-only `##` block in `DECISIONS.md` at the repo root. *(Inside a `/ship
 **Supersedes:** <prior timestamp> — <why>   (only on a revision)
 ```
 
-`context` = an issue ref (`auth/02`, `#57`) or `interactive/<topic>`, `grill-me/<topic>`.
+`context` = an issue ref (`auth/02`, `#57`) or a session tag (`interactive/<topic>`, `grill-me/<topic>`).
 
 **Dedup / revise / reuse.** Before appending, check for an existing entry with the same `(context, Question)`: same `Chosen` → do nothing (retries don't duplicate); changed `Chosen` → append a new entry with `Supersedes:` (never edit the original). A prior entry for the same question is itself a valid citation — `grep` for it rather than re-deciding; never bulk-load the journal.
 
