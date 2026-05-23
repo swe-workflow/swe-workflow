@@ -2,7 +2,7 @@
 
 Spec-by-example for the `log-decisions` skill. Each scenario maps a situation to the expected result in `DECISIONS.md`. These are the acceptance checks: following the skill's instructions for the situation must produce the expected entry. (Instructions-only skill — "tests" are behavioral, verified by reading the produced artifact.)
 
-Scope of this set: the entry **schema** + **direct-append** write path (issue 01), the **decision bar + escalation + content discipline** (issue 02), **dedup/supersede/precedent** (issue 03), and **worktree staging→promotion** (issue 04). S1–S13 are skill-direct behaviors; **S14–S17 are `/ship` integration** behaviors.
+Scope of this set: the entry **schema** + **direct-append** write path (issue 01), the **decision bar + escalation + content discipline** (issue 02), **dedup/supersede/precedent** (issue 03), **worktree staging→promotion** (issue 04), and **escalation parking + `/status` aggregation** (issue 05). S1–S13 are skill-direct behaviors; **S14–S21 are `/ship`(-all) integration** behaviors.
 
 ---
 
@@ -161,3 +161,35 @@ Scope of this set: the entry **schema** + **direct-append** write path (issue 01
 **Situation.** Mid-build, before close-out, with in-flight decisions logged.
 
 **Expected.** `DECISIONS.md` contains only previously **promoted** (settled) entries — the in-flight ones are **not** there yet; they live only in `DECISIONS.staged.md`, which is **gitignored** (never committed) and discarded at teardown. Open escalations are surfaced from the worktree by `/status` (issue 05), not from `DECISIONS.md`.
+
+---
+
+## Scenario 18 — an escalation parks the issue; the batch continues
+
+**Situation.** `/ship-all` is shipping a backlog. Issue B's AFK build escalates (a decision it can't justify from an artifact). Issues C and D don't depend on B.
+
+**Expected.** B is **parked** — its worktree + `DECISIONS.staged.md` left intact, the `escalated` entry logged — and B's dependents are skipped; `/ship-all` **continues** with C and D. The batch is **not** halted.
+
+---
+
+## Scenario 19 — a build failure halts the batch (distinct from an escalation)
+
+**Situation.** Issue B's build fails its 3-strike error protocol (something is broken — not a decision to make).
+
+**Expected.** `/ship-all` **halts** the batch and surfaces B. A build *failure* is a different stop-reason from an *escalation* (which would only park B and continue).
+
+---
+
+## Scenario 20 — `/status` aggregates open escalations across worktrees
+
+**Situation.** Two parked issues each have an open escalation in their worktree's `DECISIONS.staged.md`. The operator runs `/status` from the main checkout.
+
+**Expected.** `/status` enumerates live worktrees, finds both unresolved `escalated` entries, and reports them **aggregated and sorted by timestamp** ("2 open escalations across 2 worktrees: …"), each with its issue context and question. Read-only — it writes nothing.
+
+---
+
+## Scenario 21 — resolving a parked escalation re-enables the issue
+
+**Situation.** The operator answers a parked escalation.
+
+**Expected.** The agent appends a **new** entry that **supersedes** the `escalated` one (the resolution recorded, original untouched), and the parked issue can **resume** its build from where it paused.

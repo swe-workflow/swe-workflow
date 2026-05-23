@@ -220,6 +220,7 @@ Bar-crossing decisions made during a build — gate-resolutions, deviations, tra
 - **During the build (in the worktree):** append entries to `DECISIONS.staged.md` — plugin-owned, gitignored, ephemeral. Decide-and-log when a repo artifact justifies the call; otherwise **escalate** (the HITL pause).
 - **At close-out (Stage 7, from the main checkout):** promote the staged entries into repo-root `DECISIONS.md` and commit them as their own `log:` commit. Serialized by teardown, so parallel worktrees never conflict. The PR body also carries an "Autonomy decisions" section for pre-merge visibility.
 - `DECISIONS.md` is **settled history only** (append-only); open escalations are surfaced from live worktrees by `/status`.
+- **Escalations park, they don't halt.** In `/ship-all`, a mid-build escalation parks that one issue (worktree intact, dependents skipped) and the batch continues with independents; a build *failure* (3-strike) halts. `/status` from the main checkout aggregates open escalations across worktrees, so you resolve them in a batch.
 
 **Journal vs ADR.** The journal records *events* ("on this date, this was decided, by whom"); `docs/adr/` records *ratified architecture* ("this IS the decision now"). A journal entry that proves architecturally significant is **promoted to an ADR manually** — never automatically — and the entry notes the promotion. See the `log-decisions` skill for the entry schema and rules.
 

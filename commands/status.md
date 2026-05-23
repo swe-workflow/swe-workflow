@@ -1,5 +1,5 @@
 ---
-description: Show swe-workflow planning status for the current issue — phase, progress, decisions, and any logged errors from the worktree's planning files.
+description: Show swe-workflow planning status for the current issue — phase, progress, decisions, errors — and, from the main checkout, open escalations awaiting a human across all live worktrees.
 allowed-tools: Bash, Read
 ---
 
@@ -13,3 +13,13 @@ Show the planning status for the current worktree / issue.
    - **Last activity** — the most recent `progress.md` session entry.
 
 If no planning files exist in the current directory, say so and point the user at `/swe-workflow:ship <issue-slug>` to bootstrap one (or `cd` into the issue's worktree first).
+
+## Repo-wide open escalations (from the main checkout)
+
+When run from the **main checkout** (not inside an issue worktree), also surface what's waiting on a human across all in-flight issues:
+
+- Enumerate live worktrees with `git worktree list`; in each, read `DECISIONS.staged.md` for **`escalated`** entries that have no resolution.
+- Report them **aggregated and sorted by timestamp** — "<n> open escalations across <m> worktrees" — each with its issue context, question, and why it escalated.
+- Skip prunable/missing worktree paths. This is **read-only** — it never writes.
+
+This is how a returning operator finds every parked `/ship-all` decision in one place.
