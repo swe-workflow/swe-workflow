@@ -20,6 +20,7 @@ When run from the **main checkout** (not inside an issue worktree), also surface
 
 - Enumerate live worktrees with `git worktree list`; in each, read `DECISIONS.staged.md` for **`escalated`** entries that have no resolution.
 - Report them **aggregated and sorted by timestamp** — "<n> open escalations across <m> worktrees" — each with its issue context, question, and why it escalated.
+- Flagged **assumptions** (`Outcome: assumed`) are *not* shown here — they're non-blocking and surface in the PR body / journal for review. `/status` is for what's *blocking* on you.
 - Skip prunable/missing worktree paths. This is **read-only** — it never writes.
 
 This is how a returning operator finds every parked `/ship-all` decision in one place.
