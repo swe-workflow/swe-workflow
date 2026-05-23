@@ -180,6 +180,17 @@ Per-tracker fetch commands and conventions live in [`trackers/<name>.md`](tracke
 
 **Mental shorthand**: `/planning-with-files` is the project manager keeping the calendar; `/tdd` is the engineer at the keyboard. One PM, many keyboard sessions per issue.
 
+### Discovered scope
+
+Work you hit mid-build that this issue's slice didn't plan for. **Don't grow the worktree** (it breaks tracer-bullet slicing and bloats the PR), and don't just jot it in `task_plan.md` / `progress.md` — those die at teardown, so the note is lost. Route it to a durable home, then keep building:
+
+- **Belongs to this AC** (you under-estimated the slice) → do it now; if the AC was bundling behaviors, note that in `task_plan.md` so the next `/to-issues` slices finer.
+- **A new issue** (bug, follow-up, separate slice) → file it to the tracker (a `.scratch/<feature>/issues/` stub, or `gh issue create` / Linear); `/triage` classifies it later. Set `blocked-by` if it depends on this work.
+- **A new feature** → add a line to `FEATURES.md`, specced later via `/to-prd`.
+- **Rejecting it** → `.out-of-scope/<concept>.md` with the reason.
+
+Filed work won't disrupt an AFK batch — only `ready-for-agent` issues enter execution. Expanding the current issue to absorb a discovery is itself a *deviation* (log it per `log-decisions`); **escalate** only if the discovery blocks this issue and needs a human.
+
 ### When to skip stage 5 bootstrapping
 
 For trivial AFK issues (rename a flag, fix a typo, bump a version), just do it. The hook overhead of `/planning-with-files` is unjustified for <5 tool calls.

@@ -1,6 +1,6 @@
 {
   "name": "swe-workflow",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "The idiomatic software-engineering workflow: idea → PRD → issues → ship. A chain of small, observable steps connected by markdown files — not an opaque framework.",
   "author": { "name": "soulmachine" },
   "homepage": "https://github.com/swe-workflow/swe-workflow",
