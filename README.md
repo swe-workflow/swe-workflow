@@ -6,6 +6,7 @@ The idiomatic software-engineering workflow: **idea → PRD → issues → ship.
 
 | Command | What it does |
 |---|---|
+| `/swe-workflow:setup` | **Run first.** Bootstrap a repo: auto-install missing prerequisite skills, wrap stage-0, inject the always-on decision-logging rule, and set the `DECISIONS.md` privacy policy. Idempotent. |
 | `/swe-workflow:ship <issue-slug>` | Take ONE issue through **plan → build → close-out** (stages 5–7): worktree + planning files, a test-first build, PR, and teardown. The arg is an issue slug — a local-markdown path like `.scratch/feature-x/issues/02-foo.md`, or a tracker id (GitHub `#`, Linear key). |
 | `/swe-workflow:ship-all [scope]` | Run `/ship` across a backlog: walk issues in dependency order, ship each **AFK** issue, and **pause at HITL** issues. Optional scope = a feature dir; default = all `ready-for-agent` issues. |
 | `/swe-workflow:to-features` | Read `CONTEXT.md` + ADRs and enumerate user-facing features into `FEATURES.md`. |
@@ -24,7 +25,7 @@ The full workflow — stages 0–7, the parallel `/triage` concern, and the desi
 
 ### Prerequisites
 
-The workflow relies on several skills this plugin doesn't bundle — install the ones you need:
+The workflow relies on several skills this plugin doesn't bundle. **`/swe-workflow:setup` auto-installs the missing ones** (then restart to activate them); or install them manually:
 
 - [`planning-with-files`](https://github.com/OthmanAdi/planning-with-files) — the `plan` / `plan-goal` / `status` engine `/ship` runs for each issue.
 - [`andrej-karpathy-skills:karpathy-guidelines`](https://github.com/multica-ai/andrej-karpathy-skills) — code-quality guardrails (surgical, simple changes).

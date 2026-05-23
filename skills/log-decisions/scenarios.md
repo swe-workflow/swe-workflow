@@ -2,7 +2,7 @@
 
 Spec-by-example for the `log-decisions` skill. Each scenario maps a situation to the expected result in `DECISIONS.md`. These are the acceptance checks: following the skill's instructions for the situation must produce the expected entry. (Instructions-only skill — "tests" are behavioral, verified by reading the produced artifact.)
 
-Scope of this set: the entry **schema** + **direct-append** write path (issue 01), the **decision bar + escalation + content discipline** (issue 02), **dedup/supersede/precedent** (issue 03), **worktree staging→promotion** (issue 04), and **escalation parking + `/status` aggregation** (issue 05). S1–S13 are skill-direct behaviors; **S14–S21 are `/ship`(-all) integration** behaviors.
+Scope of this set: the entry **schema** + **direct-append** write path (issue 01), the **decision bar + escalation + content discipline** (issue 02), **dedup/supersede/precedent** (issue 03), **worktree staging→promotion** (issue 04), **escalation parking + `/status` aggregation** (issue 05), and the **`/swe-workflow:setup` bootstrap** (issue 06). S1–S13 are skill-direct behaviors; **S14–S21 are `/ship`(-all) integration** behaviors; **S22–S26 are `/swe-workflow:setup`** behaviors.
 
 ---
 
@@ -193,3 +193,43 @@ Scope of this set: the entry **schema** + **direct-append** write path (issue 01
 **Situation.** The operator answers a parked escalation.
 
 **Expected.** The agent appends a **new** entry that **supersedes** the `escalated` one (the resolution recorded, original untouched), and the parked issue can **resume** its build from where it paused.
+
+---
+
+## Scenario 22 — setup installs only the missing prerequisites, transparently
+
+**Situation.** `/swe-workflow:setup` runs where `planning-with-files` is already installed but the mattpocock bundle is missing.
+
+**Expected.** Setup installs only the missing skills (`mattpocock/skills`, etc.) via `claude plugin marketplace add` + `install`, **announcing each source** before pulling; `planning-with-files` is **skipped** (already present).
+
+---
+
+## Scenario 23 — setup is two-phase and tells you to restart
+
+**Situation.** Setup installs new prerequisites.
+
+**Expected.** Setup **reports what it installed and instructs a restart** (newly installed plugins aren't active until Claude Code restarts); the injected logging rule (a file write) is **effective immediately**, no restart needed. Re-running after restart verifies.
+
+---
+
+## Scenario 24 — setup is idempotent
+
+**Situation.** Setup is run a second time — the sentinel `<!-- swe-workflow:decision-logging -->` is already in `AGENTS.md`.
+
+**Expected.** The rule injection is a **no-op** (sentinel detected) — no duplicate section, user edits preserved; installs skip already-present prerequisites. Re-running is always safe.
+
+---
+
+## Scenario 25 — setup configures privacy and warns on a public repo
+
+**Situation.** Setup runs in a **public** repo.
+
+**Expected.** Setup **surfaces the oversharing tradeoff** and lets the user choose; records `decisions=tracked|local` in `.swe-workflow.conf`; on `local` it gitignores `DECISIONS.md`; it **always** gitignores `DECISIONS.staged.md`.
+
+---
+
+## Scenario 26 — setup degrades gracefully without the mattpocock skill
+
+**Situation.** `/setup-matt-pocock-skills` is not installed.
+
+**Expected.** Setup **skips** the mattpocock wrap and **warns** the bootstrap didn't run, but **still injects** the logging rule and does the privacy config — the plugin-owned parts don't depend on the external skill.
