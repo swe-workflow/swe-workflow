@@ -23,11 +23,7 @@ The idiomatic software-engineer workflow: clarify the idea → spec it → slice
 - **Claude Code** — invoke the six `/swe-workflow:*` commands (thin `commands/` shims that run the matching procedure), or invoke this `swe-workflow` skill to drive the whole chain.
 - **Other agents** — invoke the `swe-workflow` skill and say what you want (*"ship issue 42"*); it routes to the right stage's reference file.
 
-Two other skills ship in the suite: **`to-features`** (stage 2 — split the project into coarse features in `FEATURES.md`) and **`log-decisions`** (the decision journal). The external skills it orchestrates — `grill-with-docs`, `to-prd`, `to-issues`, `triage` (mattpocock), `planning-with-files`, `tdd`, `karpathy-guidelines` — install separately (the [setup procedure](references/setup.md) auto-installs them).
-
-This `swe-workflow` skill is the **conductor + map**: it documents the whole chain and drives stages 0→7 when invoked without a specific stage (see [Driving the chain](#driving-the-chain-stages-07)).
-
-The spec-layer stages (1 `grill-with-docs`, 3 `grill-with-docs` + `to-prd` (run by `/grill-feature`), 4 `to-issues`, plus the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`, `karpathy-guidelines`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; the **spec** procedure automates stages 1–4 and **ship** stages 5–7 of it.
+Two companion skills ship in the suite — **`to-features`** (stage 2 — split the project into coarse features in `FEATURES.md`) and **`log-decisions`** (the decision journal). The spec-layer skills (`grill-with-docs`, `to-prd`, `to-issues`, and the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`, `karpathy-guidelines`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; **spec** automates stages 1–4 of it and **ship** stages 5–7.
 
 ## The workflow
 
@@ -164,49 +160,11 @@ The mirror image of "Where to enter the chain" — four levels of "done", four s
 | Feature | All issues from its PRD merged | `FEATURES.md` strike-through w/ shipped refs |
 | Project | (no native concept — judgment call) | — |
 
-A feature's completion is mechanical: walk from the PRD to its child issues (via the parent reference `/to-issues` writes), confirm all closed, then strike through the `FEATURES.md` line:
-
-```
-- [x] ~~user-can-reset-password~~ — ~~A user can reset...~~ (shipped: #42, #43, #44)
-```
-
-Software projects rarely "complete" — features keep getting added. If you need a hard milestone, layer on your tracker's mechanism (`gh milestone`, Linear cycles, release tags) and define "project complete" as that milestone closing. See [REFERENCE.md](REFERENCE.md#completion-signals) for per-tracker completion queries.
+Phase/issue/feature completion is a **fact** the toolchain verifies; project completion is a **judgment call** it stays out of — layer on `gh milestone` / Linear cycles / release tags if you need a hard milestone. The mechanical walk (PRD → child issues → confirm closed → strike the `FEATURES.md` line) and per-tracker completion queries are in [REFERENCE.md](REFERENCE.md#completion-signals).
 
 ## Stages 5-7: worktree + planning-with-files
 
-The skill is **instructions-only** — there are no scripts. The agent performs each step manually, adapting to the team's issue tracker.
-
-### Bootstrap
-
-1. **Pick the tracker** — [tracker selection](trackers/README.md#selection--which-adapter).
-2. **Fetch the issue** per [`trackers/<name>.md`](trackers/) → a [normalized issue](trackers/README.md#normalized-issue) (title, body, labels, AGENT-BRIEF).
-3. **Derive paths** — `slug`, `branch`, `worktree` per the [tracker contract](trackers/README.md#branch--worktree-naming).
-4. **Create the worktree**: `git worktree add ../<repo>-issue-<id> -b issue-<id>-<slug>`
-5. **`cd` in and seed** three planning files:
-
-   | File | Contents |
-   |---|---|
-   | `task_plan.md` | Goal = title; Phases = AC checkboxes. **Structured fields only** (hook re-injection risk). |
-   | `findings.md` | Raw issue body + AGENT-BRIEF pasted verbatim. Safe sink for external content. |
-   | `progress.md` | Initial session log entry with bootstrap timestamp. |
-
-6. **Invoke `/planning-with-files:plan`** (Stage 5) with the exact prompt the [ship procedure](references/ship.md) carries (Stage 5, step 6) — kept there as the single source so it can't drift. That prompt has the planner **write `/tdd` and `andrej-karpathy-skills:karpathy-guidelines` as named rules into `task_plan.md`**, which carries the methodology into Stage 6: `plan-goal` re-reads the plan and applies the named skills instead of being re-told. The interview refines the AC seeds into real phases; `task_plan.md` is the **core artifact** Stage 6 reads, `findings.md` holds the raw issue body.
-7. **Invoke `/planning-with-files:plan-goal`** to execute (Stage 6) — reads `task_plan.md`, drives each phase to completion (planning-with-files' `plan-goal`); outer loop runs phases; `/tdd` is the inner loop for code-producing phases. Since the Stage 5 prompt already named `/tdd` and `/andrej-karpathy-skills:karpathy-guidelines`, the plan calls for them — `plan-goal` carries them out: test-first, surgical changes, simplicity first, no speculative abstractions, surfaced assumptions.
-8. **Close out** (Stage 7) — open the PR with the body drawn from `progress.md` highlights (the session log *is* the narrative; don't rewrite it). After it merges, [tear down](#teardown-after-pr-merges) the worktree and branch.
-
-### Inner loop: `/tdd` for code-producing phases
-
-`/planning-with-files:plan-goal` is the **outer loop** (phases, state, errors); `/tdd` is the **inner loop** (one failing test → one minimal fix). For each phase in `task_plan.md` that produces testable code:
-
-```
-Mark phase in_progress  →  /tdd (red → green → refactor)  →  log to progress.md  →  Mark phase complete
-```
-
-Not every phase needs `/tdd` — exploration, config tweaks, and infra changes skip it. See [REFERENCE.md](REFERENCE.md#inner-loop-tdd-within-each-code-producing-phase) for the full nuances (multiple cycles per phase, decision/error capture, when `/tdd`'s own planning step duplicates vs. complements the issue-level plan).
-
-### Teardown (after PR merges)
-
-From the **main checkout** (never inside the worktree): verify the worktree is clean, `git worktree remove`, then `git branch -d` only if it merged into the default branch. Exact commands: [REFERENCE.md](REFERENCE.md#teardown-after-pr-merge).
+The diagram above is the map. The procedure is single-sourced in [`references/ship.md`](references/ship.md) (one issue) and [`references/ship-all.md`](references/ship-all.md) (the backlog) — **instructions-only, no scripts**, **idempotent** (a re-run resumes or no-ops via ship.md's re-run check), carrying the single-source planner prompt (ship.md Stage 5, step 6) that bakes `/tdd` + `karpathy-guidelines` into `task_plan.md`. Per-stage detail — the `/tdd` inner loop, discovered scope, HITL, teardown commands, the decision journal — is in [REFERENCE.md](REFERENCE.md#stage-5-worktree--planning-with-files--build-it). The bootstrap enforces the [security boundary](#security-boundary) below: structured fields only in `task_plan.md`, raw external text in `findings.md`.
 
 ## Critical handoff rules
 

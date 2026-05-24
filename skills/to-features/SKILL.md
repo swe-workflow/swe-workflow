@@ -41,7 +41,7 @@ stage 4   /to-issues ─► tracer-bullet issues
 
 ## AFK-friendly and pausable
 
-Like the rest of the spec layer, the high-level grill is **AFK-friendly**: it offers a recommended answer to each question and applies the **[`log-decisions`](../log-decisions/SKILL.md)** rules to keep moving when you're away — decide what's determinable, take a reversible default and log it as an **assumption** — but it **pauses and escalates** on an unsure HITL call (e.g. committing the v1 scope a stakeholder owns) rather than guess.
+Like the rest of the spec layer, the high-level grill is **AFK-friendly**: it offers a recommended answer to each question and applies the **[`log-decisions`](../log-decisions/SKILL.md)** rules (decide / assume) to keep moving when you're away, but **pauses and escalates** on an unsure HITL call (e.g. committing the v1 scope a stakeholder owns) rather than guess.
 
 **Record feature-scope decisions.** A coarse-feature call someone would want to review — **including or dropping** a feature, **splitting or merging**, **deferring to vNext** — is journal-worthy: log it via `log-decisions` (`gate-resolution` / `tradeoff`), citing the grill / `CONTEXT.md` / ADR that grounded it. **Rejecting** a feature → write the reason to `.out-of-scope/<concept>.md` *and* log a `deviation` / `tradeoff` pointing at it.
 
