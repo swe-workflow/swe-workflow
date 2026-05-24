@@ -14,7 +14,7 @@ Split the project into **coarse-grained, user-facing features** → `FEATURES.md
 - `CONTEXT.md` is a glossary and `docs/adr/` are sparse architectural calls — **neither enumerates features.** The feature set has to be *elicited*, not read off.
 - The distinct **stage-1 project grill** that runs first grounds *domain language*; `to-features`' grill builds on it (ideally continuing that conversation, for context) but aims at *features*.
 
-Keep the *granularity* **coarse** — one big user-facing capability per feature (`user-can-post-photo`), never the fine detail of any one (that's `/grill-feature`'s job). But keep the *context* **rich**: everything the grill surfaced about a feature goes into its block, because that block is the seed `/grill-feature` reads — losing it makes the next stage start cold. Granularity sharpens downstream:
+Keep the *granularity* **coarse** — one big user-facing capability per feature (`user-can-post-photo`), never the fine detail of any one (that's `/grill-feature`'s job). But keep the *context* **rich** — capture what the grill surfaced about each feature (the [File format](#file-format) fields). Granularity sharpens downstream:
 
 ```
 stage 1   /grill-with-docs ─► CONTEXT.md + docs/adr/        (domain grounding)
@@ -33,7 +33,7 @@ stage 4   /to-issues ─► tracer-bullet issues
 
 1. **Ground on stage 1** — read the existing `CONTEXT.md` + `docs/adr/`, and pick up the stage-1 grill conversation if it's still live.
 2. **Invoke `/grill-with-docs` at a high level** — drive the product-level interview that surfaces the major capabilities, the actors, and where v1 begins and ends. This *is* the interview; `to-features` doesn't run a separate bespoke one.
-3. **Capture each coarse feature as a block** — a `- [ ]` header line (kebab-case slug + one-line summary, actor-first, behavioral not implementation — `user-can-reset-password`, never `add-bcrypt-hashing`) **plus an indented detail block** recording what the grill surfaced: actor, value, rough scope, dependencies, open questions, constraints/conventions. Coarse *granularity*, rich *context* — see [File format](#file-format). Don't thin a feature back to a one-liner; the captured context is what `/grill-feature` starts from.
+3. **Capture each coarse feature as a block** — a `- [ ]` header line (kebab-case slug + one-line summary, actor-first, behavioral not implementation — `user-can-reset-password`, never `add-bcrypt-hashing`) **plus an indented detail block** recording what the grill surfaced: actor, value, rough scope, dependencies, open questions, constraints/conventions. Coarse *granularity*, rich *context* — see [File format](#file-format).
 4. **Surface the list** for a last look, then **write `FEATURES.md`** at the repo root.
 5. *(Optional, local-markdown teams)* `mkdir -p .scratch/<feature-slug>/issues` per pending feature to stub the layout downstream stages fill.
 
@@ -41,13 +41,13 @@ stage 4   /to-issues ─► tracer-bullet issues
 
 ## AFK-friendly and pausable
 
-Like the rest of the spec layer, the high-level grill is **AFK-friendly**: it offers a recommended answer to each question and applies the **[`log-decisions`](../log-decisions/SKILL.md)** rules to keep moving when you're away — decide what's determinable, take a reversible default and log it as an **assumption** — but it **pauses and escalates** on an unsure HITL call (e.g. committing the v1 scope a stakeholder owns) rather than guess. (In execution that same escalation would *persist for batch review* instead of pausing — see [`spec.md`](../swe-workflow/references/spec.md).)
+Like the rest of the spec layer, the high-level grill is **AFK-friendly**: it offers a recommended answer to each question and applies the **[`log-decisions`](../log-decisions/SKILL.md)** rules to keep moving when you're away — decide what's determinable, take a reversible default and log it as an **assumption** — but it **pauses and escalates** on an unsure HITL call (e.g. committing the v1 scope a stakeholder owns) rather than guess.
 
 **Record feature-scope decisions.** A coarse-feature call someone would want to review — **including or dropping** a feature, **splitting or merging**, **deferring to vNext** — is journal-worthy: log it via `log-decisions` (`gate-resolution` / `tradeoff`), citing the grill / `CONTEXT.md` / ADR that grounded it. **Rejecting** a feature → write the reason to `.out-of-scope/<concept>.md` *and* log a `deviation` / `tradeoff` pointing at it.
 
 ## File format
 
-Each feature is a `- [ ]` **header line** + an **indented detail block** capturing what the high-level grill surfaced — the rich seed `/grill-feature` reads to start informed, instead of a bare slug. The fields below are a **guide**: fill what the grill produced, skip what doesn't apply, but don't collapse a feature to one line — preserved context is the whole point.
+Each feature is a `- [ ]` **header line** + an **indented detail block** capturing what the high-level grill surfaced — the seed `/grill-feature` reads. The fields below are a **guide**: fill what the grill produced, skip what doesn't apply, but don't thin a feature back to a one-liner.
 
 ```markdown
 # Features
@@ -96,7 +96,7 @@ Mark the **header line** with strikethrough + a shipped reference (issue number,
 
 ## Why this skill exists
 
-mattpocock's chain (`/to-prd`, `/to-issues`, `/triage`) is engineering-side — it assumes the feature set already exists. `/to-prd` deliberately **doesn't interview**; it synthesizes from a conversation. So the work of *eliciting what the features are* has no home in that chain. `to-features` is that home: the **PM step** that grills the project at a high level and writes the coarse backlog — each feature a rich block — that `/grill-feature` then specs one at a time.
+mattpocock's chain (`/to-prd`, `/to-issues`, `/triage`) is engineering-side — it assumes the feature set already exists. `/to-prd` deliberately **doesn't interview**; it synthesizes from a conversation. So the work of *eliciting what the features are* has no home in that chain. `to-features` is that home: the **PM step** that grills the project at a high level and writes the coarse backlog that `/grill-feature` then specs one at a time.
 
 It reads engineering artifacts (`CONTEXT.md`, ADRs) but its output (`FEATURES.md`) is user-facing product language — the deliberate seam where product reasoning enters the chain.
 

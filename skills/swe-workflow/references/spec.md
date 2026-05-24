@@ -6,7 +6,7 @@ Run the **spec layer** — stages 1 → 2 → 3 → 4 — turning an idea into a
 
 Per-stage detail (including when to skip each) is in [REFERENCE.md](../REFERENCE.md).
 
-**AFK-friendly — but it pauses for you.** `grill-with-docs`, `to-features`, and `to-issues` interview you intensively, yet each is AFK-friendly: when you're away it offers recommended answers and applies the `log-decisions` rules to decide or assume the determinable and reversible calls, recording them in the journal. What it **won't** settle alone is an **unsure HITL call** (irreversible, needs your context) — there it **pauses and escalates**, and waits. That's the line to execution: **spec pauses on an unsure HITL call; `/ship` and `/ship-all` ([`ship.md`](ship.md), [`ship-all.md`](ship-all.md)) persist it for your batch review and keep going** — same `log-decisions` rules in both, opposite reaction to the one call only you can make.
+**AFK-friendly — but it pauses for you.** `grill-with-docs`, `to-features`, and `to-issues` interview you intensively, yet each is AFK-friendly: when you're away it offers recommended answers and applies the `log-decisions` rules to decide or assume the determinable and reversible calls, recording them in the journal. What it **won't** settle alone is an **unsure HITL call** (irreversible, needs your context) — there it **pauses and escalates**, and waits. (Execution reacts to that same call differently — it persists rather than pauses; see [Driving the chain](../SKILL.md#driving-the-chain-stages-07).)
 
 ## Idempotent by design — do only what's missing
 Detect where the feature already is in the spec layer and resume; never clobber or duplicate. Each stage states its skip condition; run only the stages whose artifact is absent or stale.
