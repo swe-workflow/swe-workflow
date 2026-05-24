@@ -4,12 +4,6 @@ The idiomatic software-engineering workflow: **Idea → PRDs → Issues → ship
 
 It ships as **[Agent Skills](https://agentskills.io)**, so it runs on **Claude Code, Codex, Gemini CLI, Cursor**, and any other skills-compatible agent. Pure markdown — no scripts, no build.
 
-## The skill
-
-`swe-workflow` is **one skill** that conducts the whole chain. Each stage is a procedure it runs on demand; on Claude Code each is also a slash command.
-
-One companion skill ships alongside: **`log-decisions`** (the append-only `DECISIONS.md` journal). A typical run is **setup → spec → ship-all**.
-
 ## Install
 
 ### Claude Code
@@ -72,16 +66,13 @@ Those right-hand artifacts are the interface between stages — the files, not t
 
 ## A typical run
 
-Spelled out for a fresh project — what to run at each stage, and the artifact it leaves behind:
+Spelled out for a fresh project — three commands, and what each leaves behind:
 
 1. `/swe-workflow:setup` *(stage 0)* — run once at the repo root; bootstraps the repo and auto-installs the external skills the later stages need.
-2. `/grill-with-docs` *(stage 1)* — grill the domain → `CONTEXT.md` + `docs/adr/`.
-3. `/swe-workflow:to-features` *(stage 2)* — split the project into coarse features → `FEATURES.md`.
-4. `/swe-workflow:grill-feature` *(stage 3)* — once **per feature** → one PRD each.
-5. `/to-issues` *(stage 4)* — once **per PRD** → tracer-bullet issues, auto-labeled `ready-for-agent`.
-6. `/swe-workflow:ship-all` *(stages 5–7)* — build and ship the whole backlog, AFK.
+2. `/swe-workflow:spec` *(stages 1–4)* — the spec layer, AFK-friendly: grill the domain → coarse features → a PRD per feature → tracer-bullet issues. Leaves `CONTEXT.md` + ADRs, `FEATURES.md`, PRDs, and a backlog of `ready-for-agent` issues.
+3. `/swe-workflow:ship-all` *(stages 5–7)* — build and ship the whole backlog, AFK.
 
-`/grill-with-docs` and `/to-issues` are external (mattpocock) skills, while `/swe-workflow:to-features` and `:grill-feature` are commands in this suite — and stages 1–4 are exactly what `/swe-workflow:spec` runs for you. Drive the stages by hand, or run `/swe-workflow:spec` then `/swe-workflow:ship-all` for the hands-off path.
+Prefer to drive the spec layer by hand? Run its four stages as separate commands — `/grill-with-docs` (1) → `/swe-workflow:to-features` (2) → `/swe-workflow:grill-feature` (3, per feature) → `/to-issues` (4, per PRD). `/grill-with-docs` and `/to-issues` are external (mattpocock) skills; `:to-features` and `:grill-feature` are commands in this suite.
 
 ## License
 
