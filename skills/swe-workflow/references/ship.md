@@ -16,8 +16,8 @@ Rationale, the security boundary, and per-tracker fetch commands live alongside 
    - **Closed/merged, worktree still present** → a prior run merged but didn't finish: **complete the teardown** (Stage 7's journal promote + `git worktree remove` + branch delete), then stop.
    - **Closed/merged, no worktree** → report "already shipped" and stop; don't redo it.
    - **Worktree exists, issue still open** → resuming an interrupted or parked ship: `cd` in and continue from `task_plan.md`'s recorded state; never re-bootstrap or clobber its planning files.
-   - **Otherwise** → `git worktree add ../<repo>-issue-<id> -b issue-<id>-<slug>` and work inside it.
-5. **Seed the three planning files** (security boundary — structured fields only in `task_plan.md`; raw external text in `findings.md`):
+   - **Otherwise** → `git worktree add ../<repo>-issue-<id> -b issue-<id>-<slug>`, then **`cd` into the worktree** — the rest of this stage runs from the worktree root, never the main checkout.
+5. **Seed the three planning files at the worktree root** — the cwd from step 4, *not* the main checkout (step 6's parameterless skill resolves the plan by cwd; parallel issues must never share one file). Security boundary — structured fields only in `task_plan.md`; raw external text in `findings.md`:
    - `task_plan.md` — Goal = title; Phases = AC checkboxes.
    - `findings.md` — raw issue body + AGENT-BRIEF, pasted verbatim.
    - `progress.md` — initial bootstrap log entry.
