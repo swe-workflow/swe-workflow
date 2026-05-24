@@ -73,7 +73,7 @@ Each feature is a `- [ ]` **header line** + an **indented detail block** capturi
 - ~~**user-can-stream-video**~~ — rejected for v1 (see `.out-of-scope/video-streaming.md`)
 ```
 
-The header line stays terse and actor-first (it's what `/status` and the chain scan); the block holds the depth. Slugs are kebab-case and unique — they're how `/grill-feature` and issues reference a feature.
+The header line stays terse and actor-first (it's what `/status` and the chain scan); the block holds the depth. Slugs are kebab-case and unique — they're how `/grill-feature` and issues reference a feature. **`Depends on:`** lists the slugs of other **features** this one needs first — **features only** (issue-level ordering is each issue's own `blocked-by`). It's read by `/grill-feature` for context and **orders feature-session launch** (a feature waits until its dependencies have shipped; see [Session topology](../REFERENCE.md#session-topology)).
 
 ## Discipline: when a feature ships, strike it through (don't delete)
 

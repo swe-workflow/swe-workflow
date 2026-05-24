@@ -152,6 +152,8 @@ Invoked without a specific stage — *"plan this feature end-to-end," "how do I 
 
 **Spec is pausable; execution stays automatic via post-batch review.** Both blocks are **AFK-friendly** and record decisions via `log-decisions`; the **key difference** is what happens on an **unsure HITL call** (one only you can make). **Spec (1–4) pauses** to ask — its interviews proceed on recommended answers when you're away, stopping only to escalate a call that genuinely needs you. **Ship-all persists instead** — it journals and **parks** the escalation for your **batch review** (via [`/status`](references/status.md)) and keeps shipping independent issues, so the AFK batch never blocks (a pre-declared HITL issue is the exception — `ship-all` won't attempt it unattended and waits). **Re-invoking is safe** — each command self-detects state, so a re-run continues where the chain left off. To jump straight to a single stage instead of driving the whole thing, use [Where to enter the chain](#where-to-enter-the-chain). `/triage` stays a parallel concern — pull external issues into the backlog as needed.
 
+**How you map the chain onto actual CLI sessions** — one long session, one per feature, or one per issue — is the operator's call, trading context warmth against isolation; see [Session topology](REFERENCE.md#session-topology).
+
 ## When is it done?
 
 The mirror image of "Where to enter the chain" — four levels of "done", four signals:

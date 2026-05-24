@@ -204,9 +204,37 @@ Bar-crossing decisions made during a build — gate-resolutions, deviations, tra
 
 **Journal vs ADR.** The journal records *events* ("on this date, this was decided, by whom"); `docs/adr/` records *ratified architecture* ("this IS the decision now"). A journal entry that proves architecturally significant is **promoted to an ADR manually** — never automatically — and the entry notes the promotion. See the `log-decisions` skill for the entry schema and rules.
 
-## Parallel execution
+## Session topology
 
-`/ship-all` runs the backlog **sequentially — one worktree at a time** ([`references/ship-all.md`](references/ship-all.md)); it never auto-fans-out. The worktree-per-issue isolation ([handoff rule #4](SKILL.md#critical-handoff-rules)) exists to make *optional, human-driven* parallelism **safe**, not to have the loop run issues concurrently. To parallelize, a human starts a separate `/ship` (or a feature-scoped `/ship-all`) per independent unit, each in its own session.
+How to map the 0→7 chain onto agent CLI sessions — host-neutral operator guidance, not a mandated mechanism. **Files are the interface**, so a session can end wherever a durable artifact exists and the next one resumes from it (`CONTEXT.md` / `FEATURES.md` / PRD / issue + AGENT-BRIEF). But those artifacts are a *lossy* compression of the grilling conversation — rejected alternatives, the "why we landed here," the priority feel don't all survive. So every cut trades **context warmth** (fidelity to intent) against **isolation** (clean context, observability, parallelism, a fresh context for the [adversarial-review](#adversarial-review-before-close-out) gate). Three points on that spectrum:
+
+**Option 1 — one long-running session for the whole project.** *Concurrency: none — every stage, feature, and issue runs sequentially* in a single session (execution here is `/ship-all` run inline).
+
+- *Buys:* maximum warmth and zero setup — domain understanding stays hot; compaction holds conventions.
+- *Costs:* the "ball of mud" the suite exists to avoid — by feature 3 the context is clogged with feature 1's grill and feature 2's PRD, and compaction across *unrelated* work drops the wrong things; the author also reviews its own work.
+
+**Option 2 — one session per feature.** *Concurrency: feature-level — independent features run in parallel.* Spec the top of the chain once, then each feature owns stages 3→7.
+
+1. **Stage 0** alone, then exit.
+2. **Stage 1** (`/grill-with-docs`) — a fresh session or a continuation of stage 0, either works — then **Stage 2** (`/to-features`) in the *same* session, since `/to-features` builds on the stage-1 domain grill.
+3. **A session per dependency-free feature, launched as blockers clear** — start a feature's session only when its `Depends on:` features (in `FEATURES.md`) are **done** (all their issues merged — see [Completion signals](#completion-signals)); a feature with unmet blockers waits and gets its session once they land. Each session runs `/grill-feature` (stage 3) → `/to-issues` (stage 4) → a **feature-scoped [`/ship-all`](references/ship-all.md)** (stages 5–7), shipping that feature's issues **one at a time inside the one session** — each `/ship` spins up its worktree, the session `cd`s in to build, then tears it down before the next. The session persists while the worktrees come and go.
+
+- *Buys:* the **lowest information loss across the spec→execution seam** — the feature's grilling context stays warm while its issues are built.
+- *Costs:* a feature's issues share one context (a smaller ball of mud — and by the last issue the grill context you wanted is buried under earlier issues' build noise); spec and build share one context and security posture; no per-issue parallelism.
+
+**Option 3 — one session per issue.** *Concurrency: issue-level — independent issues run in parallel.* Option 2's spec handling, but the feature session ends at the backlog.
+
+1. As Option 2 through stages 3–4, but **exit each feature session once `/to-issues` has run** — PRD + issues + AGENT-BRIEF are the handoff.
+2. **A session per unblocked issue, run in parallel** — for each issue whose `blocked-by` have merged, spin up its own session and [`/ship`](references/ship.md) it; as dependencies land, newly-unblocked issues get their own. This is Option 2's `/ship-all` loop **unrolled and fanned out** — one `/ship` per session, [clean context per issue](#clean-context-per-issue).
+
+- *Buys:* per-issue isolation — each issue builds only from its durable inputs, a fresh reviewer is cheap, and state stays durable+observable rather than fragile-and-warm.
+- *Costs:* the handoff leans entirely on the artifact, so a thin AGENT-BRIEF surfaces as a build gap instead of being silently covered by warm context. The remedy is a **richer artifact, not a longer session**: push the tacit into the AGENT-BRIEF / seed `findings.md`, and mark genuinely context-hungry issues **HITL** so a human fills the gap at the checkpoint.
+
+**Choosing.** Default to **Option 3** for AFK / observable / parallel-ready work: it honors every execution-layer invariant (worktree-per-issue, clean context per issue, the review gate) and keeps the *high-loss* boundary (grill → PRD → issues) warm in one spec session while cutting only at the *low-loss* one (issues → build). Choose **Option 2** when intent-fidelity outweighs isolation and the features are small, tightly-knit, and interactive. **Option 1** is for toy scope. Picking Option 2 or 3 only sets the *granularity* of concurrency; which of those concurrent runs is actually *safe* is the subject of [Parallel execution](#parallel-execution) (independent units only). The throughline: *the cure for a lossy artifact is a better artifact, not a longer session* — the long session's richness isn't durable, and the suite is built for work that outlives any one session.
+
+### Parallel execution
+
+The safety rulebook for running Option 2 or 3 sessions concurrently — which granularity is safe, and what breaks when you do. `/ship-all` itself runs the backlog **sequentially — one worktree at a time** ([`references/ship-all.md`](references/ship-all.md)) and never auto-fans-out; the concurrency is always *optional and human-driven*, and the worktree-per-issue isolation ([handoff rule #4](SKILL.md#critical-handoff-rules)) is what makes it **safe**.
 
 **This doesn't contradict "one feature at a time"** (Anthropic, *Effective harnesses for long-running agents* — see [Further reading](#further-reading)). That rule bounds *what a single agent-iteration takes on* — don't one-shot a whole app and exhaust the context mid-feature — not *how many agents run at once*. Each worktree here is bound to one **issue** (a tracer-bullet slice, finer than the article's "feature"), so the bound holds whether one or several run. The violation to avoid is the inverse: one agent swallowing multiple issues to save worktrees, which rule #4 forbids.
 
@@ -214,8 +242,10 @@ Bar-crossing decisions made during a build — gate-resolutions, deviations, tra
 
 | Across… | Verdict | Why |
 |---|---|---|
-| Independent features (different PRDs, no `blocked-by`, disjoint code) | Safe — the sweet spot | Small disjoint diffs, no dependency ordering, low merge-conflict surface. |
+| Independent features (different PRDs, no `Depends on:`, disjoint code) | Safe — the sweet spot | Small disjoint diffs, no dependency ordering, low merge-conflict surface. |
 | Tracer-bullet slices of the *same* feature | Usually unsafe | Slices are deliberately *vertical* (schema → API → UI → tests, handoff rule #2), so two slices of one feature tend to touch the same schema/types/routing; a natural build order often `blocked-by`-serializes them anyway. |
+
+So **Option 3's issue-level concurrency is safe *across* features but collapses to the unsafe row for two slices of the *same* feature** — Option 2's feature-level concurrency is the safe sweet spot by construction.
 
 **The execution failure modes mutate under parallelism — they don't vanish:**
 
@@ -228,7 +258,7 @@ Bar-crossing decisions made during a build — gate-resolutions, deviations, tra
 - [`/status`](references/status.md) aggregates open escalations across worktrees, so one human can supervise several concurrent AFK ships.
 - Worktree + branch + planning-file isolation means no shared mutable state *during* a build.
 
-**Guardrail:** parallelize only units with **no `blocked-by` relationship and minimal file overlap**; keep same-feature vertical slices sequential.
+**Guardrail:** parallelize only units with **no unresolved dependency and minimal file overlap**; keep same-feature vertical slices sequential.
 
 ## Always-on engineering rules
 
