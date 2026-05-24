@@ -23,7 +23,7 @@ Stages 0→7, split into two layers plus a parallel concern. Each **stage proced
 
 - **Stage 0 — `/setup`**: one-time per-repo bootstrap (install prereq skills, inject the always-on rules, set the `DECISIONS.md` privacy policy). Idempotent.
 - **Stages 1–4 — `/spec`** (*spec layer*, AFK-friendly): grill domain → split into coarse features → grill + PRD each feature (`/grill-feature`) → tracer-bullet issues. Leaves a `ready-for-agent` backlog.
-- **Stages 5–7 — `/ship` (one issue) and `/ship-all` (the backlog, AFK)** (*execution layer*): worktree + planning-with-files → test-first build → PR + teardown.
+- **Stages 5–7 — `/ship` (one issue) and `/ship-all` (the backlog, AFK)** (*execution layer*): worktree + planning-with-files → test-first build → adversarial review → PR + teardown.
 - **Parallel — `/triage`**: a state machine over *external* issues; **not** in the critical path (chain-created issues are auto-labeled `ready-for-agent`).
 - The **`swe-workflow` skill itself** is the conductor for the whole 0→7 chain when invoked without a specific stage.
 

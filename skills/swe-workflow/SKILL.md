@@ -89,6 +89,8 @@ The idiomatic software-engineer workflow: clarify the idea → spec it → slice
 │              (sub-tasks already name /tdd + /karpathy-guidelines)    │
 │                                                                      │
 │  7. How do I close out each issue?                                   │
+│     Adversarial review ──► fresh read-only diff-vs-AC check          │
+│              (separation of duties — reviewer ≠ implementer)         │
 │     progress.md highlights ──► PR body / closing comment             │
 │              (the session log IS the PR narrative — don't rewrite)   │
 │                                                                      │
@@ -165,7 +167,7 @@ Phase/issue/feature completion is a **fact** the toolchain verifies; project com
 
 ## Stages 5-7: worktree + planning-with-files
 
-The diagram above is the map. The procedure is single-sourced in [`references/ship.md`](references/ship.md) (one issue) and [`references/ship-all.md`](references/ship-all.md) (the backlog) — **instructions-only, no scripts**, **idempotent** (a re-run resumes or no-ops via ship.md's re-run check), carrying the single-source planner prompt (ship.md Stage 5, step 6) that bakes `/tdd` + `karpathy-guidelines` into `task_plan.md`. Per-stage detail — the `/tdd` inner loop, discovered scope, HITL, teardown commands, the decision journal — is in [REFERENCE.md](REFERENCE.md#stage-5-worktree--planning-with-files--build-it). The bootstrap enforces the [security boundary](#security-boundary) below: structured fields only in `task_plan.md`, raw external text in `findings.md`.
+The diagram above is the map. The procedure is single-sourced in [`references/ship.md`](references/ship.md) (one issue) and [`references/ship-all.md`](references/ship-all.md) (the backlog) — **instructions-only, no scripts**, **idempotent** (a re-run resumes or no-ops via ship.md's re-run check), carrying the single-source planner prompt (ship.md Stage 5, step 6) that bakes `/tdd` + `karpathy-guidelines` into `task_plan.md`. Per-stage detail — the `/tdd` inner loop, [clean context per issue](REFERENCE.md#clean-context-per-issue), discovered scope, the [adversarial review](REFERENCE.md#adversarial-review-before-close-out) gate before close-out, HITL, teardown commands, the decision journal — is in [REFERENCE.md](REFERENCE.md#stage-5-worktree--planning-with-files--build-it). The bootstrap enforces the [security boundary](#security-boundary) below: structured fields only in `task_plan.md`, raw external text in `findings.md`.
 
 ## Critical handoff rules
 

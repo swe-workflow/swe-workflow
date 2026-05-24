@@ -128,6 +128,17 @@ The selection algorithm (priority order), the normalized-issue schema, AGENT-BRI
 
 **Mental shorthand**: `/planning-with-files` is the project manager keeping the calendar; `/tdd` is the engineer at the keyboard. One PM, many keyboard sessions per issue.
 
+### Clean context per issue
+
+The worktree isolates *files* per issue; the agent's *context* is the one piece that doesn't reset between issues. Because the planning files are the whole handoff — the security boundary and *files are the interface* make that literal — the per-issue work needs nothing carried over in-context, so each issue can, and ideally should, run in a **fresh context**.
+
+**Recommended, host-neutral, not a mandated step.** Where the host supports it, run the per-issue work (seed → plan → build) in a fresh context rooted in the worktree — a sub-agent, or a new CLI session (`claude`, `codex`, `gemini`, …) launched once the worktree exists. Where it isn't, lean on **compaction**: modern compaction retains conventions across a long session, so one long-running session stays clean enough — a hard per-issue reset is an optimization, not a requirement. This applies the "initializer + coding agent / clean-state-per-session" lineage in [Further reading](#further-reading) at the granularity of one issue.
+
+Two limits keep it from over-reaching:
+
+- **It stays guidance, never a scripted spawn.** Mandating a launch command would break the cross-agent, scriptless contract — the command, headless/interactive mode, auth, and session lifecycle all differ per host. The procedure asks for *a clean context*; how you obtain one is the host's business.
+- **AFK vs HITL.** A fresh *headless* context fits AFK issues; a **HITL** issue needs an *interactive* context so its documented checkpoints can still pause. Either way `/ship-all` stays [sequential](#parallel-execution) — clean-context-per-issue is context hygiene, not concurrency.
+
 ### Discovered scope
 
 Work you hit mid-build that this issue's slice didn't plan for. **Don't grow the worktree** (it breaks tracer-bullet slicing and bloats the PR), and don't just jot it in `task_plan.md` / `progress.md` — those die at teardown, so the note is lost. Route it to a durable home, then keep building:
@@ -149,6 +160,16 @@ If the issue is `ready-for-human` or the AGENT-BRIEF flags HITL checkpoints:
 - Don't let the planning-with-files Stop hook auto-finish you.
 - Pause at the documented checkpoint, surface the decision, wait for direction.
 - Resume by re-invoking `/planning-with-files` after the human responds — it re-reads the updated `task_plan.md`.
+
+### Adversarial review (before close-out)
+
+The procedure is a single step — [ship.md](references/ship.md), Stage 7 step 8. What that step leaves implicit — the *why* and the edge cases:
+
+- **The failure it guards against.** The most-cited unattended-run failure is *trusting the agent's own summary of what it did* — `progress.md` is the implementer narrating its own success. Hence the step's two non-negotiables: a **separate** context (not the author) that is **read-only** (so it can't quietly fix-and-pass), there to read actual state rather than re-read the narrative. Separation of duties — a reviewer who can't merge their own PR.
+- **Complementary to `/tdd`, not a duplicate.** `/tdd` is the implementer's per-phase self-check (red → green as each phase is built); the review is a separate whole-diff cross-check at the end. One proves each phase in isolation; the other asks whether the finished change, in total, satisfies the issue.
+- **Inside the security boundary.** If the reviewer needs the issue's raw acceptance text, it reads `findings.md` — never the re-injected `task_plan.md`.
+- **Idempotent.** Read-only and side-effect-free, so an interrupted run re-runs it safely.
+- **Host-neutral contract.** "A fresh read-only context" is all the procedure asks for; *how* you get one — sub-agent vs. new session — is the host's business (see [Clean context per issue](#clean-context-per-issue)).
 
 ### Teardown after PR merge
 
@@ -306,7 +327,8 @@ This rules out some patterns from spec-kit-class even when they look useful:
 
 ## Further reading
 
-Anthropic Engineering on long-running agent harnesses — the design lineage this suite operationalizes (incremental progress, files-as-handoff, clean-state-per-session):
+Long-running agent harnesses — the design lineage this suite operationalizes (incremental progress, files-as-handoff, clean-state-per-session, role separation):
 
-- [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) — initializer + coding agent, a feature list, one-feature-at-a-time incremental progress, leave-it-clean-per-session — the source for the "one feature at a time" rule discussed in [Parallel execution](#parallel-execution).
-- [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps) — a planner/generator/evaluator multi-agent architecture, context resets vs compaction with structured handoffs, and separating the builder from a skeptical evaluator.
+- [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) (Anthropic) — initializer + coding agent, a feature list, one-feature-at-a-time incremental progress, leave-it-clean-per-session — the source for the "one feature at a time" rule discussed in [Parallel execution](#parallel-execution).
+- [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps) (Anthropic) — a planner/generator/evaluator multi-agent architecture, context resets vs compaction with structured handoffs, and separating the builder from a skeptical evaluator — the lineage behind the [adversarial review](#adversarial-review-before-close-out) gate.
+- [Simon Last — lessons on running coding agents at scale](https://x.com/simonlast/status/2057978156183957995) — field practice (fewer/longer/bigger-scoped sessions, role separation, self-contained plan docs over babysitting, adversarial review for unattended runs); the impetus for the [adversarial review](#adversarial-review-before-close-out) gate and [clean context per issue](#clean-context-per-issue).

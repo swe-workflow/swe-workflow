@@ -4,7 +4,7 @@ A thin, unattended **loop over the ship stage** ([`ship.md`](ship.md)) — run i
 
 **Scope** comes from the user's request — optional. A feature directory (e.g. `.scratch/feature-x/` or `.scratch/feature-x/issues/`) limits the batch to that feature. If none is given, target **all `ready-for-agent` issues** for the active tracker.
 
-The **ship** stage owns everything **per issue** — fetch, worktree, plan, test-first build, PR, teardown, its re-run/resume check, HITL pauses, and the prerequisites. **Don't restate any of that here.** Ship-all adds only the **batch wrapper**: which issues, in what order, one at a time, what to do when one parks or needs a human, and the closing summary.
+The **ship** stage owns everything **per issue** — fetch, worktree, plan, test-first build, adversarial review, PR, teardown, its re-run/resume check, HITL pauses, and the prerequisites. **Don't restate any of that here.** Ship-all adds only the **batch wrapper**: which issues, in what order, one at a time, what to do when one parks or needs a human, and the closing summary.
 
 ## Procedure
 1. **Enumerate** issues in scope via the active adapter's **list-ready** operation — the per-tracker query lives in [trackers/](../trackers/) (the [contract](../trackers/README.md#operations-every-adapter-implements)).
