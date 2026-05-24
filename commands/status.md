@@ -1,26 +1,26 @@
 ---
-description: Show swe-workflow planning status for the current issue — phase, progress, decisions, errors — and, from the main checkout, open escalations awaiting a human across all live worktrees.
+description: Show swe-workflow status for the current project or issue — phase, progress, decisions, errors — and, from the main checkout, every in-flight issue's progress plus open escalations across all live worktrees.
 allowed-tools: Bash, Read
 ---
 
-Show the planning status for the current worktree / issue.
+Show the status for the current project or issue.
 
-1. If the `planning-with-files` plugin is installed, invoke **`/planning-with-files:status`** and present its output.
-2. Otherwise, read `task_plan.md`, `progress.md`, and `findings.md` in the current directory and report:
+1. **In an issue worktree** — when `task_plan.md`, `progress.md`, and `findings.md` exist in the current directory — invoke **`/planning-with-files:status`** (required; if it's not installed, say so and stop) and report:
    - **Where am I?** — the Current Phase.
    - **Done / remaining?** — phase checkboxes (counts + what's next).
    - **Decisions & errors** — the Decisions table and any rows in the Errors table.
    - **Last activity** — the most recent `progress.md` session entry.
+2. **At the project level** — those planning files aren't in the current directory, e.g. the main checkout — roll up every in-flight issue across all live worktrees (see below).
 
-If no planning files exist in the current directory, say so and point the user at `/swe-workflow:ship <issue-slug>` to bootstrap one (or `cd` into the issue's worktree first).
+## Project-level rollup (from the main checkout)
 
-## Repo-wide open escalations (from the main checkout)
+When run from the **main checkout** (not inside an issue worktree), enumerate live worktrees with `git worktree list` and, for each issue worktree (one carrying the planning files), report:
 
-When run from the **main checkout** (not inside an issue worktree), also surface what's waiting on a human across all in-flight issues:
+- **Progress** — its current phase, phase checkboxes (done / remaining), and most recent session entry, read from that worktree's `task_plan.md` / `progress.md`. One line per issue.
+- **Open escalations** — the **`escalated`** entries with no resolution in its `DECISIONS.staged.md`. Aggregate them **sorted by timestamp** — "<n> open escalations across <m> worktrees" — each with its issue context, question, and why it escalated.
 
-- Enumerate live worktrees with `git worktree list`; in each, read `DECISIONS.staged.md` for **`escalated`** entries that have no resolution.
-- Report them **aggregated and sorted by timestamp** — "<n> open escalations across <m> worktrees" — each with its issue context, question, and why it escalated.
-- Flagged **assumptions** (`Outcome: assumed`) are *not* shown here — they're non-blocking and surface in the PR body / journal for review. `/status` is for what's *blocking* on you.
-- Skip prunable/missing worktree paths. This is **read-only** — it never writes.
+Flagged **assumptions** (`Outcome: assumed`) are *not* shown — they're non-blocking and surface in the PR body / journal for review. `/status` is for what's *in flight* and what's *blocking* on you.
 
-This is how a returning operator finds every parked `/ship-all` decision in one place.
+Skip prunable/missing worktree paths. This is **read-only** — it never writes.
+
+This is how a returning operator sees every in-flight issue and every parked `/ship-all` decision in one place.
