@@ -22,15 +22,9 @@ Two companion skills ship alongside: **`to-features`** (stage 2 — split the pr
 
 ## Install
 
-**Any Agent-Skills agent (universal):**
+### Claude Code
 
-```text
-npx skills add swe-workflow/swe-workflow
-```
-
-Installs the three skills — `swe-workflow`, `to-features`, `log-decisions`.
-
-**Claude Code (plugin — also adds the `/swe-workflow:*` slash commands):**
+Installs the plugin — all three skills (`swe-workflow`, `to-features`, `log-decisions`) plus the `/swe-workflow:*` slash commands.
 
 ```text
 /plugin marketplace add swe-workflow/swe-workflow
@@ -38,6 +32,14 @@ Installs the three skills — `swe-workflow`, `to-features`, `log-decisions`.
 ```
 
 (`swe-workflow@swe-workflow` is `plugin@marketplace` — both happen to be named `swe-workflow`.)
+
+### Other agents (universal)
+
+Installs the three skills — `swe-workflow`, `to-features`, `log-decisions`.
+
+```text
+npx skills add swe-workflow/swe-workflow
+```
 
 ## Invoking
 
