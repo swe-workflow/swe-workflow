@@ -15,8 +15,8 @@ It ships as **[Agent Skills](https://agentskills.io)**, so it runs on **Claude C
 | 3 | **Spec one feature into a PRD** — grill that feature, then synthesize (step 3 on its own, run per feature). | `/swe-workflow:grill-feature` |
 | 5–7 | Take ONE issue through **plan → build → close-out** — worktree + planning files, test-first build, PR, teardown. | `/swe-workflow:ship` |
 | 5–7 ×N | Run **ship** across a backlog in dependency order — each **AFK** issue, **pausing at HITL**. | `/swe-workflow:ship-all` |
-| — | Show planning status for the current issue, or roll up all in-flight issues + open escalations. | `/swe-workflow:status` |
 | 0–7 | Invoke the skill itself (*"plan this feature end-to-end"*) — it conducts the whole chain. | — |
+| — | Show planning status for the current issue, or roll up all in-flight issues + open escalations. | `/swe-workflow:status` |
 
 Two companion skills ship alongside: **`to-features`** (stage 2 — split the project into coarse features in `FEATURES.md`) and **`log-decisions`** (the append-only `DECISIONS.md` journal). A typical run is **setup → spec → ship-all**.
 
@@ -55,12 +55,41 @@ The workflow orchestrates several skills this suite doesn't bundle. **The setup 
 ## How it fits together
 
 ```text
-spec layer — stages 1–4                        execution layer — stages 5–7
-grill → to-features → prd → to-issues  ──►  one issue: plan → build → close-out
-(triage runs alongside)                        ship-all — the whole backlog, AFK
+   IDEA
+   │
+   ▼   /setup (0)  ──►  bootstrap repo — prereq skills · always-on rules
+   │
+   ▼   SPEC LAYER  ·  /spec  (stages 1–4, AFK-friendly)
+   │      grill (1)          ──►  CONTEXT.md + ADRs
+   │      to-features (2)    ──►  FEATURES.md
+   │      grill-feature (3)  ──►  a PRD  (one per feature)
+   │      to-issues (4)      ──►  ready-for-agent issues
+   │
+   ▼   EXECUTION LAYER  ·  /ship (one issue) · /ship-all (backlog, AFK)
+   │      plan (5)           ──►  task_plan.md  (+ findings.md)
+   │      build (6)          ──►  progress.md  (test-first, via /tdd)
+   │      close-out (7)      ──►  PR  +  worktree teardown
+   │
+   ▼
+   SHIPPED
+
+   /triage runs alongside — sorts externally-filed issues into the ready-for-agent backlog
 ```
 
-Every step hands the next a markdown artifact (`CONTEXT.md`, `FEATURES.md`, a PRD, issues, then `task_plan.md` and `progress.md`). The files are the interface; nothing lives only in the agent's head. See the **`swe-workflow`** skill (`skills/swe-workflow/SKILL.md` + `REFERENCE.md`, with each stage's procedure in `references/`) for the full picture.
+Those right-hand artifacts are the interface between steps — the files, not the agent's memory, carry state from stage to stage. See the **`swe-workflow`** skill (`skills/swe-workflow/SKILL.md` + `REFERENCE.md`, each stage's procedure in `references/`) for the full picture, including the detailed operational diagram.
+
+## A typical run
+
+Spelled out for a fresh project — what to run at each stage, and the artifact it leaves behind:
+
+1. `/swe-workflow:setup` *(stage 0)* — run once at the repo root; bootstraps the repo and auto-installs the external skills the later steps need.
+2. `/grill-with-docs` *(stage 1)* — grill the domain → `CONTEXT.md` + `docs/adr/`.
+3. `/to-features` *(stage 2)* — split the project into coarse features → `FEATURES.md`.
+4. `/swe-workflow:grill-feature` *(stage 3)* — once **per feature** → one PRD each.
+5. `/to-issues` *(stage 4)* — once **per PRD** → tracer-bullet issues, auto-labeled `ready-for-agent`.
+6. `/swe-workflow:ship-all` *(stages 5–7)* — build and ship the whole backlog, AFK.
+
+`/grill-with-docs`, `/to-features`, and `/to-issues` are the underlying skills, not `/swe-workflow:` commands — and steps 2–5 are exactly what `/swe-workflow:spec` runs for you. Drive the stages by hand with the individual skills, or run `/swe-workflow:spec` then `/swe-workflow:ship-all` for the hands-off path.
 
 ## License
 
