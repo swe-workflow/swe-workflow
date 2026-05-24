@@ -1,8 +1,8 @@
 # Stage 2 — Enumerate features → FEATURES.md
 
-Split the project into **coarse-grained, user-facing features** → `FEATURES.md`. This is the **product-manager** step of the spec layer: it answers *what should the product do?* at the project level — the big capabilities, in user language (`user-can-…`, `admin-can-…`) — not *how* any one of them is built. It sits **after** the stage-1 domain grill (which grounds `CONTEXT.md`/ADRs) and **before** [`/grill-feature`](grill-feature.md), which grills and specs each feature in depth. Each feature is recorded as a **rich detail block, not a bare slug**, so `/grill-feature` starts from real context.
+Split the project into **coarse-grained, user-facing features** → `FEATURES.md`. This is the **product-manager** stage of the spec layer: it answers *what should the product do?* at the project level — the big capabilities, in user language (`user-can-…`, `admin-can-…`) — not *how* any one of them is built. It sits **after** the stage-1 domain grill (which grounds `CONTEXT.md`/ADRs) and **before** [`/grill-feature`](grill-feature.md), which grills and specs each feature in depth. Each feature is recorded as a **rich detail block, not a bare slug**, so `/grill-feature` starts from real context.
 
-This is **step 2 of the [spec layer](spec.md)**: `/spec` runs it inline as part of stages 1–4. On Claude Code it also runs standalone as `/swe-workflow:to-features`; on other agents, invoke the `swe-workflow` skill and ask to enumerate the project's features.
+This is **stage 2 of the [spec layer](spec.md)**: `/spec` runs it inline as part of stages 1–4. On Claude Code it also runs standalone as `/swe-workflow:to-features`; on other agents, invoke the `swe-workflow` skill and ask to enumerate the project's features.
 
 ## How it works — a high-level grill, then coarse features
 
@@ -93,7 +93,7 @@ Mark the **header line** with strikethrough + a shipped reference (issue number,
 
 ## Why this stage exists
 
-mattpocock's chain (`/to-prd`, `/to-issues`, `/triage`) is engineering-side — it assumes the feature set already exists. `/to-prd` deliberately **doesn't interview**; it synthesizes from a conversation. So the work of *eliciting what the features are* has no home in that chain. `to-features` is that home: the **PM step** that grills the project at a high level and writes the coarse backlog that `/grill-feature` then specs one at a time.
+mattpocock's chain (`/to-prd`, `/to-issues`, `/triage`) is engineering-side — it assumes the feature set already exists. `/to-prd` deliberately **doesn't interview**; it synthesizes from a conversation. So the work of *eliciting what the features are* has no home in that chain. `to-features` is that home: the **PM stage** that grills the project at a high level and writes the coarse backlog that `/grill-feature` then specs one at a time.
 
 It reads engineering artifacts (`CONTEXT.md`, ADRs) but its output (`FEATURES.md`) is user-facing product language — the deliberate seam where product reasoning enters the chain.
 

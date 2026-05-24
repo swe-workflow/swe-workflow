@@ -34,7 +34,7 @@ If a `CONTEXT-MAP.md` exists at repo root, the project uses multiple bounded con
 
 ## Stage 2: `/to-features` — What features does this break into?
 
-The product→engineering bridge — the **product-manager** step. `/to-features` **invokes `/grill-with-docs` at a high (product) level** to split the project into **coarse-grained** user-facing features, then writes `FEATURES.md`. It grills rather than reading files because `CONTEXT.md` (a glossary) and `docs/adr/` (sparse architectural calls) don't enumerate features — the set must be elicited. The distinct **stage-1 domain grill runs first**; this builds on it but aims at *features*, not vocabulary. AFK-friendly and pausable — recommended answers via the `log-decisions` rules, an unsure HITL call pauses to escalate, feature-scope calls journaled.
+The product→engineering bridge — the **product-manager** stage. `/to-features` **invokes `/grill-with-docs` at a high (product) level** to split the project into **coarse-grained** user-facing features, then writes `FEATURES.md`. It grills rather than reading files because `CONTEXT.md` (a glossary) and `docs/adr/` (sparse architectural calls) don't enumerate features — the set must be elicited. The distinct **stage-1 domain grill runs first**; this builds on it but aims at *features*, not vocabulary. AFK-friendly and pausable — recommended answers via the `log-decisions` rules, an unsure HITL call pauses to escalate, feature-scope calls journaled.
 
 The full process, the `FEATURES.md` file format (the per-feature detail block), the **strike-through-don't-delete** discipline on ship, the optional `.scratch/<feature>/` filesystem stub for local-markdown teams, and when to skip the stage all live in the **[`to-features.md` procedure](references/to-features.md)** — its home, now its own command (`/swe-workflow:to-features`). Not restated here.
 
@@ -42,7 +42,7 @@ The full process, the `FEATURES.md` file format (the per-feature detail block), 
 
 **Trigger**: a feature is picked from `FEATURES.md` and needs its spec.
 
-The second **product-manager** step — now its own command (`/grill-feature`) and procedure ([`references/grill-feature.md`](references/grill-feature.md)): **grill one feature, then synthesize its PRD.** `/spec` runs it inline for the feature it's targeting; `/grill-feature` runs it standalone, once per feature.
+The second **product-manager** stage — now its own command (`/grill-feature`) and procedure ([`references/grill-feature.md`](references/grill-feature.md)): **grill one feature, then synthesize its PRD.** `/spec` runs it inline for the feature it's targeting; `/grill-feature` runs it standalone, once per feature.
 
 1. **Grill the feature** — `grill-with-docs` scoped to the one feature (an **intensive, feature-level** interview — deeper than `to-features`' high-level project grill), grounded on `CONTEXT.md`/ADRs.
 2. **Synthesize** — `to-prd` turns that conversation into **one PRD** without re-interviewing (the grill is what gave it the material). The PRD contains:

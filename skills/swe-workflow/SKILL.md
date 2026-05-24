@@ -97,7 +97,7 @@ The idiomatic software-engineer workflow: clarify the idea → spec it → slice
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-*File-based end to end — each step hands the next a markdown artifact: `CONTEXT.md`/ADRs → `FEATURES.md` → PRD → issues → `task_plan.md` → `progress.md`. The files are the interface between steps; nothing lives only in the agent's head.*
+*File-based end to end — each stage hands the next a markdown artifact: `CONTEXT.md`/ADRs → `FEATURES.md` → PRD → issues → `task_plan.md` → `progress.md`. The files are the interface between stages; nothing lives only in the agent's head.*
 
 ## Parallel concern: `/triage`
 

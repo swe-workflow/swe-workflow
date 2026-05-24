@@ -68,20 +68,20 @@ The workflow orchestrates several skills this suite doesn't bundle. **The setup 
    /triage runs alongside — sorts externally-filed issues into the ready-for-agent backlog
 ```
 
-Those right-hand artifacts are the interface between steps — the files, not the agent's memory, carry state from stage to stage. See the **`swe-workflow`** skill (`skills/swe-workflow/SKILL.md` + `REFERENCE.md`, each stage's procedure in `references/`) for the full picture, including the detailed operational diagram.
+Those right-hand artifacts are the interface between stages — the files, not the agent's memory, carry state from stage to stage. See the **`swe-workflow`** skill (`skills/swe-workflow/SKILL.md` + `REFERENCE.md`, each stage's procedure in `references/`) for the full picture, including the detailed operational diagram.
 
 ## A typical run
 
 Spelled out for a fresh project — what to run at each stage, and the artifact it leaves behind:
 
-1. `/swe-workflow:setup` *(stage 0)* — run once at the repo root; bootstraps the repo and auto-installs the external skills the later steps need.
+1. `/swe-workflow:setup` *(stage 0)* — run once at the repo root; bootstraps the repo and auto-installs the external skills the later stages need.
 2. `/grill-with-docs` *(stage 1)* — grill the domain → `CONTEXT.md` + `docs/adr/`.
 3. `/swe-workflow:to-features` *(stage 2)* — split the project into coarse features → `FEATURES.md`.
 4. `/swe-workflow:grill-feature` *(stage 3)* — once **per feature** → one PRD each.
 5. `/to-issues` *(stage 4)* — once **per PRD** → tracer-bullet issues, auto-labeled `ready-for-agent`.
 6. `/swe-workflow:ship-all` *(stages 5–7)* — build and ship the whole backlog, AFK.
 
-`/grill-with-docs` and `/to-issues` are external (mattpocock) skills, while `/swe-workflow:to-features` and `:grill-feature` are commands in this suite — and steps 2–5 are exactly what `/swe-workflow:spec` runs for you. Drive the stages by hand, or run `/swe-workflow:spec` then `/swe-workflow:ship-all` for the hands-off path.
+`/grill-with-docs` and `/to-issues` are external (mattpocock) skills, while `/swe-workflow:to-features` and `:grill-feature` are commands in this suite — and stages 1–4 are exactly what `/swe-workflow:spec` runs for you. Drive the stages by hand, or run `/swe-workflow:spec` then `/swe-workflow:ship-all` for the hands-off path.
 
 ## License
 

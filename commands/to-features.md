@@ -1,5 +1,5 @@
 ---
-description: Enumerate the project's coarse-grained user-facing features into FEATURES.md (swe-workflow stage 2) — the product-manager step that invokes grill-with-docs at a high level, capturing a rich detail block per feature so /grill-feature starts informed. Runs after the stage-1 domain grill, before /grill-feature. Idempotent — refines an existing FEATURES.md rather than overwriting.
+description: Enumerate the project's coarse-grained user-facing features into FEATURES.md (swe-workflow stage 2) — the product-manager stage that invokes grill-with-docs at a high level, capturing a rich detail block per feature so /grill-feature starts informed. Runs after the stage-1 domain grill, before /grill-feature. Idempotent — refines an existing FEATURES.md rather than overwriting.
 argument-hint: [idea-or-scope]
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 ---

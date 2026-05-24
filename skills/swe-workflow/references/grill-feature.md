@@ -1,12 +1,12 @@
 # Stage 3 — Grill a feature → PRD
 
-Spec a **single feature** into a PRD — the **product-manager** step. Grill that one feature, then synthesize its PRD. On Claude Code this runs as `/swe-workflow:grill-feature`; on other agents, invoke the `swe-workflow` skill and ask to grill a feature into its PRD.
+Spec a **single feature** into a PRD — the **product-manager** stage. Grill that one feature, then synthesize its PRD. On Claude Code this runs as `/swe-workflow:grill-feature`; on other agents, invoke the `swe-workflow` skill and ask to grill a feature into its PRD.
 
-This is **step 3 of the [spec layer](spec.md)**: `/spec` runs it inline for the feature it's targeting; `/grill-feature` runs it **standalone, once per feature**. It pairs a feature-scoped `grill-with-docs` interview with `to-prd` — the grill supplies the conversation `to-prd` synthesizes from (on its own, `to-prd` doesn't interview).
+This is **stage 3 of the [spec layer](spec.md)**: `/spec` runs it inline for the feature it's targeting; `/grill-feature` runs it **standalone, once per feature**. It pairs a feature-scoped `grill-with-docs` interview with `to-prd` — the grill supplies the conversation `to-prd` synthesizes from (on its own, `to-prd` doesn't interview).
 
 **The feature** comes from the user's request — a slug from `FEATURES.md` (e.g. `user-can-reset-password`), which carries the detail block `to-features` captured. If none is given, pick an un-specced (not struck-through) feature from `FEATURES.md`; ask which when ambiguous — don't guess.
 
-**Product, not engineering.** Like `to-features`, this is a PM step: it defines *what* the feature does (the PRD), not *how* it's built. Architecture and the build plan come later, in `/ship` (`planning-with-files` + `tdd`).
+**Product, not engineering.** Like `to-features`, this is a PM stage: it defines *what* the feature does (the PRD), not *how* it's built. Architecture and the build plan come later, in `/ship` (`planning-with-files` + `tdd`).
 
 ## Procedure
 
@@ -19,6 +19,6 @@ This is **step 3 of the [spec layer](spec.md)**: `/spec` runs it inline for the 
 
 **Runs per feature, not necessarily one conversation each.** Each feature gets its own PRD; whether you spec several in one sitting or one at a time is up to you.
 
-**Next:** slice the PRD into tracer-bullet issues with `to-issues` (step 4, separate), then `/ship` or `/ship-all`.
+**Next:** slice the PRD into tracer-bullet issues with `to-issues` (stage 4, separate), then `/ship` or `/ship-all`.
 
 **Prerequisites** (not bundled): the `grill-with-docs` and `to-prd` skills (`mattpocock/skills`). If a prerequisite is missing, say so and stop rather than improvising.
