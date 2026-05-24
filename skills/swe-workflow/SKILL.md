@@ -172,7 +172,7 @@ The diagram above is the map. The procedure is single-sourced in [`references/sh
 1. **PRD uses the glossary from stage 1.** If `to-prd` introduces terms that conflict with `CONTEXT.md`, loop back to `/grill-with-docs`.
 2. **Issues are tracer bullets, not horizontal layers.** Each is a thin vertical slice (schema → API → UI → tests). "Backend issue" + "frontend issue" is a smell — re-slice.
 3. **Only `ready-for-agent` issues enter execution.** `/to-issues` auto-applies the label on chain-created issues; `/triage` applies it to external issues (user reports, etc.). Either way, stage 5 reads from the label, not the source.
-4. **One issue = one worktree = one `task_plan.md`.** Filesystem isolation for parallel AFK agents. No exceptions.
+4. **One issue = one worktree = one `task_plan.md`.** Filesystem isolation for parallel AFK agents — no exceptions. (`/ship-all` itself is sequential; the isolation enables *optional, human-driven* parallelism — see [Parallel execution](REFERENCE.md#parallel-execution).)
 5. **Strike through, don't delete.** When a feature ships, strike it through in `FEATURES.md` with a shipped reference — never delete. Preserves institutional memory; prevents quiet scope drift.
 
 ## Don't double-track

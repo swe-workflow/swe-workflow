@@ -183,6 +183,32 @@ Bar-crossing decisions made during a build — gate-resolutions, deviations, tra
 
 **Journal vs ADR.** The journal records *events* ("on this date, this was decided, by whom"); `docs/adr/` records *ratified architecture* ("this IS the decision now"). A journal entry that proves architecturally significant is **promoted to an ADR manually** — never automatically — and the entry notes the promotion. See the `log-decisions` skill for the entry schema and rules.
 
+## Parallel execution
+
+`/ship-all` runs the backlog **sequentially — one worktree at a time** ([`references/ship-all.md`](references/ship-all.md)); it never auto-fans-out. The worktree-per-issue isolation ([handoff rule #4](SKILL.md#critical-handoff-rules)) exists to make *optional, human-driven* parallelism **safe**, not to have the loop run issues concurrently. To parallelize, a human starts a separate `/ship` (or a feature-scoped `/ship-all`) per independent unit, each in its own session.
+
+**This doesn't contradict "one feature at a time"** (Anthropic, *Effective harnesses for long-running agents* — see [Further reading](#further-reading)). That rule bounds *what a single agent-iteration takes on* — don't one-shot a whole app and exhaust the context mid-feature — not *how many agents run at once*. Each worktree here is bound to one **issue** (a tracer-bullet slice, finer than the article's "feature"), so the bound holds whether one or several run. The violation to avoid is the inverse: one agent swallowing multiple issues to save worktrees, which rule #4 forbids.
+
+**Parallelize across independent features, not slices of the same feature:**
+
+| Across… | Verdict | Why |
+|---|---|---|
+| Independent features (different PRDs, no `blocked-by`, disjoint code) | Safe — the sweet spot | Small disjoint diffs, no dependency ordering, low merge-conflict surface. |
+| Tracer-bullet slices of the *same* feature | Usually unsafe | Slices are deliberately *vertical* (schema → API → UI → tests, handoff rule #2), so two slices of one feature tend to touch the same schema/types/routing; a natural build order often `blocked-by`-serializes them anyway. |
+
+**The execution failure modes mutate under parallelism — they don't vanish:**
+
+- *Leave a clean state* becomes *leave a clean state **and** a clean merge.* Each agent leaves its own worktree mergeable, but none sees the integration — concurrent agents both plan against `main`-as-it-is-now, not against each other's uncommitted work.
+- *Verify the baseline first* assumes a **stable** `main`. Under parallelism the baseline moves as peers merge, so an agent can build against an already-stale snapshot and not know it.
+
+**What the toolchain already makes parallel-safe** — leaving concurrent edits to shared *source* as the only real residual risk, which is git's to resolve, not the toolchain's:
+
+- `DECISIONS.staged.md` is per-worktree and gitignored, promoted to `DECISIONS.md` serialized by teardown — conflict-free across worktrees (see [Decision journal](#decision-journal-decisionsmd)).
+- [`/status`](references/status.md) aggregates open escalations across worktrees, so one human can supervise several concurrent AFK ships.
+- Worktree + branch + planning-file isolation means no shared mutable state *during* a build.
+
+**Guardrail:** parallelize only units with **no `blocked-by` relationship and minimal file overlap**; keep same-feature vertical slices sequential.
+
 ## Always-on engineering rules
 
 A few skills apply to *every* run rather than to one stage. There's no framework toggle — each is a **named-skill-activation rule** written into a file that's already in context where it bites, so the agent reads the rule and invokes the skill. Two things decide *which* file: the rule's **scope** and the matching **injection site**.
@@ -277,3 +303,10 @@ This rules out some patterns from spec-kit-class even when they look useful:
 
 - `grill-with-docs`, `to-prd`, `to-issues`, `triage` — https://github.com/mattpocock/skills
 - `planning-with-files` — https://github.com/OthmanAdi/planning-with-files
+
+## Further reading
+
+Anthropic Engineering on long-running agent harnesses — the design lineage this suite operationalizes (incremental progress, files-as-handoff, clean-state-per-session):
+
+- [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) — initializer + coding agent, a feature list, one-feature-at-a-time incremental progress, leave-it-clean-per-session — the source for the "one feature at a time" rule discussed in [Parallel execution](#parallel-execution).
+- [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps) — a planner/generator/evaluator multi-agent architecture, context resets vs compaction with structured handoffs, and separating the builder from a skeptical evaluator.

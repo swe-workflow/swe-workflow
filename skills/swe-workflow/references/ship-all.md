@@ -17,6 +17,8 @@ The **ship** stage owns everything **per issue** — fetch, worktree, plan, test
 
 **Isolation makes this safe** — one issue = one worktree = one set of planning files (a ship invariant), so parked and shipped issues never interfere.
 
+**Sequential by design — no auto-fan-out.** That same isolation also makes *optional, human-driven* cross-feature parallelism safe (a separate `/ship` per independent unit, in its own session); see [Parallel execution](../REFERENCE.md#parallel-execution) for the safe/unsafe split.
+
 **Resume** — re-running ship-all is idempotent: shipped issues close and drop out of step 1; parked or interrupted issues resume through ship's re-run check. To clear a park, resolve its escalation (appends a `Supersedes` entry per `log-decisions`), then re-run — ship-all picks it back up, or run **ship** on it directly. Review open escalations anytime with **status** ([`status.md`](status.md)) from the main checkout.
 
 **Prerequisites**: same as the **ship** stage, which stops if any are missing.
