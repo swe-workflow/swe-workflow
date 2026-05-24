@@ -8,16 +8,6 @@ It ships as **[Agent Skills](https://agentskills.io)**, so it runs on **Claude C
 
 `swe-workflow` is **one skill** that conducts the whole chain. Each stage is a procedure it runs on demand; on Claude Code each is also a slash command.
 
-| Stage(s) | What it does | Claude command |
-|---|---|---|
-| 0 | **Run first.** Bootstrap a repo — auto-install missing prerequisite skills, wrap stage-0, inject the always-on rules (decision-logging + engineering discipline), set the `DECISIONS.md` privacy policy. Idempotent. | `/swe-workflow:setup` |
-| 1–4 | Take ONE feature through **grill → features → PRD → issues** — leaves a `ready-for-agent` backlog. AFK-friendly, idempotent. | `/swe-workflow:spec` |
-| 3 | **Spec one feature into a PRD** — grill that feature, then synthesize (step 3 on its own, run per feature). | `/swe-workflow:grill-feature` |
-| 5–7 | Take ONE issue through **plan → build → close-out** — worktree + planning files, test-first build, PR, teardown. | `/swe-workflow:ship` |
-| 5–7 ×N | Run **ship** across a backlog in dependency order — each **AFK** issue, **pausing at HITL**. | `/swe-workflow:ship-all` |
-| 0–7 | Invoke the skill itself (*"plan this feature end-to-end"*) — it conducts the whole chain. | — |
-| — | Show planning status for the current issue, or roll up all in-flight issues + open escalations. | `/swe-workflow:status` |
-
 Two companion skills ship alongside: **`to-features`** (stage 2 — split the project into coarse features in `FEATURES.md`) and **`log-decisions`** (the append-only `DECISIONS.md` journal). A typical run is **setup → spec → ship-all**.
 
 ## Install
@@ -43,7 +33,7 @@ npx skills add swe-workflow/swe-workflow
 
 ## Invoking
 
-- **Claude Code** — the slash commands `/swe-workflow:setup`, `:spec`, `:ship`, `:ship-all`, `:status` (thin shims over the skill), or invoke the `swe-workflow` skill to drive the whole chain.
+- **Claude Code** — the slash commands `/swe-workflow:setup` (0), `:spec` (1–4), `:grill-feature` (3), `:ship` (5–7), `:ship-all` (5–7 ×N), `:status` (thin shims over the skill), or invoke the `swe-workflow` skill to drive the whole chain (0–7).
 - **Codex · Gemini CLI · Cursor · others** — invoke the `swe-workflow` skill and say what you want (*"ship issue #42"*); it routes to the right stage. Most hosts also surface it as a slash command or trigger it from its description.
 
 ### Prerequisites
