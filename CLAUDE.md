@@ -50,7 +50,7 @@ The whole point is being a **chain of small, observable skills — not a framewo
 - **Single source of truth for the planner prompt.** The exact Stage-5 `/planning-with-files:plan` prompt lives **only** in the ship procedure (`skills/swe-workflow/references/ship.md`, Stage 5 step 6). `SKILL.md`, `REFERENCE.md`, and the `commands/ship.md` shim deliberately point at it rather than restate it, so it can't drift. Don't copy it elsewhere.
 - **No `": "` (colon-space) inside a `description:` frontmatter value.** A mid-sentence colon-space breaks the strict-YAML frontmatter parser — a recurring defect here (multiple commits fixing it). Use an em-dash (`—`) or "such as" instead. Applies to every `commands/*.md` and `skills/*/SKILL.md`.
 - **Don't double-track.** Each fact has one home (see the "Don't double-track" table in SKILL.md). The same discipline applies to the docs themselves: cross-link with relative links rather than restating content.
-- **Stage vs. step.** A *stage* is a numbered workflow phase (0→7) with its own command + durable artifact ("Stages 0→7", "Stage 5"); a *step* is a numbered action within a stage's procedure (e.g. `ship.md` Stage 5 step 6) or plain prose. **Never write "step N" for a phase** — the spec-layer phases are stages 2/3/4, not steps. Recurring drift; sibling command files have disagreed.
+- **Stage vs. step.** A *stage* is a numbered workflow phase (0→7); a *step* is a numbered action within a stage's procedure (e.g. `ship.md` "Stage 5, step 6") or plain prose. **Never write "step N" for a phase** — the spec-layer phases are stages 2/3/4, not steps. Recurring drift; sibling command files have disagreed.
 
 ## Releasing
 
