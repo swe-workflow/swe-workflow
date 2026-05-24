@@ -4,41 +4,6 @@ argument-hint: <issue-slug>
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 ---
 
-You are running the **swe-workflow execution layer** — stages 5 -> 6 -> 7 — for a single issue.
+Invoke the **`swe-workflow`** skill and run its **ship** procedure (`references/ship.md`, which holds the single-source planner prompt), following it exactly — kept in the skill so it stays identical for every agent.
 
-Issue to ship: **$ARGUMENTS**
-
-If `$ARGUMENTS` is empty, ask for the issue slug (a path like `.scratch/feature-x/issues/02-foo.md`, or a tracker id) and stop — do not guess which issue.
-
-Full procedure, rationale, and per-tracker fetch commands live in the bundled skill:
-- `${CLAUDE_PLUGIN_ROOT}/skills/swe-workflow/SKILL.md` (stages 5–7 + security boundary)
-- `${CLAUDE_PLUGIN_ROOT}/skills/swe-workflow/REFERENCE.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/swe-workflow/trackers/` (one doc per tracker)
-
-## Stage 5 — Plan
-1. **Resolve the tracker** per the [tracker contract](../skills/swe-workflow/trackers/README.md#selection--which-adapter) — the issue slug in `$ARGUMENTS` is the rung-1 arg form (a `.md` path, a `TEAM-NN` key, or a bare number).
-2. **Fetch the issue** per the matching `trackers/<name>.md`. For `local-markdown`, read the file at `$ARGUMENTS`. Extract: title, body, acceptance criteria, AGENT-BRIEF, blocked-by, and whether it is HITL or AFK.
-3. **Derive paths**: `slug` = title lowercased, non-alphanumerics -> `-`, truncated to 40 chars; `branch` = `issue-<id>-<slug>`; `worktree` = `../<repo>-issue-<id>/`.
-4. **Create the worktree — re-run check first (idempotent).**
-   - **Closed/merged, worktree still present** → a prior run merged but didn't finish: **complete the teardown** (Stage 7's journal promote + `git worktree remove` + branch delete), then stop.
-   - **Closed/merged, no worktree** → report "already shipped" and stop; don't redo it.
-   - **Worktree exists, issue still open** → resuming an interrupted or parked ship: `cd` in and continue from `task_plan.md`'s recorded state; never re-bootstrap or clobber its planning files.
-   - **Otherwise** → `git worktree add ../<repo>-issue-<id> -b issue-<id>-<slug>` and work inside it.
-5. **Seed the three planning files** (security boundary — structured fields only in `task_plan.md`; raw external text in `findings.md`):
-   - `task_plan.md` — Goal = title; Phases = AC checkboxes.
-   - `findings.md` — raw issue body + AGENT-BRIEF, pasted verbatim.
-   - `progress.md` — initial bootstrap log entry.
-6. **Invoke `/planning-with-files:plan`** with this exact prompt (it bakes the methodology into `task_plan.md`):
-   > /planning-with-files:plan Interview me about this issue, then write task_plan.md to implement it. Write these two rules into task_plan.md, naming each skill explicitly so it activates when the plan is executed: (1) Use /tdd for all code and tests — tests first: red → green → refactor. (2) When writing or refactoring code, apply the andrej-karpathy-skills:karpathy-guidelines skill for code quality — surgical, simple changes.
-
-## Stage 6 — Build
-7. **Invoke `/planning-with-files:plan-goal`** to execute. It reads `task_plan.md` and drives each sub-task as a goal. Because the plan names `/tdd` and `/karpathy-guidelines`, build test-first and keep changes surgical. Log each cycle to `progress.md`; record execution-time decisions and errors in `task_plan.md`. When a **bar-crossing decision** arises mid-build, log it to `DECISIONS.staged.md` per the **`log-decisions`** skill — **look in the repo first**, then decide-and-log when an artifact grounds it (verify if irreversible), log a best-guess **assumption** and proceed when it's reversible but unsettled, and **escalate** (the HITL pause) only what's irreversible and needs human context. Reversible, spec-authorized execution decisions stay in the `task_plan.md` Decisions table. **Out-of-scope discoveries** (a new issue or feature) get captured to a durable home — the tracker or `FEATURES.md` — never folded into this worktree; see *Discovered scope* in `REFERENCE.md`.
-
-## Stage 7 — Close out
-8. Open the PR with the body drawn from `progress.md` highlights — the session log IS the narrative; don't rewrite it. Include an **"Autonomy decisions"** section in the PR body, drawn from `DECISIONS.staged.md`, so the reviewer sees what was decided unattended — especially the flagged **assumptions** (`assumed`) to confirm.
-9. After the PR merges, **promote the journal, then tear down** — **from the main checkout** (not inside the worktree): first append any `DECISIONS.staged.md` entries to repo-root `DECISIONS.md` and commit them as their own `log:` commit (serialized by teardown → conflict-free across parallel worktrees); then `git worktree remove ../<repo>-issue-<id>` (which discards the staging file), and delete the branch if it merged into the default branch.
-
-## HITL
-If the issue is `ready-for-human` or its AGENT-BRIEF flags HITL checkpoints: pause at the documented checkpoint, surface the decision, and wait for direction — do not let a Stop hook auto-finish. Resume by re-invoking `/planning-with-files:plan-goal` after the human responds.
-
-**Prerequisites** (not bundled): `planning-with-files`, `tdd`, `andrej-karpathy-skills:karpathy-guidelines`. If a prerequisite is missing, say so and stop rather than improvising.
+The issue to ship: **$ARGUMENTS** (if empty, the procedure asks which issue — don't guess).

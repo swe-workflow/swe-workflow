@@ -7,20 +7,26 @@ description: Orchestrates the full five-stage flow from raw idea to shipped PR �
 
 The idiomatic software-engineer workflow: clarify the idea → spec it → slice it → triage it → ship it. Five stages, each with a dedicated skill and a durable artifact that feeds the next. Invoked end-to-end with no specific stage in mind, this skill is the **conductor** that drives the chain 0→7 — see [Driving the chain](#driving-the-chain-stages-07); invoked at a point, it's the map for that stage.
 
-## Plugin commands
+## How it's exposed
 
-This skill ships as the **`swe-workflow` plugin**. Its actionable entry points are slash commands:
+`swe-workflow` is **one [Agent Skill](https://agentskills.io)** — portable across Claude Code, Codex, Gemini CLI, Cursor, and other skills-compatible agents — that conducts the whole 0→7 chain. Each stage's procedure lives in a reference file it loads on demand:
 
-| Command | Stage(s) | What it does |
+| Stage(s) | Procedure | Claude command |
 |---|---|---|
-| `/swe-workflow:setup` | 0 | Bootstrap a repo: install prereqs, wrap stage-0, inject the decision-logging rule, set privacy. Idempotent. |
-| `/swe-workflow:spec [feature-or-idea]` | 1–4 | Grill → features → PRD → issues for ONE feature — leaves a `ready-for-agent` backlog. Interactive, idempotent. |
-| `/swe-workflow:ship <issue-slug>` | 5–7 | Plan → build → close out ONE issue (worktree, test-first build, PR, teardown). |
-| `/swe-workflow:ship-all [scope]` | 5–7 ×N | Run `/ship` over a backlog in dependency order — AFK issues only, pausing at HITL. |
-| `/swe-workflow:to-features` | 2 | Enumerate user-facing features into `FEATURES.md` (the stage-2 step `spec` runs). |
-| `/swe-workflow:status` | — | Show planning status for the current issue. |
+| 0 | [`references/setup.md`](references/setup.md) | `/swe-workflow:setup` |
+| 1–4 | [`references/spec.md`](references/spec.md) | `/swe-workflow:spec` |
+| 5–7 | [`references/ship.md`](references/ship.md) | `/swe-workflow:ship` |
+| 5–7 ×N | [`references/ship-all.md`](references/ship-all.md) | `/swe-workflow:ship-all` |
+| — | [`references/status.md`](references/status.md) | `/swe-workflow:status` |
 
-The spec-layer stages (1 `grill-with-docs`, 3 `to-prd`, 4 `to-issues`, plus the parallel `/triage`) and the execution engine (`planning-with-files`, `tdd`, `karpathy-guidelines`) are **external skills this plugin orchestrates** — install them separately (see the plugin README). The diagram below is the conceptual chain; `/swe-workflow:spec` automates stages 1–4 and `/swe-workflow:ship` stages 5–7 of it.
+- **Claude Code** — invoke the five `/swe-workflow:*` commands (thin `commands/` shims that run the matching procedure), or invoke this `swe-workflow` skill to drive the whole chain.
+- **Other agents** — invoke the `swe-workflow` skill and say what you want (*"ship issue 42"*); it routes to the right stage's reference file.
+
+Two other skills ship in the suite: **`to-features`** (stage 2 — enumerate features into `FEATURES.md`) and **`log-decisions`** (the decision journal). The external skills it orchestrates — `grill-with-docs`, `to-prd`, `to-issues`, `triage` (mattpocock), `planning-with-files`, `tdd`, `karpathy-guidelines` — install separately (the [setup procedure](references/setup.md) auto-installs them).
+
+This `swe-workflow` skill is the **conductor + map**: it documents the whole chain and drives stages 0→7 when invoked without a specific stage (see [Driving the chain](#driving-the-chain-stages-07)).
+
+The spec-layer stages (1 `grill-with-docs`, 3 `to-prd`, 4 `to-issues`, plus the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`, `karpathy-guidelines`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; the **spec** procedure automates stages 1–4 and **ship** stages 5–7 of it.
 
 ## The workflow
 
@@ -140,9 +146,9 @@ Don't always start at stage 1 — jump to where the chain actually breaks.
 
 Invoked without a specific stage — *"plan this feature end-to-end," "how do I start on this idea?"* — act as the **conductor**. The chain packs into three **idempotent** building blocks; run them in order and let each skip whatever's already done:
 
-1. **`/swe-workflow:setup`** (stage 0) — only if the repo isn't bootstrapped; it skips itself otherwise.
-2. **`/swe-workflow:spec [feature-or-idea]`** (stages 1–4, *interactive*) — grill → features → PRD → issues, leaving a `ready-for-agent` backlog. Resumes from whatever specs already exist.
-3. **`/swe-workflow:ship-all`** (stages 5–7, *AFK*) — build and ship the backlog.
+1. **Setup** (stage 0) — only if the repo isn't bootstrapped; it skips itself otherwise.
+2. **Spec** (stages 1–4, *interactive*) — grill → features → PRD → issues, leaving a `ready-for-agent` backlog. Resumes from whatever specs already exist.
+3. **Ship-all** (stages 5–7, *AFK*) — build and ship the backlog.
 
 Pause through `spec` (it interviews the human); go AFK once `ship-all` starts. A HITL issue still pauses `ship-all` and waits. **Re-invoking is safe** — each command self-detects state, so a re-run continues where the chain left off. To jump straight to a single stage instead of driving the whole thing, use [Where to enter the chain](#where-to-enter-the-chain). `/triage` stays a parallel concern — pull external issues into the backlog as needed.
 
@@ -183,8 +189,8 @@ The skill is **instructions-only** — there are no scripts. The agent performs 
    | `findings.md` | Raw issue body + AGENT-BRIEF pasted verbatim. Safe sink for external content. |
    | `progress.md` | Initial session log entry with bootstrap timestamp. |
 
-6. **Invoke `/planning-with-files:plan`** (Stage 5) with the exact prompt the [`/swe-workflow:ship`](../../commands/ship.md) command uses (Stage 5, step 6) — kept there as the single source so it can't drift. That prompt has the planner **write `/tdd` and `andrej-karpathy-skills:karpathy-guidelines` as named rules into `task_plan.md`**, which carries the methodology into Stage 6: `plan-goal` re-reads the plan and applies the named skills instead of being re-told. The interview refines the AC seeds into real phases; `task_plan.md` is the **core artifact** Stage 6 reads, `findings.md` holds the raw issue body.
-7. **Invoke `/planning-with-files:plan-goal`** to execute (Stage 6) — reads `task_plan.md`, drives each phase as a goal via Claude Code's goal command; outer loop runs phases; `/tdd` is the inner loop for code-producing phases. Since the Stage 5 prompt already named `/tdd` and `/andrej-karpathy-skills:karpathy-guidelines`, the plan calls for them — `plan-goal` carries them out: test-first, surgical changes, simplicity first, no speculative abstractions, surfaced assumptions.
+6. **Invoke `/planning-with-files:plan`** (Stage 5) with the exact prompt the [ship procedure](references/ship.md) carries (Stage 5, step 6) — kept there as the single source so it can't drift. That prompt has the planner **write `/tdd` and `andrej-karpathy-skills:karpathy-guidelines` as named rules into `task_plan.md`**, which carries the methodology into Stage 6: `plan-goal` re-reads the plan and applies the named skills instead of being re-told. The interview refines the AC seeds into real phases; `task_plan.md` is the **core artifact** Stage 6 reads, `findings.md` holds the raw issue body.
+7. **Invoke `/planning-with-files:plan-goal`** to execute (Stage 6) — reads `task_plan.md`, drives each phase to completion (planning-with-files' `plan-goal`); outer loop runs phases; `/tdd` is the inner loop for code-producing phases. Since the Stage 5 prompt already named `/tdd` and `/andrej-karpathy-skills:karpathy-guidelines`, the plan calls for them — `plan-goal` carries them out: test-first, surgical changes, simplicity first, no speculative abstractions, surfaced assumptions.
 8. **Close out** (Stage 7) — open the PR with the body drawn from `progress.md` highlights (the session log *is* the narrative; don't rewrite it). After it merges, [tear down](#teardown-after-pr-merges) the worktree and branch.
 
 ### Inner loop: `/tdd` for code-producing phases
