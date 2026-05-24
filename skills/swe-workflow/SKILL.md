@@ -50,8 +50,8 @@ The spec-layer stages (1 `grill-with-docs`, 3 `to-prd`, 4 `to-issues`, plus the 
 │                                                                      │
 │  2. What features does this break into?                              │
 │     /to-features ──► FEATURES.md                                     │
-│              (read CONTEXT.md + ADRs → user-facing features;         │
-│               strike through, don't delete, on ship)                 │
+│              (same conversation as the grill; interview to draw out  │
+│               the user-facing features; strike through, don't delete)│
 │                                                                      │
 │  3. What does done look like?                                        │
 │     /to-prd ──► PRD (auto-labeled `ready-for-agent`)                 │
@@ -122,7 +122,7 @@ Operating maxim (Matt Pocock, after [surveying ~2000 AI coding course participan
 - **Instructions-only, no scripts.** Deterministic operations are documented as instructions the agent runs, not wrapped in scripts. Every script reintroduced would move the chain toward the opacity Matt's surveyed users rejected.
 - **Transparent markdown all the way down.** Seven chain stages plus `/triage` as a parallel concern — every link is a markdown skill or documented procedure you can read, edit, or replace without touching code. None of them opaque. The direct test of the operating maxim above.
 
-**Engineering-side, by design.** The mattpocock toolchain assumes features come from product thinking (user needs, business goals) that lives outside this skill ecosystem. Stage 2 (`/to-features`) is the deliberate seam: features get *enumerated* here (read from `CONTEXT.md` + ADRs), but *discovered* elsewhere — in user interviews, product strategy, sales conversations, whatever your team uses. This toolchain has no opinion on that.
+**Engineering-side, by design.** The mattpocock toolchain assumes features come from product thinking (user needs, business goals) that lives outside this skill ecosystem. Stage 2 (`/to-features`) is the deliberate seam: features get *enumerated* here — an interview run in the grill's conversation that turns domain understanding into a backlog — but *discovered* elsewhere, in user research, product strategy, sales conversations, whatever your team uses. This toolchain has no opinion on that.
 
 See [REFERENCE.md](REFERENCE.md#how-this-differs-from-spec-kit-class-frameworks) for the comparison with spec-kit / BMAD / GSD.
 
@@ -147,10 +147,10 @@ Don't always start at stage 1 — jump to where the chain actually breaks.
 Invoked without a specific stage — *"plan this feature end-to-end," "how do I start on this idea?"* — act as the **conductor**. The chain packs into three **idempotent** building blocks; run them in order and let each skip whatever's already done:
 
 1. **Setup** (stage 0) — only if the repo isn't bootstrapped; it skips itself otherwise.
-2. **Spec** (stages 1–4, *interactive*) — grill → features → PRD → issues, leaving a `ready-for-agent` backlog. Resumes from whatever specs already exist.
+2. **Spec** (stages 1–4, *AFK-friendly*) — grill → features → PRD → issues, leaving a `ready-for-agent` backlog. Resumes from whatever specs already exist.
 3. **Ship-all** (stages 5–7, *AFK*) — build and ship the backlog.
 
-Pause through `spec` (it interviews the human); go AFK once `ship-all` starts. A HITL issue still pauses `ship-all` and waits. **Re-invoking is safe** — each command self-detects state, so a re-run continues where the chain left off. To jump straight to a single stage instead of driving the whole thing, use [Where to enter the chain](#where-to-enter-the-chain). `/triage` stays a parallel concern — pull external issues into the backlog as needed.
+**Spec is pausable; execution stays automatic via post-batch review.** Both blocks are **AFK-friendly** and record decisions via `log-decisions`; the **key difference** is what happens on an **unsure HITL call** (one only you can make). **Spec (1–4) pauses** to ask — its interviews proceed on recommended answers when you're away, stopping only to escalate a call that genuinely needs you. **Ship-all persists instead** — it journals and **parks** the escalation for your **batch review** (via [`/status`](references/status.md)) and keeps shipping independent issues, so the AFK batch never blocks (a pre-declared HITL issue is the exception — `ship-all` won't attempt it unattended and waits). **Re-invoking is safe** — each command self-detects state, so a re-run continues where the chain left off. To jump straight to a single stage instead of driving the whole thing, use [Where to enter the chain](#where-to-enter-the-chain). `/triage` stays a parallel concern — pull external issues into the backlog as needed.
 
 ## When is it done?
 

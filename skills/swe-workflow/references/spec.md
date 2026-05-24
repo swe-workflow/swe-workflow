@@ -6,7 +6,7 @@ Run the **spec layer** — stages 1 → 2 → 3 → 4 — turning an idea into a
 
 Per-stage detail (including when to skip each) is in [REFERENCE.md](../REFERENCE.md).
 
-**This is interactive, not AFK** — `grill-with-docs` and `to-issues` interview you. Expect to answer questions. (The unattended part is **ship-all**, [`ship-all.md`](ship-all.md), afterward.)
+**AFK-friendly — but it pauses for you.** `grill-with-docs`, `to-features`, and `to-issues` interview you intensively, yet each is AFK-friendly: when you're away it offers recommended answers and applies the `log-decisions` rules to decide or assume the determinable and reversible calls, recording them in the journal. What it **won't** settle alone is an **unsure HITL call** (irreversible, needs your context) — there it **pauses and escalates**, and waits. That's the line to execution: **spec pauses on an unsure HITL call; `/ship` and `/ship-all` ([`ship.md`](ship.md), [`ship-all.md`](ship-all.md)) persist it for your batch review and keep going** — same `log-decisions` rules in both, opposite reaction to the one call only you can make.
 
 ## Idempotent by design — do only what's missing
 Detect where the feature already is in the spec layer and resume; never clobber or duplicate. Each stage states its skip condition; run only the stages whose artifact is absent or stale.
@@ -17,7 +17,7 @@ Resolve the domain language → `CONTEXT.md` (+ ADRs under `docs/adr/` for subst
 - Otherwise invoke `grill-with-docs`. It's re-runnable — each pass **sharpens** `CONTEXT.md` (and may add ADRs); it refines, never duplicates. Loop until no questions remain or the user calls it.
 
 ## Stage 2 — Enumerate features (`to-features` skill)
-Read `CONTEXT.md` + ADRs → user-facing features in `FEATURES.md`.
+**Run in the same conversation as stage 1** — `CONTEXT.md` + ADRs don't capture every feature, so `to-features` rides the live grill context and **interviews** you to complete the set, then writes `FEATURES.md`. It offers recommended answers, follows `log-decisions`' AFK rules (proceed on safe defaults, escalate what needs you), and journals feature-scope calls.
 - **Idempotent**: if `FEATURES.md` exists, this is a **refinement** — propose additions / strikethroughs; never overwrite shipped (struck-through) lines.
 
 ## Stage 3 — Write the PRD (`to-prd` skill)
