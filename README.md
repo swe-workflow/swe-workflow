@@ -1,6 +1,6 @@
 # swe-workflow
 
-The idiomatic software-engineering workflow: **idea → PRD → issues → ship.** A chain of small, observable steps connected by markdown files — not an opaque framework.
+The idiomatic software-engineering workflow: **Idea → PRDs → Issues → ship.** A chain of small, observable steps connected by markdown files — not an opaque framework.
 
 It ships as **[Agent Skills](https://agentskills.io)**, so it runs on **Claude Code, Codex, Gemini CLI, Cursor**, and any other skills-compatible agent. Pure markdown — no scripts, no build.
 

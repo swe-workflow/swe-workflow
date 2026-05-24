@@ -46,9 +46,7 @@ When a feature ships, mark its line in `FEATURES.md` with strikethrough + a ship
 - **Traceability** — link from `FEATURES.md` to the issue/PR that completed it
 - **Drift resistance** — you can't quietly drop a feature; dropping requires explicitly marking it out of scope (and writing the reason to `.out-of-scope/`)
 
-Format:
-- Pending: `- [ ] user-can-reset-password — A user can reset a forgotten password`
-- Shipped: `- [x] ~~user-can-reset-password~~ — ~~A user can reset a forgotten password~~ (shipped: #42)`
+Format: each feature is a `- [ ]` header line (slug + one-line summary) **plus an indented detail block** — actor, value, scope, dependencies, open questions, grill notes — the rich seed `/grill-feature` reads to start informed. On ship, strike the header line and add a shipped ref; **keep the block**. Full format in the [`to-features` skill](../to-features/SKILL.md).
 
 ### Optional: stub the filesystem alongside
 
