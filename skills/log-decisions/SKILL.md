@@ -28,12 +28,12 @@ Categories (a descriptive label on each entry): `gate-resolution` (answered an o
 
 ## Defer: assume vs escalate
 
-- **Assume** — reversible & needs human context. Write `Outcome: assumed`, `Chosen:` your default, `Justification:` the default rule you applied, and **proceed**. It's a settled entry flagged for async review (it promotes, and surfaces in the PR body) — not a blocker.
-- **Escalate** — irreversible & needs human context, or the catastrophic floor. Write `Outcome: escalated`, `Chosen: —`, `Justification:` *why only a human can decide*, and **pause** for a human (the HITL pause in a build; just ask, interactively). It stays open — surfaced by `/status`, not promoted until resolved. Resolving escalations is the broader workflow's job.
+- **Assume** — reversible & needs human context. Write `Outcome: assumed`, `Chosen:` your default, `Justification:` the default rule you applied, and **proceed**. It's a settled entry flagged for async review — not a blocker.
+- **Escalate** — irreversible & needs human context, or the catastrophic floor. Write `Outcome: escalated`, `Chosen: —`, `Justification:` *why only a human can decide*, and **pause to ask a human**. It stays open until a human resolves it — don't mark it settled on your own.
 
 ## The entry
 
-One append-only `##` block in `DECISIONS.md` at the repo root. *(Inside a `/ship` build, append to the worktree's `DECISIONS.staged.md` instead — the build promotes settled entries to `DECISIONS.md` at close-out.)* Create the file with an `<!-- AI-maintained, append-only -->` header if absent. **Never edit, reorder, or delete existing entries.**
+One append-only `##` block in `DECISIONS.md` at the repo root. Create the file with an `<!-- AI-maintained, append-only -->` header if absent. **Never edit, reorder, or delete existing entries.**
 
 ```
 ## <ISO-8601 timestamp> — <context> — <category>
@@ -48,7 +48,7 @@ One append-only `##` block in `DECISIONS.md` at the repo root. *(Inside a `/ship
 **Supersedes:** <prior timestamp> — <why>   (only on a revision)
 ```
 
-`context` = an issue ref (`auth/02`, `#57`) or a session tag (`interactive/<topic>`, `grill-me/<topic>`).
+`context` = an issue ref (`auth/02`, `#57`) or a session tag (`interactive/<topic>`, `research/<topic>`).
 
 **Dedup / revise / reuse.** Before appending, check for an existing entry with the same `(context, Question)`: same `Chosen` → do nothing (retries don't duplicate); changed `Chosen` → append a new entry with `Supersedes:` (never edit the original). A prior entry for the same question is itself a valid citation — `grep` for it rather than re-deciding; never bulk-load the journal.
 
@@ -72,7 +72,7 @@ A determinable call — cite the artifact that settled it:
 **Ref:** (pending)
 ```
 
-A reversible call the spec left open — a logged assumption, so the build proceeds and the human reviews later:
+A reversible call the spec left open — a logged assumption, so you proceed and the human reviews later:
 
 ```
 ## 2026-05-22T14:05:00-07:00 — auth/02 — gate-resolution
