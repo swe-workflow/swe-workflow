@@ -11,8 +11,8 @@ It packages the idiomatic SWE workflow — **idea → PRD → issues → ship** 
 ## Repository layout (each dir maps to an architectural role)
 
 - `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` — plugin and marketplace manifests. Both carry a `version` that **must stay in sync** (see Releasing).
-- `commands/*.md` — **thin Claude-Code shims** (`setup`, `spec`, `ship`, `ship-all`, `status`) that keep the `/swe-workflow:*` slash-command UX; each just delegates to the `swe-workflow` skill's matching procedure (`Invoke the swe-workflow skill and run its ship procedure…`). Behavior lives in the skill, not here — so other agents get the same workflow without the commands.
-- `skills/swe-workflow/` — the one **workflow skill** that conducts the whole 0→7 chain: `SKILL.md` (the map + conductor), `REFERENCE.md` (per-stage detail + the always-on rules registry, read when something feels off), `references/{setup,spec,ship,ship-all,status}.md` (the five **stage procedures**; `ship.md` holds the single-source planner prompt), `trackers/` (tracker-adapter docs).
+- `commands/*.md` — **thin Claude-Code shims** (`setup`, `spec`, `grill-feature`, `ship`, `ship-all`, `status`) that keep the `/swe-workflow:*` slash-command UX; each just delegates to the `swe-workflow` skill's matching procedure (`Invoke the swe-workflow skill and run its ship procedure…`). Behavior lives in the skill, not here — so other agents get the same workflow without the commands.
+- `skills/swe-workflow/` — the one **workflow skill** that conducts the whole 0→7 chain: `SKILL.md` (the map + conductor), `REFERENCE.md` (per-stage detail + the always-on rules registry, read when something feels off), `references/{setup,spec,grill-feature,ship,ship-all,status}.md` (the six **stage procedures**; `ship.md` holds the single-source planner prompt, `grill-feature.md` the single-source step-3 grill + `to-prd` procedure that `/spec` and `/grill-feature` both run), `trackers/` (tracker-adapter docs).
 - `skills/to-features/`, `skills/log-decisions/` — the two companion skills (stage-2 feature enumeration; the decision journal).
 - `README.md` — install (universal `npx skills add` + Claude plugin) and per-agent invocation.
 - `.scratch/` — untracked dogfooding workspace; the repo runs its own workflow on itself (e.g. the `log-decisions` feature's PRD + issues live here).
@@ -22,7 +22,7 @@ It packages the idiomatic SWE workflow — **idea → PRD → issues → ship** 
 Stages 0→7, split into two layers plus a parallel concern. Each **stage procedure** automates a contiguous range (on Claude Code, run via its `/swe-workflow:*` command):
 
 - **Stage 0 — `/setup`**: one-time per-repo bootstrap (install prereq skills, inject the always-on rules, set the `DECISIONS.md` privacy policy). Idempotent.
-- **Stages 1–4 — `/spec`** (*spec layer*, interactive): grill domain → enumerate features → PRD → tracer-bullet issues. Leaves a `ready-for-agent` backlog.
+- **Stages 1–4 — `/spec`** (*spec layer*, AFK-friendly): grill domain → split into coarse features → grill + PRD each feature (`/grill-feature`) → tracer-bullet issues. Leaves a `ready-for-agent` backlog.
 - **Stages 5–7 — `/ship` (one issue) and `/ship-all` (the backlog, AFK)** (*execution layer*): worktree + planning-with-files → test-first build → PR + teardown.
 - **Parallel — `/triage`**: a state machine over *external* issues; **not** in the critical path (chain-created issues are auto-labeled `ready-for-agent`).
 - The **`swe-workflow` skill itself** is the conductor for the whole 0→7 chain when invoked without a specific stage.

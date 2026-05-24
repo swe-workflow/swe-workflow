@@ -34,7 +34,7 @@ If a `CONTEXT-MAP.md` exists at repo root, the project uses multiple bounded con
 
 ## Stage 2: `/to-features` — What features does this break into?
 
-The **product→engineering bridge**, formerly a manual filesystem action, now a dedicated skill. **Run it in the same conversation as stage 1** — `CONTEXT.md` (a glossary) and `docs/adr/` (sparse architectural calls) don't capture the full feature set, so `/to-features` rides the live grill context and **interviews** you to complete it, then writes `FEATURES.md` at the repo root. The interview offers a recommended answer to every question and applies the `log-decisions` rules — deciding what the grill or docs already settle, assuming the reversible-but-open calls — and journals the decisions. It's **AFK-friendly** (it proceeds on those recommendations when you're away), but an **unsure HITL call** makes it **pause and escalate** rather than guess — where `/ship`/`/ship-all` would instead *persist* that escalation for batch review and keep going. That pause-vs-persist split is the key spec/execution difference.
+The product→engineering bridge, and the **product-manager** step: `/to-features` **invokes `/grill-with-docs` at a high (product) level** to split the project into **coarse-grained** user-facing features, then writes them to `FEATURES.md`. It grills rather than reading files because `CONTEXT.md` (a glossary) and `docs/adr/` (sparse architectural calls) don't enumerate features — the set must be elicited. The distinct **stage-1 domain grill runs first**; this builds on it but aims at *features*, not vocabulary. Like the rest of the spec layer it's **AFK-friendly and pausable** — it proceeds on recommended answers via the `log-decisions` rules, but an **unsure HITL call pauses to escalate** (where `/ship`/`/ship-all` would persist it for batch review) — and it journals feature-scope calls.
 
 See the [`/to-features` skill](../to-features/SKILL.md) for the full process and file format.
 
@@ -64,21 +64,23 @@ This follows mattpocock's `.scratch/<feature>/` layout (see [`trackers/local-mar
 
 When using GitHub/Linear/Multica/GitLab and your team handles feature enumeration in those tools (epics, projects, etc.), skip `/to-features` — use the external source of truth and pass features directly to `/to-prd`. Stage 2 fills the seam for local-markdown teams (or solo devs) who'd rather keep feature tracking in the repo alongside the code.
 
-## Stage 3: `/to-prd` — What does done look like?
+## Stage 3: `/grill-feature` — What does done look like?
 
-**Trigger**: glossary is stable, but no spec exists yet.
+**Trigger**: a feature is picked from `FEATURES.md` and needs its spec.
 
-Synthesizes the conversation + codebase into a PRD without re-interviewing the user. The PRD contains:
+The second **product-manager** step — now its own command (`/grill-feature`) and procedure ([`references/grill-feature.md`](references/grill-feature.md)): **grill one feature, then synthesize its PRD.** `/spec` runs it inline for the feature it's targeting; `/grill-feature` runs it standalone, once per feature.
 
-- Problem Statement / Solution (user perspective)
-- User Stories (extensive, numbered)
-- Implementation Decisions (modules, interfaces, schemas — NO file paths)
-- Testing Decisions (which modules get tested, prior art)
-- Out of Scope
+1. **Grill the feature** — `grill-with-docs` scoped to the one feature (an **intensive, feature-level** interview — deeper than `to-features`' high-level project grill), grounded on `CONTEXT.md`/ADRs.
+2. **Synthesize** — `to-prd` turns that conversation into **one PRD** without re-interviewing (the grill is what gave it the material). The PRD contains:
+   - Problem Statement / Solution (user perspective)
+   - User Stories (extensive, numbered)
+   - Implementation Decisions (modules, interfaces, schemas — NO file paths)
+   - Testing Decisions (which modules get tested, prior art)
+   - Out of Scope
 
-Published as a parent issue with `ready-for-agent` triage label.
+   Published as a parent issue with the `ready-for-agent` triage label. One feature → one PRD; **skip** if one already exists.
 
-**Common mistake**: putting file paths or line numbers in the PRD. Those rot. Describe interfaces and behavior instead.
+**Common mistake**: putting file paths or line numbers in the PRD. Those rot. Describe interfaces and behavior instead. Full procedure: [`references/grill-feature.md`](references/grill-feature.md).
 
 ## Stage 4: `/to-issues` — What are the units of work?
 

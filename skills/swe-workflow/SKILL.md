@@ -15,18 +15,19 @@ The idiomatic software-engineer workflow: clarify the idea → spec it → slice
 |---|---|---|
 | 0 | [`references/setup.md`](references/setup.md) | `/swe-workflow:setup` |
 | 1–4 | [`references/spec.md`](references/spec.md) | `/swe-workflow:spec` |
+| 3 | [`references/grill-feature.md`](references/grill-feature.md) | `/swe-workflow:grill-feature` |
 | 5–7 | [`references/ship.md`](references/ship.md) | `/swe-workflow:ship` |
 | 5–7 ×N | [`references/ship-all.md`](references/ship-all.md) | `/swe-workflow:ship-all` |
 | — | [`references/status.md`](references/status.md) | `/swe-workflow:status` |
 
-- **Claude Code** — invoke the five `/swe-workflow:*` commands (thin `commands/` shims that run the matching procedure), or invoke this `swe-workflow` skill to drive the whole chain.
+- **Claude Code** — invoke the six `/swe-workflow:*` commands (thin `commands/` shims that run the matching procedure), or invoke this `swe-workflow` skill to drive the whole chain.
 - **Other agents** — invoke the `swe-workflow` skill and say what you want (*"ship issue 42"*); it routes to the right stage's reference file.
 
-Two other skills ship in the suite: **`to-features`** (stage 2 — enumerate features into `FEATURES.md`) and **`log-decisions`** (the decision journal). The external skills it orchestrates — `grill-with-docs`, `to-prd`, `to-issues`, `triage` (mattpocock), `planning-with-files`, `tdd`, `karpathy-guidelines` — install separately (the [setup procedure](references/setup.md) auto-installs them).
+Two other skills ship in the suite: **`to-features`** (stage 2 — split the project into coarse features in `FEATURES.md`) and **`log-decisions`** (the decision journal). The external skills it orchestrates — `grill-with-docs`, `to-prd`, `to-issues`, `triage` (mattpocock), `planning-with-files`, `tdd`, `karpathy-guidelines` — install separately (the [setup procedure](references/setup.md) auto-installs them).
 
 This `swe-workflow` skill is the **conductor + map**: it documents the whole chain and drives stages 0→7 when invoked without a specific stage (see [Driving the chain](#driving-the-chain-stages-07)).
 
-The spec-layer stages (1 `grill-with-docs`, 3 `to-prd`, 4 `to-issues`, plus the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`, `karpathy-guidelines`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; the **spec** procedure automates stages 1–4 and **ship** stages 5–7 of it.
+The spec-layer stages (1 `grill-with-docs`, 3 `grill-with-docs` + `to-prd` (run by `/grill-feature`), 4 `to-issues`, plus the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`, `karpathy-guidelines`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; the **spec** procedure automates stages 1–4 and **ship** stages 5–7 of it.
 
 ## The workflow
 
@@ -50,13 +51,13 @@ The spec-layer stages (1 `grill-with-docs`, 3 `to-prd`, 4 `to-issues`, plus the 
 │                                                                      │
 │  2. What features does this break into?                              │
 │     /to-features ──► FEATURES.md                                     │
-│              (same conversation as the grill; interview to draw out  │
-│               the user-facing features; strike through, don't delete)│
+│              (PM — high-level grill → coarse user-facing features;   │
+│               strike through, don't delete, on ship)                 │
 │                                                                      │
-│  3. What does done look like?                                        │
-│     /to-prd ──► PRD (auto-labeled `ready-for-agent`)                 │
-│              (Problem / Solution / User Stories /                    │
-│               Implementation Decisions / Testing Decisions / Scope)  │
+│  3. What does done look like?  (per feature)                         │
+│     /grill-feature = grill-with-docs <feature> + /to-prd ──► one PRD │
+│              (intensive feature grill, then synthesize —             │
+│               Problem / Solution / Stories / Decisions / Scope)      │
 │                                                                      │
 │  4. What are the units of work?                                      │
 │     /to-issues ──► N tracer-bullet issues                            │

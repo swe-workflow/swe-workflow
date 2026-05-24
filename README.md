@@ -11,13 +11,14 @@ It ships as **[Agent Skills](https://agentskills.io)**, so it runs on **Claude C
 | Stage(s) | What it does | Claude command |
 |---|---|---|
 | 0 | **Run first.** Bootstrap a repo — auto-install missing prerequisite skills, wrap stage-0, inject the always-on rules (decision-logging + engineering discipline), set the `DECISIONS.md` privacy policy. Idempotent. | `/swe-workflow:setup` |
-| 1–4 | Take ONE feature through **grill → features → PRD → issues** — leaves a `ready-for-agent` backlog. Interactive, idempotent. | `/swe-workflow:spec` |
+| 1–4 | Take ONE feature through **grill → features → PRD → issues** — leaves a `ready-for-agent` backlog. AFK-friendly, idempotent. | `/swe-workflow:spec` |
+| 3 | **Spec one feature into a PRD** — grill that feature, then synthesize (step 3 on its own, run per feature). | `/swe-workflow:grill-feature` |
 | 5–7 | Take ONE issue through **plan → build → close-out** — worktree + planning files, test-first build, PR, teardown. | `/swe-workflow:ship` |
 | 5–7 ×N | Run **ship** across a backlog in dependency order — each **AFK** issue, **pausing at HITL**. | `/swe-workflow:ship-all` |
 | — | Show planning status for the current issue, or roll up all in-flight issues + open escalations. | `/swe-workflow:status` |
 | 0–7 | Invoke the skill itself (*"plan this feature end-to-end"*) — it conducts the whole chain. | — |
 
-Two companion skills ship alongside: **`to-features`** (stage 2 — enumerate features into `FEATURES.md`) and **`log-decisions`** (the append-only `DECISIONS.md` journal). A typical run is **setup → spec → ship-all**.
+Two companion skills ship alongside: **`to-features`** (stage 2 — split the project into coarse features in `FEATURES.md`) and **`log-decisions`** (the append-only `DECISIONS.md` journal). A typical run is **setup → spec → ship-all**.
 
 ## Install
 
@@ -55,7 +56,7 @@ The workflow orchestrates several skills this suite doesn't bundle. **The setup 
 
 ```text
 spec layer — stages 1–4                        execution layer — stages 5–7
-grill → to-features → to-prd → to-issues  ──►  one issue: plan → build → close-out
+grill → to-features → prd → to-issues  ──►  one issue: plan → build → close-out
 (triage runs alongside)                        ship-all — the whole backlog, AFK
 ```
 

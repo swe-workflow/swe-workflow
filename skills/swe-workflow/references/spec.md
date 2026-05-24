@@ -17,12 +17,12 @@ Resolve the domain language → `CONTEXT.md` (+ ADRs under `docs/adr/` for subst
 - Otherwise invoke `grill-with-docs`. It's re-runnable — each pass **sharpens** `CONTEXT.md` (and may add ADRs); it refines, never duplicates. Loop until no questions remain or the user calls it.
 
 ## Stage 2 — Enumerate features (`to-features` skill)
-**Run in the same conversation as stage 1** — `CONTEXT.md` + ADRs don't capture every feature, so `to-features` rides the live grill context and **interviews** you to complete the set, then writes `FEATURES.md`. It offers recommended answers, follows `log-decisions`' AFK rules (proceed on safe defaults, escalate what needs you), and journals feature-scope calls.
+The **product-manager** step: `to-features` **invokes `/grill-with-docs` at a high level** to split the project into **coarse-grained** features, then writes `FEATURES.md`. (Files don't enumerate features — the set is elicited.) AFK-friendly and pausable; journals feature-scope calls via `log-decisions`.
 - **Idempotent**: if `FEATURES.md` exists, this is a **refinement** — propose additions / strikethroughs; never overwrite shipped (struck-through) lines.
 
-## Stage 3 — Write the PRD (`to-prd` skill)
-For the target feature, synthesize a PRD (Problem / Solution / User Stories / Implementation + Testing Decisions / Out of Scope), published as a parent issue labeled `ready-for-agent`.
-- **Skip if** a PRD already exists for this feature — don't create a duplicate parent (re-run `to-prd` only to refine a PRD whose feature genuinely changed).
+## Stage 3 — PRD one feature (`to-prd`, via the [`grill-feature.md`](grill-feature.md) procedure)
+The second **product-manager** step: **grill the target feature** (`grill-with-docs`, feature-scoped, intensive) **then synthesize its PRD** (`to-prd`) → one PRD, published as a parent issue labeled `ready-for-agent`. Run the [`grill-feature.md`](grill-feature.md) procedure — kept there as the single source; it's also the standalone `/grill-feature` command.
+- **Skip if** a PRD already exists for this feature — don't create a duplicate parent.
 - If no feature is targeted yet, pick from `FEATURES.md`; ask the user which when it's ambiguous.
 
 ## Stage 4 — Slice into issues (`to-issues` skill)
