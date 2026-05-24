@@ -15,15 +15,16 @@ The idiomatic software-engineer workflow: clarify the idea → spec it → slice
 |---|---|---|
 | 0 | [`references/setup.md`](references/setup.md) | `/swe-workflow:setup` |
 | 1–4 | [`references/spec.md`](references/spec.md) | `/swe-workflow:spec` |
+| 2 | [`references/to-features.md`](references/to-features.md) | `/swe-workflow:to-features` |
 | 3 | [`references/grill-feature.md`](references/grill-feature.md) | `/swe-workflow:grill-feature` |
 | 5–7 | [`references/ship.md`](references/ship.md) | `/swe-workflow:ship` |
 | 5–7 ×N | [`references/ship-all.md`](references/ship-all.md) | `/swe-workflow:ship-all` |
 | — | [`references/status.md`](references/status.md) | `/swe-workflow:status` |
 
-- **Claude Code** — invoke the six `/swe-workflow:*` commands (thin `commands/` shims that run the matching procedure), or invoke this `swe-workflow` skill to drive the whole chain.
+- **Claude Code** — invoke the seven `/swe-workflow:*` commands (thin `commands/` shims that run the matching procedure), or invoke this `swe-workflow` skill to drive the whole chain.
 - **Other agents** — invoke the `swe-workflow` skill and say what you want (*"ship issue 42"*); it routes to the right stage's reference file.
 
-Two companion skills ship in the suite — **`to-features`** (stage 2 — split the project into coarse features in `FEATURES.md`) and **`log-decisions`** (the decision journal). The spec-layer skills (`grill-with-docs`, `to-prd`, `to-issues`, and the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`, `karpathy-guidelines`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; **spec** automates stages 1–4 of it and **ship** stages 5–7.
+**`log-decisions`** ships in the suite as a companion skill (the decision journal). Stage 2 — **`to-features`**, which splits the project into coarse features in `FEATURES.md` — is a stage of *this* skill (its [`references/to-features.md`](references/to-features.md) procedure + the `/swe-workflow:to-features` command), not a separate skill. The spec-layer skills (`grill-with-docs`, `to-prd`, `to-issues`, and the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`, `karpathy-guidelines`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; **spec** automates stages 1–4 of it and **ship** stages 5–7.
 
 ## The workflow
 

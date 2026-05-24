@@ -36,7 +36,7 @@ If a `CONTEXT-MAP.md` exists at repo root, the project uses multiple bounded con
 
 The product→engineering bridge — the **product-manager** step. `/to-features` **invokes `/grill-with-docs` at a high (product) level** to split the project into **coarse-grained** user-facing features, then writes `FEATURES.md`. It grills rather than reading files because `CONTEXT.md` (a glossary) and `docs/adr/` (sparse architectural calls) don't enumerate features — the set must be elicited. The distinct **stage-1 domain grill runs first**; this builds on it but aims at *features*, not vocabulary. AFK-friendly and pausable — recommended answers via the `log-decisions` rules, an unsure HITL call pauses to escalate, feature-scope calls journaled.
 
-The full process, the `FEATURES.md` file format (the per-feature detail block), the **strike-through-don't-delete** discipline on ship, the optional `.scratch/<feature>/` filesystem stub for local-markdown teams, and when to skip the stage all live in the **[`to-features` skill](../to-features/SKILL.md)** — its home. Not restated here.
+The full process, the `FEATURES.md` file format (the per-feature detail block), the **strike-through-don't-delete** discipline on ship, the optional `.scratch/<feature>/` filesystem stub for local-markdown teams, and when to skip the stage all live in the **[`to-features.md` procedure](references/to-features.md)** — its home, now its own command (`/swe-workflow:to-features`). Not restated here.
 
 ## Stage 3: `/grill-feature` — What does done look like?
 
@@ -226,7 +226,7 @@ Every issue produced by `/to-issues` on the feature's PRD has merged. Workflow:
    ```
    - [x] ~~user-can-reset-password~~ — ~~A user can reset a forgotten password~~ (shipped: #42, #43, #44)
    ```
-3. **Never delete the line** (see the [`to-features` skill](../to-features/SKILL.md)) — strike-through preserves institutional memory and prevents quiet scope drift.
+3. **Never delete the line** (see the [`to-features.md` procedure](references/to-features.md)) — strike-through preserves institutional memory and prevents quiet scope drift.
 
 ### Project
 

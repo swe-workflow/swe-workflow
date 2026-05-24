@@ -8,13 +8,13 @@ It ships as **[Agent Skills](https://agentskills.io)**, so it runs on **Claude C
 
 `swe-workflow` is **one skill** that conducts the whole chain. Each stage is a procedure it runs on demand; on Claude Code each is also a slash command.
 
-Two companion skills ship alongside: **`to-features`** (stage 2 — split the project into coarse features in `FEATURES.md`) and **`log-decisions`** (the append-only `DECISIONS.md` journal). A typical run is **setup → spec → ship-all**.
+One companion skill ships alongside: **`log-decisions`** (the append-only `DECISIONS.md` journal). A typical run is **setup → spec → ship-all**.
 
 ## Install
 
 ### Claude Code
 
-Installs the plugin — all three skills (`swe-workflow`, `to-features`, `log-decisions`) plus the `/swe-workflow:*` slash commands.
+Installs the plugin — both skills (`swe-workflow`, `log-decisions`) plus the `/swe-workflow:*` slash commands.
 
 ```text
 /plugin marketplace add swe-workflow/swe-workflow
@@ -25,7 +25,7 @@ Installs the plugin — all three skills (`swe-workflow`, `to-features`, `log-de
 
 ### Other agents (universal)
 
-Installs the three skills — `swe-workflow`, `to-features`, `log-decisions`.
+Installs both skills — `swe-workflow` and `log-decisions`.
 
 ```text
 npx skills add swe-workflow/swe-workflow
@@ -33,7 +33,7 @@ npx skills add swe-workflow/swe-workflow
 
 ## Invoking
 
-- **Claude Code** — the slash commands `/swe-workflow:setup` (0), `:spec` (1–4), `:grill-feature` (3), `:ship` (5–7), `:ship-all` (5–7 ×N), `:status` (thin shims over the skill), or invoke the `swe-workflow` skill to drive the whole chain (0–7).
+- **Claude Code** — the slash commands `/swe-workflow:setup` (0), `:spec` (1–4), `:to-features` (2), `:grill-feature` (3), `:ship` (5–7), `:ship-all` (5–7 ×N), `:status` (thin shims over the skill), or invoke the `swe-workflow` skill to drive the whole chain (0–7).
 - **Codex · Gemini CLI · Cursor · others** — invoke the `swe-workflow` skill and say what you want (*"ship issue #42"*); it routes to the right stage. Most hosts also surface it as a slash command or trigger it from its description.
 
 ### Prerequisites
@@ -76,12 +76,12 @@ Spelled out for a fresh project — what to run at each stage, and the artifact 
 
 1. `/swe-workflow:setup` *(stage 0)* — run once at the repo root; bootstraps the repo and auto-installs the external skills the later steps need.
 2. `/grill-with-docs` *(stage 1)* — grill the domain → `CONTEXT.md` + `docs/adr/`.
-3. `/to-features` *(stage 2)* — split the project into coarse features → `FEATURES.md`.
+3. `/swe-workflow:to-features` *(stage 2)* — split the project into coarse features → `FEATURES.md`.
 4. `/swe-workflow:grill-feature` *(stage 3)* — once **per feature** → one PRD each.
 5. `/to-issues` *(stage 4)* — once **per PRD** → tracer-bullet issues, auto-labeled `ready-for-agent`.
 6. `/swe-workflow:ship-all` *(stages 5–7)* — build and ship the whole backlog, AFK.
 
-`/grill-with-docs`, `/to-features`, and `/to-issues` are the underlying skills, not `/swe-workflow:` commands — and steps 2–5 are exactly what `/swe-workflow:spec` runs for you. Drive the stages by hand with the individual skills, or run `/swe-workflow:spec` then `/swe-workflow:ship-all` for the hands-off path.
+`/grill-with-docs` and `/to-issues` are external (mattpocock) skills, while `/swe-workflow:to-features` and `:grill-feature` are commands in this suite — and steps 2–5 are exactly what `/swe-workflow:spec` runs for you. Drive the stages by hand, or run `/swe-workflow:spec` then `/swe-workflow:ship-all` for the hands-off path.
 
 ## License
 

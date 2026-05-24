@@ -16,8 +16,8 @@ Resolve the domain language → `CONTEXT.md` (+ ADRs under `docs/adr/` for subst
 - **Skip if** terminology is settled — `CONTEXT.md` exists and a grill pass surfaces no new questions.
 - Otherwise invoke `grill-with-docs`. It's re-runnable — each pass **sharpens** `CONTEXT.md` (and may add ADRs); it refines, never duplicates. Loop until no questions remain or the user calls it.
 
-## Stage 2 — Enumerate features (`to-features` skill)
-The **product-manager** step: `to-features` **invokes `/grill-with-docs` at a high level** to split the project into **coarse-grained** features, then writes `FEATURES.md`. (Files don't enumerate features — the set is elicited.) AFK-friendly and pausable; journals feature-scope calls via `log-decisions`.
+## Stage 2 — Enumerate features (the [`to-features.md`](to-features.md) procedure)
+The **product-manager** step: `to-features` **invokes `/grill-with-docs` at a high level** to split the project into **coarse-grained** features, then writes `FEATURES.md`. (Files don't enumerate features — the set is elicited.) AFK-friendly and pausable; journals feature-scope calls via `log-decisions`. Run the [`to-features.md`](to-features.md) procedure — kept there as the single source; it's also the standalone `/swe-workflow:to-features` command.
 - **Idempotent**: if `FEATURES.md` exists, this is a **refinement** — propose additions / strikethroughs; never overwrite shipped (struck-through) lines.
 
 ## Stage 3 — PRD one feature (`to-prd`, via the [`grill-feature.md`](grill-feature.md) procedure)
@@ -32,4 +32,4 @@ Break the PRD into **tracer-bullet** issues (thin vertical slices through every 
 ## Done
 You now have a `ready-for-agent` backlog. Hand off to **ship** ([`ship.md`](ship.md), one issue) or **ship-all** ([`ship-all.md`](ship-all.md), the batch).
 
-**Prerequisites** (not bundled): the `grill-with-docs`, `to-prd`, `to-issues` skills (`mattpocock/skills`). `to-features` is part of this suite. If a prerequisite is missing, say so and stop rather than improvising.
+**Prerequisites** (not bundled): the `grill-with-docs`, `to-prd`, `to-issues` skills (`mattpocock/skills`). (`to-features` and `grill-feature` are internal `swe-workflow` procedures, not separate installs.) If a prerequisite is missing, say so and stop rather than improvising.

@@ -1,11 +1,8 @@
----
-name: to-features
-description: Split the project into coarse-grained, user-facing features → FEATURES.md, capturing a rich detail block per feature (actor, value, scope, dependencies, open questions, grill notes) so /grill-feature starts informed rather than from a bare slug. The product-manager step — to-features invokes /grill-with-docs at a high level to elicit the major capabilities, not read them off CONTEXT.md/ADRs (which don't enumerate features). Runs after the stage-1 domain grill and before /grill-feature. AFK-friendly and pausable; records feature-scope calls via log-decisions.
----
+# Stage 2 — Enumerate features → FEATURES.md
 
-# to-features
+Split the project into **coarse-grained, user-facing features** → `FEATURES.md`. This is the **product-manager** step of the spec layer: it answers *what should the product do?* at the project level — the big capabilities, in user language (`user-can-…`, `admin-can-…`) — not *how* any one of them is built. It sits **after** the stage-1 domain grill (which grounds `CONTEXT.md`/ADRs) and **before** [`/grill-feature`](grill-feature.md), which grills and specs each feature in depth. Each feature is recorded as a **rich detail block, not a bare slug**, so `/grill-feature` starts from real context.
 
-Split the project into **coarse-grained, user-facing features** → `FEATURES.md`. This is the **product-manager** step of the spec layer: it answers *what should the product do?* at the project level — the big capabilities, in user language (`user-can-…`, `admin-can-…`) — not *how* any one of them is built. It sits **after** the stage-1 domain grill (which grounds `CONTEXT.md`/ADRs) and **before** [`/grill-feature`](../swe-workflow/references/grill-feature.md), which grills and specs each feature in depth. Each feature is recorded as a **rich detail block, not a bare slug**, so `/grill-feature` starts from real context.
+This is **step 2 of the [spec layer](spec.md)**: `/spec` runs it inline as part of stages 1–4. On Claude Code it also runs standalone as `/swe-workflow:to-features`; on other agents, invoke the `swe-workflow` skill and ask to enumerate the project's features.
 
 ## How it works — a high-level grill, then coarse features
 
@@ -41,7 +38,7 @@ stage 4   /to-issues ─► tracer-bullet issues
 
 ## AFK-friendly and pausable
 
-Like the rest of the spec layer, the high-level grill is **AFK-friendly**: it offers a recommended answer to each question and applies the **[`log-decisions`](../log-decisions/SKILL.md)** rules (decide / assume) to keep moving when you're away, but **pauses and escalates** on an unsure HITL call (e.g. committing the v1 scope a stakeholder owns) rather than guess.
+Like the rest of the spec layer, the high-level grill is **AFK-friendly**: it offers a recommended answer to each question and applies the **[`log-decisions`](../../log-decisions/SKILL.md)** rules (decide / assume) to keep moving when you're away, but **pauses and escalates** on an unsure HITL call (e.g. committing the v1 scope a stakeholder owns) rather than guess.
 
 **Record feature-scope decisions.** A coarse-feature call someone would want to review — **including or dropping** a feature, **splitting or merging**, **deferring to vNext** — is journal-worthy: log it via `log-decisions` (`gate-resolution` / `tradeoff`), citing the grill / `CONTEXT.md` / ADR that grounded it. **Rejecting** a feature → write the reason to `.out-of-scope/<concept>.md` *and* log a `deviation` / `tradeoff` pointing at it.
 
@@ -94,7 +91,7 @@ Mark the **header line** with strikethrough + a shipped reference (issue number,
   - **Actor:** … (block preserved as the record)
 ```
 
-## Why this skill exists
+## Why this stage exists
 
 mattpocock's chain (`/to-prd`, `/to-issues`, `/triage`) is engineering-side — it assumes the feature set already exists. `/to-prd` deliberately **doesn't interview**; it synthesizes from a conversation. So the work of *eliciting what the features are* has no home in that chain. `to-features` is that home: the **PM step** that grills the project at a high level and writes the coarse backlog that `/grill-feature` then specs one at a time.
 
@@ -102,4 +99,8 @@ It reads engineering artifacts (`CONTEXT.md`, ADRs) but its output (`FEATURES.md
 
 ## When to skip
 
-If your team enumerates features in an external tool — Linear projects, Notion, Productboard, a spreadsheet, anything — skip `to-features`, keep that as the source of truth, and pass features straight to `/grill-feature`. This skill fills the seam for teams without a product-backlog convention, or solo devs who'd rather keep feature tracking in the repo alongside the code.
+If your team enumerates features in an external tool — Linear projects, Notion, Productboard, a spreadsheet, anything — skip this stage, keep that as the source of truth, and pass features straight to `/grill-feature`. It fills the seam for teams without a product-backlog convention, or solo devs who'd rather keep feature tracking in the repo alongside the code.
+
+## Prerequisites
+
+Not bundled: the `grill-with-docs` skill (`mattpocock/skills`), which this stage drives at a high (product) level. If it's missing, say so and stop rather than improvising.
