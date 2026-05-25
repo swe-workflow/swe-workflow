@@ -166,10 +166,12 @@ If the issue is `ready-for-human` or the AGENT-BRIEF flags HITL checkpoints:
 The procedure is a single step — [ship.md](references/ship.md), Stage 7 step 8. What that step leaves implicit — the *why* and the edge cases:
 
 - **The failure it guards against.** The most-cited unattended-run failure is *trusting the agent's own summary of what it did* — `progress.md` is the implementer narrating its own success. Hence the step's two non-negotiables: a **separate** context (not the author) that is **read-only** (so it can't quietly fix-and-pass), there to read actual state rather than re-read the narrative. Separation of duties — a reviewer who can't merge their own PR.
+- **It's the autonomy gate.** A clean pass is what lets an **AFK** issue complete *without a human merge* — the conductor merges, tears down, and marks it done on the green light, and the human spot-checks afterward via the PR + its Autonomy-decisions record. It's the only thing standing between a build and the default branch, so the bar is real. (HITL waits for a human; a gap loops back to Stage 6; a parked escalation never reaches close-out.)
 - **Complementary to `/tdd`, not a duplicate.** `/tdd` is the implementer's per-phase self-check (red → green as each phase is built); the review is a separate whole-diff cross-check at the end. One proves each phase in isolation; the other asks whether the finished change, in total, satisfies the issue.
 - **Inside the security boundary.** If the reviewer needs the issue's raw acceptance text, it reads `findings.md` — never the re-injected `task_plan.md`.
 - **Idempotent.** Read-only and side-effect-free, so an interrupted run re-runs it safely.
-- **Host-neutral contract.** "A fresh read-only context" is all the procedure asks for; *how* you get one — sub-agent vs. new session — is the host's business (see [Clean context per issue](#clean-context-per-issue)).
+- **Fresh per diff.** The reviewer mirrors the build's rule one level down — [clean context per issue](#clean-context-per-issue) applied per *diff*: a fresh read-only context for each, never one long-running reviewer accumulating reviews (the reviewer's own ball of mud).
+- **Host-neutral contract.** "A fresh read-only context" is all the procedure asks for; *how* you get one — sub-agent vs. new session — is the host's business.
 
 ### Teardown after PR merge
 
@@ -198,7 +200,7 @@ If you want the planning files as a post-mortem record, commit them on the branc
 Bar-crossing decisions made during a build — gate-resolutions, deviations, tradeoffs, irreversible-action calls, flagged assumptions, escalations — are recorded by the `log-decisions` skill, **not** in the ephemeral `task_plan.md` Decisions table (which keeps only reversible execution decisions). The flow:
 
 - **During the build (in the worktree):** append entries to `DECISIONS.staged.md` — plugin-owned, gitignored, ephemeral. Resolve each call per the **`log-decisions`** rules (look first → decide / assume / escalate, with the catastrophic floor that always escalates). In a build an escalation **parks for batch review — it doesn't pause** (the park model below).
-- **At close-out (Stage 7, from the main checkout):** promote the staged entries into repo-root `DECISIONS.md` and commit them as their own `log:` commit. Serialized by teardown, so parallel worktrees never conflict. The PR body also carries an "Autonomy decisions" section for pre-merge visibility.
+- **At close-out (Stage 7, from the main checkout):** promote the staged entries into repo-root `DECISIONS.md` and commit them as their own `log:` commit. Serialized by teardown, so parallel worktrees never conflict. The PR body also carries an "Autonomy decisions" section for the human's post-merge spot-check.
 - `DECISIONS.md` is **settled history only** (append-only) — including flagged **assumptions** (`assumed`), which promote and surface in the PR body for async review; open **escalations** stay in their worktrees, surfaced by `/status`.
 - **Escalations park, they don't halt.** In `/ship-all`, a mid-build escalation parks that one issue (worktree intact, dependents skipped) and the batch continues with independents; a build *failure* (3-strike) halts. `/status` from the main checkout aggregates open escalations across worktrees, so you resolve them in a batch.
 
@@ -289,7 +291,7 @@ A phase in `task_plan.md` is done when its `/tdd` cycle lands green (or, for non
 
 ### Issue
 
-All phases in `task_plan.md` ticked **and** PR merged into the default branch. The merge event is the durable signal — `task_plan.md` itself is ephemeral. The tracker carries the persistent "closed/merged" status.
+All phases in `task_plan.md` ticked **and** the change merged into the default branch. For an **AFK** issue that merge is **autonomous** — the [adversarial review](#adversarial-review-before-close-out)'s clean pass triggers it, not a human at the merge button (the human spot-checks after); a **HITL** issue waits for a human. Either way the merge event is the durable signal — `task_plan.md` itself is ephemeral — and the tracker carries the persistent "closed/merged" status.
 
 ### Feature
 
