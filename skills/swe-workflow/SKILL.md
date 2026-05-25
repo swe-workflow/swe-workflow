@@ -109,11 +109,12 @@ See [REFERENCE.md](REFERENCE.md#parallel-concern-triage--whats-actionable-for-ex
 
 ## Design philosophy
 
-This is a **chain of small skills, not a framework.** Three principles guard against drifting into framework opacity:
+This is a **chain of small skills, not a framework.** Four principles hold the design together — the first three guard against framework opacity, the fourth makes the chain safe to re-run:
 
 1. **Own the process.** "Process" here means *deciding what goes into context at each stage*. Every skill in the chain is a markdown file you can read, edit, swap, or skip — there is no opaque orchestrator.
 2. **Every artifact is observable.** PRDs, issues, AGENT-BRIEFs, `task_plan.md`, `findings.md`, `progress.md` — all human-readable markdown, all `cat`-able at any point.
-3. **Ephemeral state is intentional.** Per-issue worktrees and planning files die when the PR ships. Deliberate defense against spec/plan drift accumulating into a "ball of mud" over time.
+3. **Ephemeral state is intentional — files *and* context.** Per-issue worktrees and planning files die when the PR ships; and each issue ideally builds in a **fresh context** ([clean context per issue](REFERENCE.md#clean-context-per-issue)), not one accumulating across issues. Two kinds of state, one defense: neither stale artifacts nor stale context can pile into a "ball of mud" over time.
+4. **Idempotent by design.** Because the state lives in observable artifacts (principle 2), not the agent's head, any stage can re-read where things stand and pick up — so every command is safe to re-run: it no-ops a finished step, resumes an interrupted one, and never duplicates or clobbers. That's what lets the chain survive an interruption, a `/clear`, or an unattended batch.
 
 Operating maxim (Matt Pocock, after [surveying ~2000 AI coding course participants on framework dissatisfaction](https://x.com/mattpocockuk/status/2044029094942159126)): *"a good framework hands a lot of control over to the user and is easy to observe."* If a proposed addition reduces either, reject it — even if it's borrowed from a framework that looks useful.
 

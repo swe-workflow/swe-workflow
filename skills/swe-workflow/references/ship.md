@@ -6,6 +6,8 @@ Run the **execution layer** — stages 5 → 6 → 7 — for a single issue: pla
 
 **Unattended, not unsupervised.** For an **AFK** issue, ship runs end-to-end without interviewing you — `/tdd`'s mid-build calls go through the `log-decisions` rules (decide / assume / escalate), not to a prompt. It doesn't decide blindly: a reversible best-guess is logged as an **assumption** and surfaced in the PR's *Autonomy decisions* section to confirm, and an **unsure HITL call** (irreversible, needs you) does **not** pause the run — it's **persisted for your batch review**, parked and surfaced by [`/status`](status.md), while shipping continues. (A **pre-declared HITL** issue is separate — it pauses at its documented checkpoints; see [HITL](#hitl).) `/ship-all` ([`ship-all.md`](ship-all.md)) is this same per-issue posture, looped over the backlog.
 
+**Idempotent — safe to re-run.** Stage 5's re-run check (step 4) is the mechanism: a re-run resumes an interrupted build from `task_plan.md`, finishes a half-done teardown, or no-ops an already-shipped issue — it never re-builds a finished issue, re-merges its PR, or clobbers a live worktree. (`/ship-all` inherits this by looping `/ship`.)
+
 Rationale, the security boundary, and per-tracker fetch commands live alongside this file: [REFERENCE.md](../REFERENCE.md), [trackers/](../trackers/).
 
 ## Stage 5 — Plan
