@@ -296,11 +296,11 @@ All phases in `task_plan.md` ticked **and** the change merged into the default b
 
 ### Feature
 
-Every issue produced by `/to-issues` on the feature's PRD has merged. Workflow:
+Every issue produced by `/to-issues` on the feature's PRD has reached a **terminal** state — `shipped`, or closed-unshipped. A rejected or duplicate child is *resolved* and doesn't block the feature; a child still in-flight (`needs-info`, etc.) does. Workflow:
 
-1. **Detect**: walk from the PRD to its child issues (via the parent reference each issue body carries) and confirm all closed.
+1. **Detect**: walk from the PRD to its child issues (via the parent reference each issue body carries) and confirm every child is [terminal](trackers/README.md#lifecycle-states) — none still in-flight.
    - **GitHub**: `gh issue list --search "parent:<PRD#> state:open"` returns empty.
-   - **Local-markdown**: every file in `.scratch/<feature-slug>/issues/` has a terminal `Status:` (e.g., `closed`).
+   - **Local-markdown**: every file in `.scratch/<feature-slug>/issues/` has a terminal `Status:` ([lifecycle states](trackers/README.md#lifecycle-states)).
    - **Linear / GitLab / Multica**: tracker-specific child-issue query.
 2. **Mark**: strike through the `FEATURES.md` line and append shipped refs:
    ```

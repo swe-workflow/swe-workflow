@@ -41,6 +41,17 @@ Derived once, the same way for every tracker:
 - **Fetch one** — given an issue ID → a normalized issue. Used by `/ship`.
 - **List ready** — enumerate the tracker's `ready-for-agent` issues (scoped to a feature if one is given). Used by `/ship-all`. `ready-for-agent` is the canonical *role*; the **actual label string** for this repo comes from mattpocock's `docs/agents/triage-labels.md` (written here as `<ready-for-agent>`).
 
+## Lifecycle states
+
+Close-out itself is tracker-agnostic — [the ship procedure owns it](../references/ship.md). The only thing a tracker contributes is its **status vocabulary**: which states are **terminal** vs. **in-flight**. That one line is all the chain's reads turn on — **list ready** returns only `ready-for-agent`, `/ship`'s re-run check skips a terminal issue, and [feature completion](../REFERENCE.md#completion-signals) counts a terminal child resolved.
+
+- **In-flight** — `/triage`'s intake roles (`needs-triage` … `ready-for-human`), per the repo's `triage-labels.md`. Not this contract's to define.
+- **Terminal** — settled, won't re-enter the chain:
+  - `shipped` — built and merged; **swe-workflow's success state**, set by `/ship` close-out (triage never models completion).
+  - closed-unshipped — `wontfix`, `duplicate` (link the original), or a team's own value (e.g. `obsolete`); a triage decision, no code landed.
+
+Each tracker **realizes** these states natively — GitHub `open`/`closed`, Linear `Done`/`Canceled`/`Duplicate`, `local-markdown` the literal `Status:` string (`shipped`, `wontfix`, …). The only per-tracker variation close-out cares about is how it *reaches* the terminal state: where merge and close are coupled through a PR/MR the merge reaches it for free; otherwise [close-out](../references/ship.md) sets it. Adding a terminal value changes nothing in the three consumers.
+
 ## Selection — which adapter
 
 First match wins:
@@ -60,6 +71,7 @@ Write `trackers/<name>.md` satisfying this contract — that's the whole job:
 - **CLI / auth** and **ID format**
 - **Fetch one** command + any field-mapping *deltas* from the normalized issue
 - **List ready** command
+- **Terminal state** — the tracker's terminal status value(s), and (only if the merge doesn't auto-close the issue, e.g. no PR like `local-markdown`) how close-out writes it
 - **AGENT-BRIEF location** — only if it deviates from the standard resolution
 - **Auto-detect signal**
 
