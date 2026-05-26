@@ -222,6 +222,21 @@ Bar-crossing decisions made during a build — gate-resolutions, deviations, tra
 
 **Journal vs ADR.** The journal records *events* ("on this date, this was decided, by whom"); `docs/adr/` records *ratified architecture* ("this IS the decision now"). A journal entry that proves architecturally significant is **promoted to an ADR manually** — never automatically — and the entry notes the promotion. See the `log-decisions` skill for the entry schema and rules.
 
+### Stop conditions
+
+A long-horizon build doesn't run until it *can't* — it stops at a small, explicit set of triggers (the supervision surface of the execution layer). Each lives in its canonical home; this is the consolidated list:
+
+| Trigger | What happens | Home |
+|---|---|---|
+| A **bar-crossing call only a human can make** (incl. the catastrophic floor — always escalate) | escalate → parks for batch review | [Decision journal](#decision-journal-decisionsmd) / `log-decisions` |
+| A **pre-declared HITL checkpoint** | pause, wait for the human | [HITL execution](#hitl-execution) |
+| A **test that won't go green** (same error 3×) | **halt** — the 3-strike protocol | [Inner loop](#inner-loop-tdd-within-each-code-producing-phase) |
+| A **failed adversarial review** | loop back to Stage 6 — a gap never reaches close-out | [Adversarial review](#adversarial-review-before-close-out) |
+| **Scope discovered beyond the slice** | route to a durable home; keep the slice bounded | [Discovered scope](#discovered-scope) |
+| A build that **thrashes without converging** (no net progress, short of a 3-strike trip) | **park** for reassessment, don't grind on | [ship Stage 6](references/ship.md) |
+
+All but the last already existed across the chain; the last is the soft circuit-breaker that keeps a long-horizon build from grinding once it's lost the thread. Everything parked here surfaces to a returning operator via [`/status`](references/status.md).
+
 ## Session topology
 
 How to map the 0→7 chain onto agent CLI sessions — host-neutral operator guidance, not a mandated mechanism. **Files are the interface**, so a session can end wherever a durable artifact exists and the next one resumes from it (`CONTEXT.md` / `FEATURES.md` / PRD / issue + AGENT-BRIEF). But those artifacts are a *lossy* compression of the grilling conversation — rejected alternatives, the "why we landed here," the priority feel don't all survive. So every cut trades **context warmth** (fidelity to intent) against **isolation** (clean context, observability, parallelism, a fresh context for the [adversarial-review](#adversarial-review-before-close-out) gate). Three points on that spectrum:
