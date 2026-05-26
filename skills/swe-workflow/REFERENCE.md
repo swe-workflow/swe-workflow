@@ -233,7 +233,7 @@ A long-horizon build doesn't run until it *can't* — it stops at a small, expli
 | A **test that won't go green** (same error 3×) | **halt** — the 3-strike protocol | [Inner loop](#inner-loop-tdd-within-each-code-producing-phase) |
 | A **failed adversarial review** | loop back to Stage 6 — a gap never reaches close-out | [Adversarial review](#adversarial-review-before-close-out) |
 | **Scope discovered beyond the slice** | route to a durable home; keep the slice bounded | [Discovered scope](#discovered-scope) |
-| A build that **thrashes without converging** (no net progress, short of a 3-strike trip) | **park** for reassessment, don't grind on | [ship Stage 6](references/ship.md) |
+| A build that **thrashes without converging** (no `task_plan.md` phase advancing across cycles, short of a 3-strike trip) | **park** for reassessment, don't grind on | [ship Stage 6](references/ship.md) |
 
 All but the last already existed across the chain; the last is the soft circuit-breaker that keeps a long-horizon build from grinding once it's lost the thread. Everything parked here surfaces to a returning operator via [`/status`](references/status.md).
 
