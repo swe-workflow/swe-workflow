@@ -1,6 +1,6 @@
 ---
 name: swe-workflow
-description: The idiomatic idea → PRD → issues → shipped-PR workflow, built as a chain of small Markdown skills. Use to plan a feature end-to-end, turn a fuzzy idea into a PRD, or ship a ready-for-agent issue.
+description: The idiomatic idea → PRD → issues → shipped-PR workflow. Use to plan a feature end-to-end, turn a fuzzy idea into a PRD, or ship a ready-for-agent issue.
 ---
 
 # SWE Workflow
