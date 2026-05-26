@@ -1,6 +1,6 @@
 ---
 name: swe-workflow
-description: Orchestrates the full five-stage flow from raw idea to shipped PR — grill-with-docs → to-prd → to-issues → triage → worktree+planning-with-files. Each stage answers one question (What do I want? / What does done look like? / What are the units of work? / What's actionable? / Build it). Use when the user has an idea but no spec yet, wants to plan a feature end-to-end, says "let's PRD this," asks "how do I start on this idea?", or grabs a ready-for-agent issue to implement.
+description: The idiomatic idea → PRD → issues → shipped-PR workflow, built as a chain of small Markdown skills. Use to plan a feature end-to-end, turn a fuzzy idea into a PRD, or ship a ready-for-agent issue.
 ---
 
 # SWE Workflow

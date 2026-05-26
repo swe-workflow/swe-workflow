@@ -1,6 +1,6 @@
 ---
 name: log-decisions
-description: Maintain a running DECISIONS.md markdown file at the repo root — an append-only journal of consequential calls the spec didn't settle. Decide-and-log when the repo grounds the call, log a best-guess assumption when it's reversible, or escalate when only a human can decide. Use whenever you (or the user) make a non-trivial call worth a durable record — an under-specified requirement, a tradeoff, a deviation, a hard-to-undo action, or any call someone would want to review.
+description: Append-only DECISIONS.md journal at the repo root for consequential calls the spec didn't settle. Use when you (or the user) make a non-trivial call worth a durable record — an under-specified requirement, a tradeoff, a deviation, or a hard-to-undo action.
 ---
 
 # log-decisions

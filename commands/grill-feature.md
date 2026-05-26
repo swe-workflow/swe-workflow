@@ -1,5 +1,5 @@
 ---
-description: Spec one feature into a PRD (swe-workflow stage 3) — grill that feature with grill-with-docs, then synthesize its PRD with to-prd. Pass a feature slug from FEATURES.md. Runs per feature; to-issues slices the PRD afterward. Idempotent — skips a feature that already has a PRD.
+description: Spec one feature into a PRD (swe-workflow stage 3) — grill it, then synthesize the PRD. Pass a feature slug from FEATURES.md. Idempotent — skips a feature that already has a PRD.
 argument-hint: [feature-slug]
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 ---

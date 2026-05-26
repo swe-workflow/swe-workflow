@@ -1,5 +1,5 @@
 ---
-description: Batch-run /ship across a backlog — ship each AFK issue sequentially in dependency order, one worktree at a time, each with a fresh-context review before close-out, pausing at HITL issues. Optional scope = a feature directory.
+description: Batch-run /ship across a backlog — each AFK issue sequentially, in dependency order, pausing at HITL issues. Optional scope = a feature directory.
 argument-hint: [scope]
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 ---

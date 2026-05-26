@@ -1,5 +1,5 @@
 ---
-description: Plan, build, and close out ONE issue end to end (swe-workflow stages 5->6->7). Takes an issue slug — a local-markdown issue path, or a tracker id (GitHub #, Linear key).
+description: Plan, build, and close out ONE issue end to end (swe-workflow stages 5–7). Takes an issue slug — a local-markdown path, or a tracker id (GitHub #, Linear key).
 argument-hint: <issue-slug>
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 ---

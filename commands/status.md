@@ -1,5 +1,5 @@
 ---
-description: Show swe-workflow status for the current project or issue — phase, progress, decisions, errors — and, from the main checkout, every in-flight issue's progress plus open escalations across all live worktrees.
+description: Show swe-workflow status — the current issue's phase, progress, decisions, and errors; or from the main checkout, every in-flight issue plus open escalations across worktrees.
 allowed-tools: Bash, Read
 ---
 

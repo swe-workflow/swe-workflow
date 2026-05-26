@@ -1,5 +1,5 @@
 ---
-description: Bootstrap a repo for swe-workflow — auto-install missing prerequisite skills, wrap stage-0 setup, inject the always-on rules (decision-logging and engineering discipline), configure the DECISIONS.md privacy policy, and choose the landing method. Safe to re-run (idempotent).
+description: Bootstrap a repo for swe-workflow (stage 0) — install prerequisite skills, inject the always-on rules, and record per-repo config (tracker, decisions privacy, landing method). Idempotent, safe to re-run.
 allowed-tools: Bash, Read, Write, Edit, Grep
 ---
 

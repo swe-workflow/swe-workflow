@@ -1,5 +1,5 @@
 ---
-description: Derive PRDs and issues from an idea or feature end to end (swe-workflow stages 1->2->3->4) — grill the domain, enumerate coarse features, grill + PRD each feature, slice into tracer-bullet issues. Leaves a ready-for-agent backlog for /ship. Optional arg = a feature slug or a raw idea. Idempotent — resumes from whatever already exists.
+description: Take an idea or feature from domain grill to a ready-for-agent backlog (swe-workflow stages 1–4) — grill, features, PRD, issues. Optional arg = a feature slug or raw idea. Idempotent.
 argument-hint: [feature-or-idea]
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep
 ---
