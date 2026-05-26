@@ -1,5 +1,5 @@
 ---
-description: Bootstrap a repo for swe-workflow (stage 0) — install prerequisite skills, inject the always-on rules, and record per-repo config (tracker, decisions privacy, landing method). Idempotent, safe to re-run.
+description: Bootstrap a repo for swe-workflow (stage 0) — install prerequisite skills, inject the always-on rules, and configure per-repo settings (issue tracker, triage labels, domain docs, landing method). Idempotent, safe to re-run.
 allowed-tools: Bash, Read, Write, Edit, Grep
 ---
 
