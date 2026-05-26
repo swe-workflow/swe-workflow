@@ -62,7 +62,7 @@ First match wins:
 4. **Auto-detect** — each adapter's signal (below).
 5. **Ask** the user.
 
-The tracker name is *not* double-recorded: `.swe-workflow.conf` carries only swe-workflow-specific config (e.g. `decisions=`).
+The tracker name is *not* double-recorded: `.swe-workflow.conf` carries only swe-workflow-specific config (e.g. `decisions=`, `landing=`).
 
 ## Adding a tracker
 

@@ -62,6 +62,16 @@ Test-first development via the `tdd` skill is **not** a repo-wide rule — it is
 4. **On `decisions=local`**, add `DECISIONS.md` to `.gitignore` **if not already listed**.
 5. **Always** add `DECISIONS.staged.md` to `.gitignore` **if not already listed** (the ephemeral per-worktree staging file is never committed).
 
-## 5. Report
+## 5. Choose the landing method
 
-Summarize: prerequisites installed (with the restart reminder), whether stage-0 ran, the rule injections (each added / already present), and the privacy choice. If a restart is needed, say so clearly.
+How `/ship` lands a finished branch into the canonical branch ([Landing the work](../REFERENCE.md#landing-the-work)) is a per-repo choice — record it once here.
+
+1. **Check whether `origin` is a fork** — `gh repo view --json isFork -q .isFork` (or: an `upstream` remote exists). This decides the recommendation.
+2. **Offer both, and mark the recommendation from that check** — a **fork** can't push to `upstream`, so it needs a PR → recommend **`pr`**; otherwise you own `main` → recommend **`direct`**:
+   - **`pr`** — land via a pull request — the reviewable, protected-`main`-safe path. *Also pick this for a non-fork whose `main` is protected/shared.*
+   - **`direct`** — merge straight onto `main`, no PR — for a repo you own outright (incl. local-only), where the adversarial review is the only gate.
+3. **Record the choice** in `.swe-workflow.conf` — set or **update** the `landing=` line (`pr` or `direct`); don't append a duplicate if one is present. `/ship` reads it at close-out; absent it, the method falls back to topology inference.
+
+## 6. Report
+
+Summarize: prerequisites installed (with the restart reminder), whether stage-0 ran, the rule injections (each added / already present), the privacy choice, and the landing method. If a restart is needed, say so clearly.

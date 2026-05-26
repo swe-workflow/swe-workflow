@@ -176,7 +176,7 @@ The procedure is a single step — [ship.md](references/ship.md), Stage 7 step 8
 
 ### Landing the work
 
-Close-out lands the **branch** — *the worktree is just a second checkout of it, irrelevant here* (it matters only at teardown). Two habits first: **rebase onto the target** (`git rebase <target>`) so conflicts resolve before review rather than during the merge, and match the repo's **merge convention** (merge / squash / rebase-and-merge). **How** to land is keyed on repo topology + branch protection — *not* the issue tracker:
+Close-out lands the **branch** — *the worktree is just a second checkout of it, irrelevant here* (it matters only at teardown). Two habits first: **rebase onto the target** (`git rebase <target>`) so conflicts resolve before review rather than during the merge, and match the repo's **merge convention** (merge / squash / rebase-and-merge). **How** to land is keyed on repo topology + branch protection — *not* the issue tracker. [Setup](references/setup.md) records the choice as `landing=` (`pr` / `direct`) in `.swe-workflow.conf` — it checks fork status to recommend; this table is `/ship`'s fallback when `landing=` is unset:
 
 | Topology | Land by |
 |---|---|
