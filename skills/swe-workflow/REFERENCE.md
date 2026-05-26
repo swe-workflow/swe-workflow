@@ -174,7 +174,19 @@ The procedure is a single step — [ship.md](references/ship.md), Stage 7 step 8
 - **Fresh per diff.** The reviewer mirrors the build's rule one level down — [clean context per issue](#clean-context-per-issue) applied per *diff*: a fresh read-only context for each, never one long-running reviewer accumulating reviews (the reviewer's own ball of mud).
 - **Host-neutral contract.** "A fresh read-only context" is all the procedure asks for; *how* you get one — sub-agent vs. new session — is the host's business.
 
-### Teardown after PR merge
+### Landing the work
+
+Close-out lands the **branch** — *the worktree is just a second checkout of it, irrelevant here* (it matters only at teardown). Two habits first: **rebase onto the target** (`git rebase <target>`) so conflicts resolve before review rather than during the merge, and match the repo's **merge convention** (merge / squash / rebase-and-merge). **How** to land is keyed on repo topology + branch protection — *not* the issue tracker:
+
+| Topology | Land by |
+|---|---|
+| Fork, no upstream write | PR `fork:<branch> → upstream:<target>`; never route through the fork's `main` (keep it mirroring upstream) |
+| Single repo, protected/shared `main` | PR `<branch> → main` |
+| Single repo, solo / unprotected | rebase + `git merge --ff-only` onto `main`, then push |
+
+Check the **target branch** first — not every project lands on `main` (some use `develop`/`next`/a release branch; read `CONTRIBUTING.md`). The PR, when one is used, carries the `progress.md` body + the Autonomy-decisions section and is the durable record. Whether the issue then reads *done* is the separate, tracker-keyed concern — [Lifecycle states](trackers/README.md#lifecycle-states).
+
+### Teardown after landing
 
 From the **main checkout** (NOT inside the worktree):
 
@@ -190,11 +202,14 @@ default_branch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remote
 if git branch --merged "$default_branch" | grep -qE "^[[:space:]]*\*?[[:space:]]*issue-<id>-<slug>$"; then
   git branch -d "issue-<id>-<slug>"
 fi
+
+# 4. If the branch was pushed (PR landings), delete it on the remote too
+git push origin --delete issue-<id>-<slug>
 ```
 
 Don't run this from inside the worktree being removed — git rejects that.
 
-If you want the planning files as a post-mortem record, commit them on the branch BEFORE the teardown — the PR will carry them. Default is to discard.
+If you want the planning files as a post-mortem record, commit them on the branch BEFORE the teardown — the landing carries them. Default is to discard.
 
 ### Decision journal (`DECISIONS.md`)
 

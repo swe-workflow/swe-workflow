@@ -50,7 +50,7 @@ Close-out itself is tracker-agnostic — [the ship procedure owns it](../referen
   - `shipped` — built and merged; **swe-workflow's success state**, set by `/ship` close-out (triage never models completion).
   - closed-unshipped — `wontfix`, `duplicate` (link the original), or a team's own value (e.g. `obsolete`); a triage decision, no code landed.
 
-Each tracker **realizes** these states natively — GitHub `open`/`closed`, Linear `Done`/`Canceled`/`Duplicate`, `local-markdown` the literal `Status:` string (`shipped`, `wontfix`, …). The only per-tracker variation close-out cares about is how it *reaches* the terminal state: where merge and close are coupled through a PR/MR the merge reaches it for free; otherwise [close-out](../references/ship.md) sets it. Adding a terminal value changes nothing in the three consumers.
+Each tracker **realizes** these states natively — GitHub `open`/`closed`, Linear `Done`/`Canceled`/`Duplicate`, `local-markdown` the literal `Status:` string (`shipped`, `wontfix`, …). [Close-out](../references/ship.md) sets the terminal state once the work has landed: a PR-linked tracker landed via a PR closes the issue on merge for free; otherwise it's set explicitly (`gh issue close`, or `local-markdown`'s `Status:` line). *How* the work lands is a separate, [topology-driven](../REFERENCE.md#landing-the-work) decision — not the tracker's concern. Adding a terminal value changes nothing in the three consumers.
 
 ## Selection — which adapter
 
