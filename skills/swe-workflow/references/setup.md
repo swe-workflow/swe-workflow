@@ -64,13 +64,16 @@ Test-first development via the `tdd` skill is **not** a repo-wide rule — it is
 
 ## 5. Choose the landing method
 
-How `/ship` lands a finished branch into the canonical branch ([Landing the work](../REFERENCE.md#landing-the-work)) is a per-repo choice — record it once here.
+How `/ship` lands a finished branch into the canonical branch ([Landing the work](../REFERENCE.md#landing-the-work)) is a per-repo choice — it reduces to **one question — can you write the target's `main` directly?** (yes ⇒ `landing=direct`, no ⇒ `landing=pr`). Record it once here.
 
-1. **Check whether `origin` is a fork** — `gh repo view --json isFork -q .isFork` (or: an `upstream` remote exists). This decides the recommendation.
-2. **Offer both, and mark the recommendation from that check** — a **fork** can't push to `upstream`, so it needs a PR → recommend **`pr`**; otherwise you own `main` → recommend **`direct`**:
-   - **`pr`** — land via a pull request — the reviewable, protected-`main`-safe path. *Also pick this for a non-fork whose `main` is protected/shared.*
-   - **`direct`** — merge straight onto `main`, no PR — for a repo you own outright (incl. local-only), where the adversarial review is the only gate.
-3. **Record the choice** in `.swe-workflow.conf` — set or **update** the `landing=` line (`pr` or `direct`); don't append a duplicate if one is present. `/ship` reads it at close-out; absent it, the method falls back to topology inference.
+1. **Read three signals — all read-only; never probe by pushing to `main`.** Fork status alone isn't enough — a non-fork can still have a protected `main`. On GitHub, read `gh repo view --json isFork,viewerPermission,defaultBranchRef` plus the default branch's protection — `gh api repos/<owner>/<repo>/branches/<default-branch> --jq '.protected'` (readable without admin). Off GitHub or without `gh`, fall back to the fork signal alone (an `upstream` remote ⇒ treat as a fork).
+2. **Ask the user — *Can you write the target's `main` directly?*** — recommending the answer from the signals:
+   - **Forked → No** — you can't push to `upstream`.
+   - **Not a fork, but `main` is protected → No** — a shared/protected `main` needs review.
+   - **Not a fork, `main` unprotected, and you own it (solo) → Yes.**
+
+   The user gives the final answer — detection can't tell an *unprotected-but-PR-by-policy* repo from a genuine direct-push one (the "solo" judgment is theirs), so confirm rather than decide.
+3. **Record the answer** as the `landing=` line in `.swe-workflow.conf` — **Yes → `direct`** (merge straight onto `main`, no PR; the adversarial review is the only gate), **No → `pr`** (a PR from the feature branch, never local `main`; the fork-check sets the base — `upstream:<target>` for a fork, `origin`'s `<target>` otherwise). Set or **update** the line; don't append a duplicate if one is present. `/ship` reads it at close-out; absent it, the method falls back to topology inference.
 
 ## 6. Report
 

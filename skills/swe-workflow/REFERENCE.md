@@ -176,7 +176,16 @@ The procedure is a single step — [ship.md](references/ship.md), Stage 7 step 8
 
 ### Landing the work
 
-Close-out lands the **branch** — *the worktree is just a second checkout of it, irrelevant here* (it matters only at teardown). Two habits first: **rebase onto the target** (`git rebase <target>`) so conflicts resolve before review rather than during the merge, and match the repo's **merge convention** (merge / squash / rebase-and-merge). **How** to land is keyed on repo topology + branch protection — *not* the issue tracker. [Setup](references/setup.md) records the choice as `landing=` (`pr` / `direct`) in `.swe-workflow.conf` — it checks fork status to recommend; this table is `/ship`'s fallback when `landing=` is unset:
+Close-out lands the **branch** — *the worktree is just a second checkout of it, irrelevant here* (it matters only at teardown). Two habits first: **rebase onto the target** (`git rebase <target>`) so conflicts resolve before review rather than during the merge, and match the repo's **merge convention** (merge / squash / rebase-and-merge).
+
+**The whole decision is one question — *can you write the target's `main` directly?*** Yes only when **all** of these hold: it's **not a fork**, `main` is **unprotected**, and **you own it** (solo / write access). It's keyed on repo topology + branch protection, *not* the issue tracker. [Setup](references/setup.md) answers it once and records `landing=` in `.swe-workflow.conf` (`direct` = yes, `pr` = no); absent that, `/ship` infers it:
+
+- **Yes → `direct`.** Rebase onto `<target>`, then `git merge --ff-only` and push — the only path that advances local `main`.
+- **No → `pr`.** Open a PR **from the feature branch** (never from local `main`); the fork-check sets the base:
+  - **Forked** → `fork:<branch> → upstream:<target>`, keeping the fork's `main` mirroring upstream (never route through it).
+  - **Non-fork, protected/shared `main`** → `<branch> → <target>` on `origin`.
+
+The same three cases, by topology:
 
 | Topology | Land by |
 |---|---|
