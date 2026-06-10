@@ -276,6 +276,8 @@ How to map the 0→7 chain onto agent CLI sessions — host-neutral operator gui
 
 **Effort per session type (Claude Code).** Spec is the highest-leverage reasoning in the chain, so run a **spec session at max effort** — `claude --effort max`, `/effort max`, or `CLAUDE_CODE_EFFORT_LEVEL=max`. The **session** level is the lever that reaches the *external* stages `grill-with-docs` (1) and `to-issues` (4) — they inherit it, and swe-workflow can't set their frontmatter. Keep **execution sessions at the default** (`xhigh` on Opus 4.7); `max` there mostly overthinks a plan that already exists.
 
+**Model tier per session type.** Same shape as the effort lever, one level up — *which* model you point a session at. Spec is the highest-leverage reasoning, so run **spec sessions on a frontier-tier model** — the strongest your host supports (e.g., Fable 5). **Execution sessions can drop to a workhorse model** (e.g., Opus, gpt-5, kimi-k2.6) — the plan already exists, so the run wants competent code-following, not novel reasoning. Invest where the reasoning is irreversible (grill → PRD → issues); economize where you're executing an existing plan.
+
 ### Parallel execution
 
 The safety rulebook for running Option 2 or 3 sessions concurrently — which granularity is safe, and what breaks when you do. `/ship-all` itself runs the backlog **sequentially — one worktree at a time** ([`references/ship-all.md`](references/ship-all.md)) and never auto-fans-out; the concurrency is always *optional and human-driven*, and the worktree-per-issue isolation ([handoff rule #4](SKILL.md#critical-handoff-rules)) is what makes it **safe**.
