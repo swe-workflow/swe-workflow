@@ -2,6 +2,46 @@
 
 Why swe-workflow is shaped the way it is. **Human-facing** — nothing here is loaded by an agent at runtime; the skill files under [`skills/swe-workflow/`](../skills/swe-workflow/) are the product, this is the rationale behind them.
 
+## The workflow
+
+The whole chain end to end — each stage, the external skill it drives, and the artifact it hands the next. This is the annotated view; the terse **canonical** map is [`SKILL.md`](../skills/swe-workflow/SKILL.md)'s stage table, and the README carries a compact, name-free version of the same shape.
+
+```mermaid
+flowchart TD
+    IDEA([IDEA])
+
+    subgraph BOOT["BOOTSTRAP · /swe-workflow:setup (0)"]
+        Q0["<b>0 · How is this repo set up?</b><br/>/setup-matt-pocock-skills → AGENTS.md, docs/agents/<br/>one-time: tracker, triage labels, doc layout"]
+    end
+
+    subgraph SPEC["SPEC LAYER · /swe-workflow:spec (1–4) · AFK-friendly"]
+        direction TB
+        Q1["<b>1 · What do I want?</b><br/>/grill-with-docs → CONTEXT.md, ADRs"]
+        Q2["<b>2 · What does this break into?</b><br/>/to-features → FEATURES.md"]
+        Q3["<b>3 · What does done look like?</b> (per feature)<br/>/grill-feature = grill-with-docs (feature) + /to-spec → a PRD"]
+        Q4["<b>4 · What are the units of work?</b><br/>/to-tickets → tracer-bullet issues, all ready-for-agent"]
+        Q1 --> Q2 --> Q3 --> Q4
+    end
+
+    subgraph EXEC["EXECUTION LAYER · /swe-workflow:ship (5–7)"]
+        direction TB
+        Q5["<b>5 · How do I plan each issue?</b><br/>fetch issue (per tracker) → worktree + branch + seed files<br/>/planning-with-files:plan → interview → plan (bakes in /tdd)"]
+        TP[["task_plan.md"]]
+        Q6["<b>6 · How do I build each issue?</b><br/>/planning-with-files:plan-goal → work each sub-task → commit"]
+        Q7["<b>7 · How do I close out each issue?</b><br/>adversarial review (reviewer ≠ implementer)<br/>progress.md → PR body · teardown worktree"]
+        Q5 -->|writes| TP -->|reads| Q6 --> Q7
+    end
+
+    SHIPPED([SHIPPED])
+    TRIAGE["/triage · sorts externally-filed issues<br/>into the ready-for-agent backlog<br/>(parallel — not in the critical path)"]
+
+    IDEA --> Q0
+    Q0 --> Q1
+    Q4 -->|grab ONE ready-for-agent issue| Q5
+    Q7 --> SHIPPED
+    TRIAGE -.->|ready-for-agent| Q5
+```
+
 ## Philosophy
 
 This is a **chain of small skills, not a framework.** Four principles:

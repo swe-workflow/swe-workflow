@@ -39,26 +39,36 @@ The workflow orchestrates several skills this suite doesn't bundle. **The setup 
 
 ## How it fits together
 
-```text
-   IDEA
-   │
-   ▼   /setup (0)  ──►  bootstrap repo — prereq skills · always-on rules
-   │
-   ▼   SPEC LAYER  ·  /spec  (stages 1–4, AFK-friendly)
-   │      grill the domain (1)    ──►  CONTEXT.md + ADRs
-   │      enumerate features (2)  ──►  FEATURES.md
-   │      spec one feature (3)    ──►  a PRD  (one per feature)
-   │      slice into issues (4)   ──►  ready-for-agent issues
-   │
-   ▼   EXECUTION LAYER  ·  /ship (one issue) · /ship-all (backlog, AFK)
-   │      plan (5)       ──►  task_plan.md  (+ findings.md)
-   │      build (6)      ──►  progress.md  (test-first)
-   │      close-out (7)  ──►  PR  +  worktree teardown
-   │
-   ▼
-   SHIPPED
+```mermaid
+flowchart TD
+    IDEA([IDEA])
+    S0["/setup (0)<br/>bootstrap repo — prereq skills · always-on rules"]
 
-   triage runs alongside — sorts externally-filed issues into the ready-for-agent backlog
+    subgraph SPEC["SPEC LAYER · /spec (stages 1–4, AFK-friendly)"]
+        direction TB
+        S1["grill the domain (1) → CONTEXT.md + ADRs"]
+        S2["enumerate features (2) → FEATURES.md"]
+        S3["spec one feature (3) → a PRD (one per feature)"]
+        S4["slice into issues (4) → ready-for-agent issues"]
+        S1 --> S2 --> S3 --> S4
+    end
+
+    subgraph EXEC["EXECUTION LAYER · /ship (one issue) · /ship-all (backlog, AFK)"]
+        direction TB
+        S5["plan (5) → task_plan.md (+ findings.md)"]
+        S6["build (6) → progress.md (test-first)"]
+        S7["close-out (7) → PR + worktree teardown"]
+        S5 --> S6 --> S7
+    end
+
+    SHIPPED([SHIPPED])
+    TRIAGE["triage runs alongside — sorts externally-filed<br/>issues into the ready-for-agent backlog"]
+
+    IDEA --> S0
+    S0 --> S1
+    S4 --> S5
+    S7 --> SHIPPED
+    TRIAGE -.-> S5
 ```
 
 Those right-hand artifacts are the interface between stages — the files, not the agent's memory, carry state from stage to stage. The **`swe-workflow`** skill's stage table (`skills/swe-workflow/SKILL.md`) is the canonical map, with each stage's full procedure in `references/`; the design rationale lives in [docs/DESIGN.md](docs/DESIGN.md).
