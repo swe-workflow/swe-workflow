@@ -9,7 +9,7 @@ The workflow depends on external skills this suite doesn't bundle. Detect which 
 | Skill(s) | Source (GitHub repo) |
 |---|---|
 | `planning-with-files` | `OthmanAdi/planning-with-files` |
-| `tdd`, `setup-matt-pocock-skills`, `grill-with-docs`, `to-prd`, `to-issues`, `triage` | `mattpocock/skills` |
+| `tdd`, `setup-matt-pocock-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, `triage` | `mattpocock/skills` |
 
 1. **Detect** what's already available to your agent and skip those.
 2. **Install the missing ones**, announcing each source first (never silently pull third-party code). Use whichever installer your agent supports:

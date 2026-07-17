@@ -35,7 +35,7 @@ npx skills add swe-workflow/swe-workflow
 The workflow orchestrates several skills this suite doesn't bundle. **The setup stage (`/swe-workflow:setup`) auto-installs the missing ones** (then restart to activate them); or install manually:
 
 - [`planning-with-files`](https://github.com/OthmanAdi/planning-with-files) — the `plan` / `plan-goal` / `status` engine the ship stage runs for each issue. Cross-agent.
-- [`mattpocock/skills`](https://github.com/mattpocock/skills) — `tdd` (the red → green → refactor inner loop) plus the upstream spec layer: `setup-matt-pocock-skills`, `grill-with-docs`, `to-prd`, `to-issues`, and `triage`. Cross-agent.
+- [`mattpocock/skills`](https://github.com/mattpocock/skills) — `tdd` (the red → green → refactor inner loop) plus the upstream spec layer: `setup-matt-pocock-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, and `triage`. Cross-agent.
 
 ## How it fits together
 
@@ -48,7 +48,7 @@ The workflow orchestrates several skills this suite doesn't bundle. **The setup 
    │      grill (1)          ──►  CONTEXT.md + ADRs
    │      to-features (2)    ──►  FEATURES.md
    │      grill-feature (3)  ──►  a PRD  (one per feature)
-   │      to-issues (4)      ──►  ready-for-agent issues
+   │      to-tickets (4)     ──►  ready-for-agent issues
    │
    ▼   EXECUTION LAYER  ·  /ship (one issue) · /ship-all (backlog, AFK)
    │      plan (5)           ──►  task_plan.md  (+ findings.md)
@@ -71,7 +71,7 @@ Spelled out for a fresh project — three commands, and what each leaves behind:
 2. `/swe-workflow:spec` *(stages 1–4)* — the spec layer, AFK-friendly: grill the domain → coarse features → a PRD per feature → tracer-bullet issues. Leaves `CONTEXT.md` + ADRs, `FEATURES.md`, PRDs, and a backlog of `ready-for-agent` issues.
 3. `/swe-workflow:ship-all` *(stages 5–7)* — build and ship the whole backlog, AFK.
 
-Prefer to drive the spec layer by hand? Run its four stages as separate commands — `/grill-with-docs` (1) → `/swe-workflow:to-features` (2) → `/swe-workflow:grill-feature` (3, per feature) → `/to-issues` (4, per PRD). `/grill-with-docs` and `/to-issues` are external (mattpocock) skills; `:to-features` and `:grill-feature` are commands in this suite.
+Prefer to drive the spec layer by hand? Run its four stages as separate commands — `/grill-with-docs` (1) → `/swe-workflow:to-features` (2) → `/swe-workflow:grill-feature` (3, per feature) → `/to-tickets` (4, per PRD). `/grill-with-docs` and `/to-tickets` are external (mattpocock) skills; `:to-features` and `:grill-feature` are commands in this suite.
 
 ## License
 

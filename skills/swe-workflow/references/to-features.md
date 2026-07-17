@@ -20,10 +20,10 @@ stage 1   /grill-with-docs ─► CONTEXT.md + docs/adr/        (domain groundin
 stage 2   /to-features (PM — high-level grill) ─► FEATURES.md   (coarse features, each a rich block)
               │
               ▼  per feature
-stage 3   /grill-feature (PM — feature grill + /to-prd) ─► one PRD
+stage 3   /grill-feature (PM — feature grill + /to-spec) ─► one PRD
               │
               ▼
-stage 4   /to-issues ─► tracer-bullet issues
+stage 4   /to-tickets ─► tracer-bullet issues
 ```
 
 ## Process
@@ -93,7 +93,7 @@ Mark the **header line** with strikethrough + a shipped reference (issue number,
 
 ## Why this stage exists
 
-mattpocock's chain (`/to-prd`, `/to-issues`, `/triage`) is engineering-side — it assumes the feature set already exists. `/to-prd` deliberately **doesn't interview**; it synthesizes from a conversation. So the work of *eliciting what the features are* has no home in that chain. `to-features` is that home: the **PM stage** that grills the project at a high level and writes the coarse backlog that `/grill-feature` then specs one at a time.
+mattpocock's chain (`/to-spec`, `/to-tickets`, `/triage`) is engineering-side — it assumes the feature set already exists. `/to-spec` deliberately **doesn't interview**; it synthesizes from a conversation. So the work of *eliciting what the features are* has no home in that chain. `to-features` is that home: the **PM stage** that grills the project at a high level and writes the coarse backlog that `/grill-feature` then specs one at a time.
 
 It reads engineering artifacts (`CONTEXT.md`, ADRs) but its output (`FEATURES.md`) is user-facing product language — the deliberate seam where product reasoning enters the chain.
 

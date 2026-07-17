@@ -24,7 +24,7 @@ The idiomatic software-engineer workflow: clarify the idea → spec it → slice
 - **Claude Code** — invoke the seven `/swe-workflow:*` commands (thin `commands/` shims that run the matching procedure), or invoke this `swe-workflow` skill to drive the whole chain.
 - **Other agents** — invoke the `swe-workflow` skill and say what you want (*"ship issue 42"*); it routes to the right stage's reference file.
 
-**`log-decisions`** ships in the suite as a companion skill (the decision journal). Stage 2 — **`to-features`**, which splits the project into coarse features in `FEATURES.md` — is a stage of *this* skill (its [`references/to-features.md`](references/to-features.md) procedure + the `/swe-workflow:to-features` command), not a separate skill. The spec-layer skills (`grill-with-docs`, `to-prd`, `to-issues`, and the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; **spec** automates stages 1–4 of it and **ship** stages 5–7.
+**`log-decisions`** ships in the suite as a companion skill (the decision journal). Stage 2 — **`to-features`**, which splits the project into coarse features in `FEATURES.md` — is a stage of *this* skill (its [`references/to-features.md`](references/to-features.md) procedure + the `/swe-workflow:to-features` command), not a separate skill. The spec-layer skills (`grill-with-docs`, `to-spec`, `to-tickets`, and the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; **spec** automates stages 1–4 of it and **ship** stages 5–7.
 
 ## The workflow
 
@@ -52,12 +52,12 @@ The idiomatic software-engineer workflow: clarify the idea → spec it → slice
 │               strike through, don't delete, on ship)                 │
 │                                                                      │
 │  3. What does done look like?  (per feature)                         │
-│     /grill-feature = grill-with-docs <feature> + /to-prd ──► one PRD │
+│     /grill-feature = grill-with-docs <feature> + /to-spec ──► a PRD  │
 │              (intensive feature grill, then synthesize —             │
 │               Problem / Solution / Stories / Decisions / Scope)      │
 │                                                                      │
 │  4. What are the units of work?                                      │
-│     /to-issues ──► N tracer-bullet issues                            │
+│     /to-tickets ──► N tracer-bullet issues                           │
 │              (vertical slices, all auto-labeled `ready-for-agent`    │
 │               — /triage NOT in the critical path)                    │
 │                                                                      │
@@ -103,7 +103,7 @@ The idiomatic software-engineer workflow: clarify the idea → spec it → slice
 
 ## Parallel concern: `/triage`
 
-`/triage` sits beside the chain, not inside it — a small state machine over the issue tracker (`needs-info` / `ready-for-agent` / `ready-for-human` / `wontfix`). Required for issues filed *outside* the chain (user bug reports, external contributions, ad-hoc feature requests); redundant for chain-created issues, since `/to-prd` and `/to-issues` auto-label `ready-for-agent` at creation.
+`/triage` sits beside the chain, not inside it — a small state machine over the issue tracker (`needs-info` / `ready-for-agent` / `ready-for-human` / `wontfix`). Required for issues filed *outside* the chain (user bug reports, external contributions, ad-hoc feature requests); redundant for chain-created issues, since `/to-spec` and `/to-tickets` auto-label `ready-for-agent` at creation.
 
 See [REFERENCE.md](REFERENCE.md#parallel-concern-triage--whats-actionable-for-external-issues) for the full state machine and per-state outputs.
 
@@ -174,9 +174,9 @@ The diagram above is the map. The procedure is single-sourced in [`references/sh
 
 ## Critical handoff rules
 
-1. **PRD uses the glossary from stage 1.** If `to-prd` introduces terms that conflict with `CONTEXT.md`, loop back to `/grill-with-docs`.
+1. **PRD uses the glossary from stage 1.** If `to-spec` introduces terms that conflict with `CONTEXT.md`, loop back to `/grill-with-docs`.
 2. **Issues are tracer bullets, not horizontal layers.** Each is a thin vertical slice (schema → API → UI → tests). "Backend issue" + "frontend issue" is a smell — re-slice.
-3. **Only `ready-for-agent` issues enter execution.** `/to-issues` auto-applies the label on chain-created issues; `/triage` applies it to external issues (user reports, etc.). Either way, stage 5 reads from the label, not the source.
+3. **Only `ready-for-agent` issues enter execution.** `/to-tickets` auto-applies the label on chain-created issues; `/triage` applies it to external issues (user reports, etc.). Either way, stage 5 reads from the label, not the source.
 4. **One issue = one worktree = one `task_plan.md`.** Filesystem isolation for parallel AFK agents — no exceptions. (`/ship-all` itself is sequential; the isolation enables *optional, human-driven* parallelism — see [Parallel execution](REFERENCE.md#parallel-execution).)
 5. **Strike through, don't delete.** When a feature ships, strike it through in `FEATURES.md` with a shipped reference — never delete. Preserves institutional memory; prevents quiet scope drift.
 
@@ -207,4 +207,4 @@ The bootstrap procedure ([Stages 5-7](#stages-5-7-worktree--planning-with-files)
 ## Further reading
 
 - [REFERENCE.md](REFERENCE.md) — per-stage detail, HITL vs AFK execution, gotchas
-- Source skills: `grill-with-docs`, `to-prd`, `to-issues`, `triage` (mattpocock/skills), `planning-with-files` (OthmanAdi/planning-with-files)
+- Source skills: `grill-with-docs`, `to-spec`, `to-tickets`, `triage` (mattpocock/skills), `planning-with-files` (OthmanAdi/planning-with-files)

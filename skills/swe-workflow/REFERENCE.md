@@ -45,7 +45,7 @@ The full process, the `FEATURES.md` file format (the per-feature detail block), 
 The second **product-manager** stage — now its own command (`/grill-feature`) and procedure ([`references/grill-feature.md`](references/grill-feature.md)): **grill one feature, then synthesize its PRD.** `/spec` runs it inline for the feature it's targeting; `/grill-feature` runs it standalone, once per feature.
 
 1. **Grill the feature** — `grill-with-docs` scoped to the one feature (an **intensive, feature-level** interview — deeper than `to-features`' high-level project grill), grounded on `CONTEXT.md`/ADRs.
-2. **Synthesize** — `to-prd` turns that conversation into **one PRD** without re-interviewing (the grill is what gave it the material). The PRD contains:
+2. **Synthesize** — `to-spec` turns that conversation into **one PRD** without re-interviewing (the grill is what gave it the material). The PRD contains:
    - Problem Statement / Solution (user perspective)
    - User Stories (extensive, numbered)
    - Implementation Decisions (modules, interfaces, schemas — NO file paths)
@@ -56,7 +56,7 @@ The second **product-manager** stage — now its own command (`/grill-feature`) 
 
 **Common mistake**: putting file paths or line numbers in the PRD. Those rot. Describe interfaces and behavior instead. Full procedure: [`references/grill-feature.md`](references/grill-feature.md).
 
-## Stage 4: `/to-issues` — What are the units of work?
+## Stage 4: `/to-tickets` — What are the units of work?
 
 **Trigger**: PRD exists but is too big for any single agent to grab.
 
@@ -74,7 +74,7 @@ Prefer AFK when possible. HITL is for genuine judgment calls, not for "I want to
 
 ## Parallel concern: `/triage` — What's actionable for external issues?
 
-**`/triage` is NOT a sequential stage in the chain.** `/to-prd` and `/to-issues` auto-apply the `ready-for-agent` label on the issues they create — those issues skip triage entirely and go straight to stage 5. `/triage` exists for issues filed *outside* the chain: user bug reports, external contributions, ad-hoc feature requests.
+**`/triage` is NOT a sequential stage in the chain.** `/to-spec` and `/to-tickets` auto-apply the `ready-for-agent` label on the issues they create — those issues skip triage entirely and go straight to stage 5. `/triage` exists for issues filed *outside* the chain: user bug reports, external contributions, ad-hoc feature requests.
 
 **Trigger**: an external issue arrives in the tracker without a triage label, OR an existing labeled issue needs re-evaluation after new info.
 
@@ -121,7 +121,7 @@ The selection algorithm (priority order), the normalized-issue schema, AGENT-BRI
 
 - **Not every phase needs `/tdd`.** Exploration, `.gitignore` updates, config tweaks, infra changes have no behavior to test — just do them and log.
 - **User-facing phases need more than unit-green.** A passing unit test proves a unit, not that the feature works for a user — so a user-visible phase isn't "done" until its behavior is exercised end-to-end, not just unit-tested.
-- **A single phase can contain multiple `/tdd` cycles** if the AC bundles sub-behaviors. Often a sign the AC was too coarse — note it in `task_plan.md` so the next `/to-issues` run can slice finer.
+- **A single phase can contain multiple `/tdd` cycles** if the AC bundles sub-behaviors. Often a sign the AC was too coarse — note it in `task_plan.md` so the next `/to-tickets` run can slice finer.
 - **Decisions discovered mid-`/tdd`** split by the bar: reversible, spec-authorized ones (e.g., extracting a private helper) land in `task_plan.md`'s Decisions table; **bar-crossing** ones — and a public-interface change is a *deviation* — go to the **decision journal** (`DECISIONS.staged.md` → `DECISIONS.md`) per the `log-decisions` skill (look first → decide / assume / escalate).
 - **Errors during RED or GREEN** go in `task_plan.md`'s Errors table — same 3-strike protocol as any other error. Never silently retry a failed test in the same form.
 - **`/tdd`'s own per-phase planning step is light** (interface confirmation, test list, prior-art lookup). It's not a duplicate of `/planning-with-files:plan`'s issue-level interview — just a quick check-in at the top of each phase.
@@ -144,9 +144,9 @@ Two limits keep it from over-reaching:
 
 Work you hit mid-build that this issue's slice didn't plan for. **Don't grow the worktree** (it breaks tracer-bullet slicing and bloats the PR), and don't just jot it in `task_plan.md` / `progress.md` — those die at teardown, so the note is lost. Route it to a durable home, then keep building:
 
-- **Belongs to this AC** (you under-estimated the slice) → do it now; if the AC was bundling behaviors, note that in `task_plan.md` so the next `/to-issues` slices finer.
+- **Belongs to this AC** (you under-estimated the slice) → do it now; if the AC was bundling behaviors, note that in `task_plan.md` so the next `/to-tickets` slices finer.
 - **A new issue** (bug, follow-up, separate slice) → file it to the tracker (a `.scratch/<feature>/issues/` stub, or `gh issue create` / Linear); `/triage` classifies it later. Set `blocked-by` if it depends on this work.
-- **A new feature** → add a line to `FEATURES.md`, specced later via `/to-prd`.
+- **A new feature** → add a line to `FEATURES.md`, specced later via `/to-spec`.
 - **Rejecting it** → `.out-of-scope/<concept>.md` with the reason.
 
 Filed work won't disrupt an AFK batch — only `ready-for-agent` issues enter execution. Expanding the current issue to absorb a discovery is itself a *deviation* (log it per `log-decisions`); **escalate** only if the discovery blocks this issue and needs a human.
@@ -259,14 +259,14 @@ How to map the 0→7 chain onto agent CLI sessions — host-neutral operator gui
 
 1. **Stage 0** alone, then exit.
 2. **Stage 1** (`/grill-with-docs`) — a fresh session or a continuation of stage 0, either works — then **Stage 2** (`/to-features`) in the *same* session, since `/to-features` builds on the stage-1 domain grill.
-3. **A session per dependency-free feature, launched as blockers clear** — start a feature's session only when its `Depends on:` features (in `FEATURES.md`) are **done** (all their issues merged — see [Completion signals](#completion-signals)); a feature with unmet blockers waits and gets its session once they land. Each session runs `/grill-feature` (stage 3) → `/to-issues` (stage 4) → a **feature-scoped [`/ship-all`](references/ship-all.md)** (stages 5–7), shipping that feature's issues **one at a time inside the one session** — each `/ship` spins up its worktree, the session `cd`s in to build, then tears it down before the next. The session persists while the worktrees come and go.
+3. **A session per dependency-free feature, launched as blockers clear** — start a feature's session only when its `Depends on:` features (in `FEATURES.md`) are **done** (all their issues merged — see [Completion signals](#completion-signals)); a feature with unmet blockers waits and gets its session once they land. Each session runs `/grill-feature` (stage 3) → `/to-tickets` (stage 4) → a **feature-scoped [`/ship-all`](references/ship-all.md)** (stages 5–7), shipping that feature's issues **one at a time inside the one session** — each `/ship` spins up its worktree, the session `cd`s in to build, then tears it down before the next. The session persists while the worktrees come and go.
 
 - *Pros:* the **lowest information loss across the spec→execution seam** — the feature's grilling context stays warm while its issues are built.
 - *Cons:* a feature's issues share one context (a smaller ball of mud — and by the last issue the grill context you wanted is buried under earlier issues' build noise); spec and build share one context and security posture; no per-issue parallelism.
 
 **Option 3 — one session per issue.** *Concurrency: issue-level — independent issues run in parallel.* Option 2's spec handling, but the feature session ends at the backlog.
 
-1. As Option 2 through stages 3–4, but **exit each feature session once `/to-issues` has run** — PRD + issues + AGENT-BRIEF are the handoff.
+1. As Option 2 through stages 3–4, but **exit each feature session once `/to-tickets` has run** — PRD + issues + AGENT-BRIEF are the handoff.
 2. **A session per unblocked issue, run in parallel** — for each issue whose `blocked-by` have merged, spin up its own session and [`/ship`](references/ship.md) it; as dependencies land, newly-unblocked issues get their own. This is Option 2's `/ship-all` loop **unrolled and fanned out** — one `/ship` per session, [clean context per issue](#clean-context-per-issue).
 
 - *Pros:* per-issue isolation — each issue builds only from its durable inputs, a fresh reviewer is cheap, and state stays durable+observable rather than fragile-and-warm.
@@ -274,7 +274,7 @@ How to map the 0→7 chain onto agent CLI sessions — host-neutral operator gui
 
 **Choosing.** Default to **Option 3** for AFK / observable / parallel-ready work: it honors every execution-layer invariant (worktree-per-issue, clean context per issue, the review gate) and keeps the *high-loss* boundary (grill → PRD → issues) warm in one spec session while cutting only at the *low-loss* one (issues → build). Choose **Option 2** when intent-fidelity outweighs isolation and the features are small, tightly-knit, and interactive. **Option 1** is for toy scope. Picking Option 2 or 3 only sets the *granularity* of concurrency; which of those concurrent runs is actually *safe* is the subject of [Parallel execution](#parallel-execution) (independent units only). The throughline: *the cure for a lossy artifact is a better artifact, not a longer session* — the long session's richness isn't durable, and the suite is built for work that outlives any one session.
 
-**Effort per session type (Claude Code).** Spec is the highest-leverage reasoning in the chain, so run a **spec session at max effort** — `claude --effort max`, `/effort max`, or `CLAUDE_CODE_EFFORT_LEVEL=max`. The **session** level is the lever that reaches the *external* stages `grill-with-docs` (1) and `to-issues` (4) — they inherit it, and swe-workflow can't set their frontmatter. Keep **execution sessions at the default** (`xhigh` on Opus 4.7); `max` there mostly overthinks a plan that already exists.
+**Effort per session type (Claude Code).** Spec is the highest-leverage reasoning in the chain, so run a **spec session at max effort** — `claude --effort max`, `/effort max`, or `CLAUDE_CODE_EFFORT_LEVEL=max`. The **session** level is the lever that reaches the *external* stages `grill-with-docs` (1) and `to-tickets` (4) — they inherit it, and swe-workflow can't set their frontmatter. Keep **execution sessions at the default** (`xhigh` on Opus 4.7); `max` there mostly overthinks a plan that already exists.
 
 **Model tier per session type.** Same shape as the effort lever, one level up — *which* model you point a session at. Spec is the highest-leverage reasoning, so run **spec sessions on a frontier-tier model** — the strongest your host supports (e.g., Fable 5). **Execution sessions can drop to a workhorse model** (e.g., Opus, gpt-5, kimi-k2.6) — the plan already exists, so the run wants competent code-following, not novel reasoning. Invest where the reasoning is irreversible (grill → PRD → issues); economize where you're executing an existing plan.
 
@@ -338,7 +338,7 @@ All phases in `task_plan.md` ticked **and** the change merged into the default b
 
 ### Feature
 
-Every issue produced by `/to-issues` on the feature's PRD has reached a **terminal** state — `shipped`, or closed-unshipped. A rejected or duplicate child is *resolved* and doesn't block the feature; a child still in-flight (`needs-info`, etc.) does. Workflow:
+Every issue produced by `/to-tickets` on the feature's PRD has reached a **terminal** state — `shipped`, or closed-unshipped. A rejected or duplicate child is *resolved* and doesn't block the feature; a child still in-flight (`needs-info`, etc.) does. Workflow:
 
 1. **Detect**: walk from the PRD to its child issues (via the parent reference each issue body carries) and confirm every child is [terminal](trackers/README.md#lifecycle-states) — none still in-flight.
    - **GitHub**: `gh issue list --search "parent:<PRD#> state:open"` returns empty.
@@ -364,7 +364,7 @@ The asymmetry is intentional: phase/issue/feature completion is a **fact** the t
 ## Gotchas
 
 - **Don't re-litigate PRD decisions in `task_plan.md`.** Architecture choices ("Postgres not Redis") are upstream. The `task_plan.md` Decisions table is only for *new* decisions made during execution (e.g., "extracted a CronExpression validator").
-- **Don't `/to-issues` an issue you've already started executing.** That forks state. If a `ready-for-agent` issue turns out to need decomposition, send it back to triage as `needs-info` or split it via a new `/to-issues` run on the PRD parent.
+- **Don't `/to-tickets` an issue you've already started executing.** That forks state. If a `ready-for-agent` issue turns out to need decomposition, send it back to triage as `needs-info` or split it via a new `/to-tickets` run on the PRD parent.
 - **Worktree path collisions.** If `../<repo>-issue-<id>/` already exists, the bootstrap aborts. Either you didn't tear down a previous attempt, or someone else is on the same issue. Resolve before retrying.
 - **Tracker auth.** Each tracker has its own auth (`gh auth status`, `glab auth status`, `linear auth`, `multica` config, etc.). Verify before bootstrap — the fetch step fails fast if auth is missing.
 - **`tp` skill conflict.** If you have the `tp` skill loaded, it overlaps with `/planning-with-files` at the execution layer. Pick one. This workflow assumes `/planning-with-files`.
@@ -397,7 +397,7 @@ This rules out some patterns from spec-kit-class even when they look useful:
 
 ## Source skills
 
-- `grill-with-docs`, `to-prd`, `to-issues`, `triage` — https://github.com/mattpocock/skills
+- `grill-with-docs`, `to-spec`, `to-tickets`, `triage` — https://github.com/mattpocock/skills
 - `planning-with-files` — https://github.com/OthmanAdi/planning-with-files
 
 ## Further reading
