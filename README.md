@@ -45,23 +45,23 @@ The workflow orchestrates several skills this suite doesn't bundle. **The setup 
    ▼   /setup (0)  ──►  bootstrap repo — prereq skills · always-on rules
    │
    ▼   SPEC LAYER  ·  /spec  (stages 1–4, AFK-friendly)
-   │      grill (1)          ──►  CONTEXT.md + ADRs
-   │      to-features (2)    ──►  FEATURES.md
-   │      grill-feature (3)  ──►  a PRD  (one per feature)
-   │      to-tickets (4)     ──►  ready-for-agent issues
+   │      grill the domain (1)    ──►  CONTEXT.md + ADRs
+   │      enumerate features (2)  ──►  FEATURES.md
+   │      spec one feature (3)    ──►  a PRD  (one per feature)
+   │      slice into issues (4)   ──►  ready-for-agent issues
    │
    ▼   EXECUTION LAYER  ·  /ship (one issue) · /ship-all (backlog, AFK)
-   │      plan (5)           ──►  task_plan.md  (+ findings.md)
-   │      build (6)          ──►  progress.md  (test-first, via /tdd)
-   │      close-out (7)      ──►  PR  +  worktree teardown
+   │      plan (5)       ──►  task_plan.md  (+ findings.md)
+   │      build (6)      ──►  progress.md  (test-first)
+   │      close-out (7)  ──►  PR  +  worktree teardown
    │
    ▼
    SHIPPED
 
-   /triage runs alongside — sorts externally-filed issues into the ready-for-agent backlog
+   triage runs alongside — sorts externally-filed issues into the ready-for-agent backlog
 ```
 
-Those right-hand artifacts are the interface between stages — the files, not the agent's memory, carry state from stage to stage. See the **`swe-workflow`** skill (`skills/swe-workflow/SKILL.md` + `REFERENCE.md`, each stage's procedure in `references/`) for the full picture, including the detailed operational diagram.
+Those right-hand artifacts are the interface between stages — the files, not the agent's memory, carry state from stage to stage. The **`swe-workflow`** skill's stage table (`skills/swe-workflow/SKILL.md`) is the canonical map, with each stage's full procedure in `references/`; the design rationale lives in [docs/DESIGN.md](docs/DESIGN.md).
 
 ## A typical run
 
@@ -71,7 +71,7 @@ Spelled out for a fresh project — three commands, and what each leaves behind:
 2. `/swe-workflow:spec` *(stages 1–4)* — the spec layer, AFK-friendly: grill the domain → coarse features → a PRD per feature → tracer-bullet issues. Leaves `CONTEXT.md` + ADRs, `FEATURES.md`, PRDs, and a backlog of `ready-for-agent` issues.
 3. `/swe-workflow:ship-all` *(stages 5–7)* — build and ship the whole backlog, AFK.
 
-Prefer to drive the spec layer by hand? Run its four stages as separate commands — `/grill-with-docs` (1) → `/swe-workflow:to-features` (2) → `/swe-workflow:grill-feature` (3, per feature) → `/to-tickets` (4, per PRD). `/grill-with-docs` and `/to-tickets` are external (mattpocock) skills; `:to-features` and `:grill-feature` are commands in this suite.
+Prefer to drive the spec layer stage by stage? Every stage's procedure and command is listed in the skill's stage table (`skills/swe-workflow/SKILL.md`).
 
 ## License
 

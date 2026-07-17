@@ -14,16 +14,16 @@ This is **stage 2 of the [spec layer](spec.md)**: `/spec` runs it inline as part
 Keep the *granularity* **coarse** — one big user-facing capability per feature (`user-can-post-photo`), never the fine detail of any one (that's `/grill-feature`'s job). But keep the *context* **rich** — capture what the grill surfaced about each feature (the [File format](#file-format) fields). Granularity sharpens downstream:
 
 ```
-stage 1   /grill-with-docs ─► CONTEXT.md + docs/adr/        (domain grounding)
+stage 1   domain grill ─► CONTEXT.md + docs/adr/        (domain grounding)
               │
               ▼
-stage 2   /to-features (PM — high-level grill) ─► FEATURES.md   (coarse features, each a rich block)
+stage 2   to-features (PM — high-level grill) ─► FEATURES.md   (coarse features, each a rich block)
               │
               ▼  per feature
-stage 3   /grill-feature (PM — feature grill + /to-spec) ─► one PRD
+stage 3   grill-feature (PM — feature grill + PRD synthesis) ─► one PRD
               │
               ▼
-stage 4   /to-tickets ─► tracer-bullet issues
+stage 4   slice into issues ─► tracer-bullet issues
 ```
 
 ## Process
@@ -73,7 +73,7 @@ Each feature is a `- [ ]` **header line** + an **indented detail block** capturi
 - ~~**user-can-stream-video**~~ — rejected for v1 (see `.out-of-scope/video-streaming.md`)
 ```
 
-The header line stays terse and actor-first (it's what `/status` and the chain scan); the block holds the depth. Slugs are kebab-case and unique — they're how `/grill-feature` and issues reference a feature. **`Depends on:`** lists the slugs of other **features** this one needs first — **features only** (issue-level ordering is each issue's own `blocked-by`). It's read by `/grill-feature` for context and **orders feature-session launch** (a feature waits until its dependencies have shipped; see [Session topology](../REFERENCE.md#session-topology)).
+The header line stays terse and actor-first (it's what `/status` and the chain scan); the block holds the depth. Slugs are kebab-case and unique — they're how `/grill-feature` and issues reference a feature. **`Depends on:`** lists the slugs of other **features** this one needs first — **features only** (issue-level ordering is each issue's own `blocked-by`). It's read by `/grill-feature` for context and **orders feature-session launch** — a feature waits until its dependencies have shipped.
 
 ## Discipline: when a feature ships, strike it through (don't delete)
 
@@ -93,7 +93,7 @@ Mark the **header line** with strikethrough + a shipped reference (issue number,
 
 ## Why this stage exists
 
-mattpocock's chain (`/to-spec`, `/to-tickets`, `/triage`) is engineering-side — it assumes the feature set already exists. `/to-spec` deliberately **doesn't interview**; it synthesizes from a conversation. So the work of *eliciting what the features are* has no home in that chain. `to-features` is that home: the **PM stage** that grills the project at a high level and writes the coarse backlog that `/grill-feature` then specs one at a time.
+The upstream mattpocock chain is engineering-side — it assumes the feature set already exists, and its PRD-synthesis step deliberately **doesn't interview** (it synthesizes from a conversation). So the work of *eliciting what the features are* has no home in that chain. `to-features` is that home: the **PM stage** that grills the project at a high level and writes the coarse backlog that `/grill-feature` then specs one at a time.
 
 It reads engineering artifacts (`CONTEXT.md`, ADRs) but its output (`FEATURES.md`) is user-facing product language — the deliberate seam where product reasoning enters the chain.
 

@@ -43,14 +43,14 @@ Derived once, the same way for every tracker:
 
 ## Lifecycle states
 
-Close-out itself is tracker-agnostic — [the ship procedure owns it](../references/ship.md). The only thing a tracker contributes is its **status vocabulary**: which states are **terminal** vs. **in-flight**. That one line is all the chain's reads turn on — **list ready** returns only `ready-for-agent`, `/ship`'s re-run check skips a terminal issue, and [feature completion](../REFERENCE.md#completion-signals) counts a terminal child resolved.
+Close-out itself is tracker-agnostic — [the ship procedure owns it](../references/ship.md). The only thing a tracker contributes is its **status vocabulary**: which states are **terminal** vs. **in-flight**. That one line is all the chain's reads turn on — **list ready** returns only `ready-for-agent`, `/ship`'s re-run check skips a terminal issue, and [feature completion](../references/status.md#levels-of-done) counts a terminal child resolved.
 
 - **In-flight** — `/triage`'s intake roles (`needs-triage` … `ready-for-human`), per the repo's `triage-labels.md`. Not this contract's to define.
 - **Terminal** — settled, won't re-enter the chain:
   - `shipped` — built and merged; **swe-workflow's success state**, set by `/ship` close-out (triage never models completion).
   - closed-unshipped — `wontfix`, `duplicate` (link the original), or a team's own value (e.g. `obsolete`); a triage decision, no code landed.
 
-Each tracker **realizes** these states natively — GitHub `open`/`closed`, Linear `Done`/`Canceled`/`Duplicate`, `local-markdown` the literal `Status:` string (`shipped`, `wontfix`, …). [Close-out](../references/ship.md) sets the terminal state once the work has landed: a PR-linked tracker landed via a PR closes the issue on merge for free; otherwise it's set explicitly (`gh issue close`, or `local-markdown`'s `Status:` line). *How* the work lands is a separate, [topology-driven](../REFERENCE.md#landing-the-work) decision — not the tracker's concern. Adding a terminal value changes nothing in the three consumers.
+Each tracker **realizes** these states natively — GitHub `open`/`closed`, Linear `Done`/`Canceled`/`Duplicate`, `local-markdown` the literal `Status:` string (`shipped`, `wontfix`, …). [Close-out](../references/ship.md) sets the terminal state once the work has landed: a PR-linked tracker landed via a PR closes the issue on merge for free; otherwise it's set explicitly (`gh issue close`, or `local-markdown`'s `Status:` line). *How* the work lands is a separate, topology-driven decision ([ship](../references/ship.md)'s landing step) — not the tracker's concern. Adding a terminal value changes nothing in the three consumers.
 
 ## Selection — which adapter
 

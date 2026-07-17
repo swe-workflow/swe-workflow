@@ -21,3 +21,18 @@ Flagged **assumptions** (`Outcome: assumed`) are *not* shown — they're non-blo
 Skip prunable/missing worktree paths.
 
 This is how a returning operator sees every in-flight issue and every parked **ship-all** decision in one place.
+
+## Levels of done
+
+Four levels of "done"; the toolchain verifies three and deliberately stays out of the fourth. Status *reports* them — the writes happen elsewhere (ship's close-out).
+
+| Level | Done when | Recorded in |
+|---|---|---|
+| Phase | its test-first cycle lands green (or non-code work is logged) | `task_plan.md` checkbox — dies at teardown |
+| Issue | all phases ticked **and** the change merged | the tracker's terminal state ([lifecycle](../trackers/README.md#lifecycle-states)) |
+| Feature | every child issue of its PRD terminal | `FEATURES.md` strike-through + shipped refs |
+| Project | no native concept — a judgment call | — |
+
+**Feature detection**: walk from the PRD to its child issues (via the parent reference each issue body carries) and confirm every child is [terminal](../trackers/README.md#lifecycle-states) — a rejected or duplicate child is *resolved* and doesn't block the feature; a child still in-flight does. GitHub: `gh issue list --search "parent:<PRD#> state:open"` returns empty. Local-markdown: every file in `.scratch/<feature-slug>/issues/` has a terminal `Status:`. Others: the adapter's child-issue query.
+
+**Project completion is policy, not a fact** — it depends on release cadence, commitments, and milestone definitions the toolchain can't see. Layer a hard signal on your tracker (GitHub milestones, Linear cycles, release tags) if you need one; the closest native proxy is a `FEATURES.md` snapshot with zero unstruck `- [ ]` lines — a snapshot, not a guarantee.

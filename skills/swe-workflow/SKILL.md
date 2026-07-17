@@ -5,206 +5,56 @@ description: The idiomatic idea → PRD → issues → shipped-PR workflow. Use 
 
 # SWE Workflow
 
-The idiomatic software-engineer workflow: clarify the idea → spec it → slice it → triage it → ship it. Five stages, each with a dedicated skill and a durable artifact that feeds the next. Invoked end-to-end with no specific stage in mind, this skill is the **conductor** that drives the chain 0→7 — see [Driving the chain](#driving-the-chain-stages-07); invoked at a point, it's the map for that stage.
+The idiomatic software-engineer workflow — clarify the idea → spec it → slice it → ship it — as a chain of stages connected by durable markdown artifacts. **The files are the interface**: every stage hands the next an artifact (`CONTEXT.md`/ADRs → `FEATURES.md` → PRD → issues → `task_plan.md`/`progress.md`); nothing lives only in the agent's head.
 
-## How it's exposed
+One [Agent Skill](https://agentskills.io) — portable across Claude Code, Codex, Gemini CLI, Cursor, and other skills-compatible agents. Invoked with no specific stage, it **conducts** the whole chain ([Driving the chain](#driving-the-chain)); invoked at a point (*"ship issue 42"*), it routes to that stage's procedure. On Claude Code each procedure is also a `/swe-workflow:*` command (thin shims over the same files); on other agents, invoke the skill and say what you want.
 
-`swe-workflow` is **one [Agent Skill](https://agentskills.io)** — portable across Claude Code, Codex, Gemini CLI, Cursor, and other skills-compatible agents — that conducts the whole 0→7 chain. Each stage's procedure lives in a reference file it loads on demand:
+## The chain
 
-| Stage(s) | Procedure | Claude command |
-|---|---|---|
-| 0 | [`references/setup.md`](references/setup.md) | `/swe-workflow:setup` |
-| 1–4 | [`references/spec.md`](references/spec.md) | `/swe-workflow:spec` |
-| 2 | [`references/to-features.md`](references/to-features.md) | `/swe-workflow:to-features` |
-| 3 | [`references/grill-feature.md`](references/grill-feature.md) | `/swe-workflow:grill-feature` |
-| 5–7 | [`references/ship.md`](references/ship.md) | `/swe-workflow:ship` |
-| 5–7 ×N | [`references/ship-all.md`](references/ship-all.md) | `/swe-workflow:ship-all` |
-| — | [`references/status.md`](references/status.md) | `/swe-workflow:status` |
+| # | Stage — the question it answers | Artifact out | Procedure (command) | Enter here when |
+|---|---|---|---|---|
+| 0 | Setup — how is this repo set up? | rules block in `AGENTS.md`/`CLAUDE.md`, `docs/agents/`, `.swe-workflow.conf` | [setup.md](references/setup.md) (`:setup`) | repo not bootstrapped yet |
+| 1 | Grill the domain — what do I want? | `CONTEXT.md`, ADRs | [spec.md](references/spec.md) (`:spec` drives 1–4) | fuzzy terms, no glossary yet |
+| 2 | Enumerate features — what does this break into? | `FEATURES.md` | [to-features.md](references/to-features.md) (`:to-features`) | domain clear, features not listed |
+| 3 | Spec one feature — what does done look like? | one PRD per feature | [grill-feature.md](references/grill-feature.md) (`:grill-feature`) | feature picked, no PRD for it |
+| 4 | Slice — what are the units of work? | `ready-for-agent` issues | [spec.md](references/spec.md), stage 4 | PRD exists but is one mega-issue |
+| 5–7 | Ship — plan, build, close out | merged PR/branch + teardown | [ship.md](references/ship.md) (`:ship`); ×N [ship-all.md](references/ship-all.md) (`:ship-all`) | issue picked (5) · plan ready (6) · built (7) |
+| ∥ | Triage — what's actionable? (parallel, not in the chain) | triage labels on external issues | the external `triage` skill | an outside-filed issue needs classification |
+| — | Status — where is everything? | report only, read-only | [status.md](references/status.md) (`:status`) | returning to in-flight work |
 
-- **Claude Code** — invoke the seven `/swe-workflow:*` commands (thin `commands/` shims that run the matching procedure), or invoke this `swe-workflow` skill to drive the whole chain.
-- **Other agents** — invoke the `swe-workflow` skill and say what you want (*"ship issue 42"*); it routes to the right stage's reference file.
+Stages 1–4 are the **spec layer** (AFK-friendly interviews; leaves a `ready-for-agent` backlog); 5–7 the **execution layer** (worktree + planning files per issue; builds it). Chain-created issues are auto-labeled `ready-for-agent`, so `triage` exists only for issues filed *outside* the chain (bug reports, external contributions).
 
-**`log-decisions`** ships in the suite as a companion skill (the decision journal). Stage 2 — **`to-features`**, which splits the project into coarse features in `FEATURES.md` — is a stage of *this* skill (its [`references/to-features.md`](references/to-features.md) procedure + the `/swe-workflow:to-features` command), not a separate skill. The spec-layer skills (`grill-with-docs`, `to-spec`, `to-tickets`, and the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; **spec** automates stages 1–4 of it and **ship** stages 5–7.
+## Driving the chain
 
-## The workflow
+Invoked end-to-end (*"plan this feature end-to-end," "how do I start on this idea?"*), run three idempotent blocks in order — each skips whatever's already done:
 
-```
-┌──────────────── BOOTSTRAP — /swe-workflow:setup (0) ─────────────────┐
-│                                                                      │
-│  0. How is this repo set up?                                         │
-│     /setup-matt-pocock-skills ──► AGENTS.md, docs/agents/            │
-│              (one-time: tracker, triage labels, doc layout —         │
-│               wires this repo's conventions into the chain)          │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-                                  │
-                                  ▼
-┌──────────────── SPEC LAYER — /swe-workflow:spec (1-4) ───────────────┐
-│                                                                      │
-│  1. What do I want?                                                  │
-│     /grill-with-docs ──► CONTEXT.md, ADRs                            │
-│              (resolve domain language; capture decisions —           │
-│               re-run until no questions remain or you abort)         │
-│                                                                      │
-│  2. What features does this break into?                              │
-│     /to-features ──► FEATURES.md                                     │
-│              (PM — high-level grill → coarse user-facing features;   │
-│               strike through, don't delete, on ship)                 │
-│                                                                      │
-│  3. What does done look like?  (per feature)                         │
-│     /grill-feature = grill-with-docs <feature> + /to-spec ──► a PRD  │
-│              (intensive feature grill, then synthesize —             │
-│               Problem / Solution / Stories / Decisions / Scope)      │
-│                                                                      │
-│  4. What are the units of work?                                      │
-│     /to-tickets ──► N tracer-bullet issues                           │
-│              (vertical slices, all auto-labeled `ready-for-agent`    │
-│               — /triage NOT in the critical path)                    │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
+1. **Setup** (stage 0) — only if the repo isn't bootstrapped; it no-ops otherwise.
+2. **Spec** (stages 1–4) — grill → features → PRD → issues; resumes from whatever specs already exist.
+3. **Ship-all** (stages 5–7) — build and ship the backlog.
 
-                                  │
-                  (Agent grabs ONE `ready-for-agent` issue)
-                                  │
-                                  ▼
-┌───────────── EXECUTION LAYER — /swe-workflow:ship (5-7) ─────────────┐
-│                                                                      │
-│  5. How do I plan each issue?                                        │
-│     Fetch issue (per tracker) ──► worktree + branch + seed files     │
-│              (task_plan.md, findings.md, progress.md from AC)        │
-│                                                                      │
-│     /planning-with-files:plan ──► interview → make the plan          │
-│              (prompt bakes in /tdd —                                 │
-│               shapes phases, key questions, decisions to make)       │
-│                                                                      │
-│                    step 5 writes ▼                                   │
-│                        ┌────────────────────┐                        │
-│                        │    task_plan.md    │                        │
-│                        └────────────────────┘                        │
-│                     step 6 reads ▼                                   │
-│                                                                      │
-│  6. How do I build each issue?                                       │
-│     /planning-with-files:plan-goal ──► read task_plan.md,            │
-│              work each sub-task in order → commit                    │
-│              (sub-tasks already name /tdd)                           │
-│                                                                      │
-│  7. How do I close out each issue?                                   │
-│     Adversarial review ──► fresh read-only diff-vs-AC check          │
-│              (separation of duties — reviewer ≠ implementer)         │
-│     progress.md highlights ──► PR body / closing comment             │
-│              (the session log IS the PR narrative — don't rewrite)   │
-│                                                                      │
-│     Teardown ──► git worktree remove + branch -d if merged           │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
+Both layers record decisions via the `log-decisions` skill and proceed on recommended answers when you're away. The difference is what happens on an **unsure HITL call** (one only you can make): **spec pauses** to ask; **ship parks it** for batch review (via [status](references/status.md)) and keeps shipping independent issues, so the AFK batch never blocks (a pre-declared HITL issue is the exception — ship won't attempt it unattended). Re-invoking anything is safe: every command self-detects state and resumes where the chain left off.
 
-*File-based end to end — each stage hands the next a markdown artifact: `CONTEXT.md`/ADRs → `FEATURES.md` → PRD → issues → `task_plan.md` → `progress.md`. The files are the interface between stages; nothing lives only in the agent's head.*
+How to map the chain onto CLI sessions — one long session, one per feature, one per issue — is the operator's call; see [Session topology](https://github.com/swe-workflow/swe-workflow/blob/main/docs/DESIGN.md#session-topology).
 
-## Parallel concern: `/triage`
+## Invariants
 
-`/triage` sits beside the chain, not inside it — a small state machine over the issue tracker (`needs-info` / `ready-for-agent` / `ready-for-human` / `wontfix`). Required for issues filed *outside* the chain (user bug reports, external contributions, ad-hoc feature requests); redundant for chain-created issues, since `/to-spec` and `/to-tickets` auto-label `ready-for-agent` at creation.
+1. **Files are the interface** — every handoff is a markdown artifact, so any stage can re-read where things stand and resume. That's what makes every command idempotent: re-runs no-op finished steps, never duplicate or clobber.
+2. **Issues are tracer bullets** — thin vertical slices through every layer (schema → API → UI → tests). "Backend issue" + "frontend issue" is a smell — re-slice.
+3. **Only `ready-for-agent` issues enter execution** — the label comes from the chain (auto-applied) or from `triage` (external issues); stage 5 reads the label, not the source.
+4. **One issue = one worktree = one `task_plan.md`** — filesystem isolation, no exceptions ([ship.md](references/ship.md)).
+5. **Strike through, don't delete** — a shipped feature stays in `FEATURES.md`, struck through with shipped refs ([to-features.md](references/to-features.md)).
+6. **Security boundary** — `task_plan.md` is re-injected into context on every tool call, so it gets only structured fields the executor wrote; raw external text (issue bodies, fetched docs) goes to `findings.md` ([ship.md](references/ship.md)).
+7. **Don't double-track** — one home per fact: architecture decisions in the PRD, the raw brief in `findings.md`, execution-time decisions in `task_plan.md`, the session narrative in `progress.md` (which IS the PR body — don't rewrite it).
+8. **Ephemeral by design** — worktrees and planning files die at merge; only the tracker, `CONTEXT.md`/ADRs, and `FEATURES.md` survive across features.
+9. **PRD language = stage-1 glossary** — a PRD that conflicts with `CONTEXT.md` loops back to the domain grill.
+10. **Done is layered** — phase = `task_plan.md` checkbox; issue = merged + terminal in the tracker; feature = every child terminal → strike; project = your judgment call ([status.md](references/status.md#levels-of-done)).
 
-See [REFERENCE.md](REFERENCE.md#parallel-concern-triage--whats-actionable-for-external-issues) for the full state machine and per-state outputs.
+## When to skip
 
-## Design philosophy
+- Single-file edits — no spec, no plan needed.
+- Bug fixes whose brief is one paragraph — just do it, skip the stage-5 bootstrap ([ship.md](references/ship.md)).
+- Exploration / prototypes — use a prototyping skill instead.
 
-This is a **chain of small skills, not a framework.** Four principles hold the design together — the first three guard against framework opacity, the fourth makes the chain safe to re-run:
+---
 
-1. **Own the process.** "Process" here means *deciding what goes into context at each stage*. Every skill in the chain is a markdown file you can read, edit, swap, or skip — there is no opaque orchestrator.
-2. **Every artifact is observable.** PRDs, issues, AGENT-BRIEFs, `task_plan.md`, `findings.md`, `progress.md` — all human-readable markdown, all `cat`-able at any point.
-3. **Ephemeral state is intentional — files *and* context.** Per-issue worktrees and planning files die when the PR ships; and each issue ideally builds in a **fresh context** ([clean context per issue](REFERENCE.md#clean-context-per-issue)), not one accumulating across issues. Two kinds of state, one defense: neither stale artifacts nor stale context can pile into a "ball of mud" over time.
-4. **Idempotent by design.** Because the state lives in observable artifacts (principle 2), not the agent's head, any stage can re-read where things stand and pick up — so every command is safe to re-run: it no-ops a finished step, resumes an interrupted one, and never duplicates or clobbers. That's what lets the chain survive an interruption, a `/clear`, or an unattended batch.
-
-Operating maxim (Matt Pocock, after [surveying ~2000 AI coding course participants on framework dissatisfaction](https://x.com/mattpocockuk/status/2044029094942159126)): *"a good framework hands a lot of control over to the user and is easy to observe."* If a proposed addition reduces either, reject it — even if it's borrowed from a framework that looks useful.
-
-**Concrete commitments** derived from these principles:
-
-- **Instructions-only, no scripts.** Deterministic operations are documented as instructions the agent runs, not wrapped in scripts. Every script reintroduced would move the chain toward the opacity Matt's surveyed users rejected.
-- **Transparent markdown all the way down.** Seven chain stages plus `/triage` as a parallel concern — every link is a markdown skill or documented procedure you can read, edit, or replace without touching code. None of them opaque. The direct test of the operating maxim above.
-
-**Engineering-side, by design.** The mattpocock toolchain assumes features come from product thinking (user needs, business goals) that lives outside this skill ecosystem. Stage 2 (`/to-features`) is the deliberate seam: features get *enumerated* here — an interview run in the grill's conversation that turns domain understanding into a backlog — but *discovered* elsewhere, in user research, product strategy, sales conversations, whatever your team uses. This toolchain has no opinion on that.
-
-See [REFERENCE.md](REFERENCE.md#how-this-differs-from-spec-kit-class-frameworks) for the comparison with spec-kit / BMAD / GSD.
-
-## Where to enter the chain
-
-Don't always start at stage 1 — jump to where the chain actually breaks.
-
-| Entry signal | Start at |
-|--------------|----------|
-| Fresh repo, no `## Agent skills` block or `docs/agents/` yet | 0 |
-| Vocabulary fights, fuzzy terms, no glossary yet | 1 |
-| Domain understood, features not yet enumerated | 2 |
-| Feature picked, no PRD yet for this one | 3 |
-| PRD exists but is one mega-issue | 4 |
-| Picked a `ready-for-agent` issue, ready to plan | 5 |
-| `task_plan.md` refined, ready to implement | 6 |
-| Implementation committed, ready to open the PR + tear down | 7 |
-| External issue filed by a user, needs classification | (parallel: `/triage`) |
-
-## Driving the chain (stages 0→7)
-
-Invoked without a specific stage — *"plan this feature end-to-end," "how do I start on this idea?"* — act as the **conductor**. The chain packs into three **idempotent** building blocks; run them in order and let each skip whatever's already done:
-
-1. **Setup** (stage 0) — only if the repo isn't bootstrapped; it skips itself otherwise.
-2. **Spec** (stages 1–4, *AFK-friendly*) — grill → features → PRD → issues, leaving a `ready-for-agent` backlog. Resumes from whatever specs already exist.
-3. **Ship-all** (stages 5–7, *AFK*) — build and ship the backlog.
-
-**Spec is pausable; execution stays automatic via post-batch review.** Both blocks are **AFK-friendly** and record decisions via `log-decisions`; the **key difference** is what happens on an **unsure HITL call** (one only you can make). **Spec (1–4) pauses** to ask — its interviews proceed on recommended answers when you're away, stopping only to escalate a call that genuinely needs you. **Ship-all persists instead** — it journals and **parks** the escalation for your **batch review** (via [`/status`](references/status.md)) and keeps shipping independent issues, so the AFK batch never blocks (a pre-declared HITL issue is the exception — `ship-all` won't attempt it unattended and waits). **Re-invoking is safe** — each command self-detects state, so a re-run continues where the chain left off. To jump straight to a single stage instead of driving the whole thing, use [Where to enter the chain](#where-to-enter-the-chain). `/triage` stays a parallel concern — pull external issues into the backlog as needed.
-
-**How you map the chain onto actual CLI sessions** — one long session, one per feature, or one per issue — is the operator's call, trading context warmth against isolation; see [Session topology](REFERENCE.md#session-topology).
-
-## When is it done?
-
-The mirror image of "Where to enter the chain" — four levels of "done", four signals:
-
-| Level | Done when | Recorded in |
-|-------|-----------|-------------|
-| Phase | TDD cycle green + logged | `task_plan.md` checkbox ticked |
-| Issue | All phases ticked, PR merged | tracker status (closed/merged) |
-| Feature | All issues from its PRD merged | `FEATURES.md` strike-through w/ shipped refs |
-| Project | (no native concept — judgment call) | — |
-
-Phase/issue/feature completion is a **fact** the toolchain verifies; project completion is a **judgment call** it stays out of — layer on `gh milestone` / Linear cycles / release tags if you need a hard milestone. The mechanical walk (PRD → child issues → confirm closed → strike the `FEATURES.md` line) and per-tracker completion queries are in [REFERENCE.md](REFERENCE.md#completion-signals).
-
-## Stages 5-7: worktree + planning-with-files
-
-The diagram above is the map. The procedure is single-sourced in [`references/ship.md`](references/ship.md) (one issue) and [`references/ship-all.md`](references/ship-all.md) (the backlog) — **instructions-only, no scripts**, **idempotent** (a re-run resumes or no-ops via ship.md's re-run check), carrying the single-source planner prompt (ship.md Stage 5, step 6) that bakes `/tdd` into `task_plan.md`. Per-stage detail — the `/tdd` inner loop, [clean context per issue](REFERENCE.md#clean-context-per-issue), discovered scope, the [adversarial review](REFERENCE.md#adversarial-review-before-close-out) gate before close-out, HITL, teardown commands, the decision journal — is in [REFERENCE.md](REFERENCE.md#stage-5-worktree--planning-with-files--build-it). The bootstrap enforces the [security boundary](#security-boundary) below: structured fields only in `task_plan.md`, raw external text in `findings.md`.
-
-## Critical handoff rules
-
-1. **PRD uses the glossary from stage 1.** If `to-spec` introduces terms that conflict with `CONTEXT.md`, loop back to `/grill-with-docs`.
-2. **Issues are tracer bullets, not horizontal layers.** Each is a thin vertical slice (schema → API → UI → tests). "Backend issue" + "frontend issue" is a smell — re-slice.
-3. **Only `ready-for-agent` issues enter execution.** `/to-tickets` auto-applies the label on chain-created issues; `/triage` applies it to external issues (user reports, etc.). Either way, stage 5 reads from the label, not the source.
-4. **One issue = one worktree = one `task_plan.md`.** Filesystem isolation for parallel AFK agents — no exceptions. (`/ship-all` itself is sequential; the isolation enables *optional, human-driven* parallelism — see [Parallel execution](REFERENCE.md#parallel-execution).)
-5. **Strike through, don't delete.** When a feature ships, strike it through in `FEATURES.md` with a shipped reference — never delete. Preserves institutional memory; prevents quiet scope drift.
-
-## Don't double-track
-
-| Lives in… | Don't also put in… |
-|-----------|--------------------|
-| PRD (immutable arch decisions) | `task_plan.md` (would rot; the spec is authoritative) |
-| AGENT-BRIEF (durable contract) | `task_plan.md` (copy only AC + key interfaces; raw brief goes in `findings.md`) |
-| `task_plan.md` (execution-time decisions, errors hit) | The issue (don't litter the spec with build noise) |
-| `progress.md` (session log) | A hand-written PR summary (the log IS the summary) |
-
-## Security boundary
-
-`planning-with-files` re-injects `task_plan.md` into context on every tool call. Any text in `task_plan.md` is an amplified prompt-injection target.
-
-- Raw issue bodies, fetched docs, web content → `findings.md` only.
-- `task_plan.md` gets only **structured fields** the executor wrote (Goal, Phases from AC, Decisions, Errors).
-
-The bootstrap procedure ([Stages 5-7](#stages-5-7-worktree--planning-with-files)) enforces this split.
-
-## When to skip this skill
-
-- Single-file edits (no spec, no plan needed)
-- Bug fixes where the AGENT-BRIEF is one paragraph — just do it, skip stage 5 bootstrap
-- Exploration / prototypes — use the `prototype` skill instead
-
-## Further reading
-
-- [REFERENCE.md](REFERENCE.md) — per-stage detail, HITL vs AFK execution, gotchas
-- Source skills: `grill-with-docs`, `to-spec`, `to-tickets`, `triage` (mattpocock/skills), `planning-with-files` (OthmanAdi/planning-with-files)
+A chain of small skills, not a framework: own the process, keep every artifact observable, keep per-issue state ephemeral, stay instructions-only (no scripts). The rationale, session topology, and spec-kit comparison live in [docs/DESIGN.md](https://github.com/swe-workflow/swe-workflow/blob/main/docs/DESIGN.md).

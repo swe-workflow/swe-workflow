@@ -25,7 +25,7 @@ If the `setup-matt-pocock-skills` skill is available, **invoke it** to wire this
 
 ## 3. Inject the always-on rules
 
-Write the standing rules into the repo's agent-instructions file — `AGENTS.md` if present, else `CLAUDE.md` (match where the repo keeps agent instructions; stage-0 uses the same target). These are two independently sentinel-wrapped blocks (see the [always-on rules registry](../REFERENCE.md#always-on-engineering-rules) for how rules route to their injection sites).
+Write the standing rules into the repo's agent-instructions file — `AGENTS.md` if present, else `CLAUDE.md` (match where the repo keeps agent instructions; stage-0 uses the same target). These are two independently sentinel-wrapped blocks. (This file is the injection site for *all-stages* rules; execution-only rules ride the [ship procedure](ship.md)'s planner prompt instead.)
 
 **Idempotency:** before writing **each** block, `grep` for its sentinel. If present → **no-op** for that block (report "already configured"; never duplicate or overwrite user edits). If absent → append it. The blocks are independent — a repo that has only the decision-logging block from an earlier run gets the engineering-discipline block added on the next.
 
@@ -61,7 +61,7 @@ Test-first development via the `tdd` skill is **not** a repo-wide rule — it is
 
 ## 5. Choose the landing method
 
-How `/ship` lands a finished branch into the canonical branch ([Landing the work](../REFERENCE.md#landing-the-work)) is a per-repo choice — it reduces to **one question — can you write the target's `main` directly?** (yes ⇒ `landing=direct`, no ⇒ `landing=pr`). Record it once here.
+How `/ship` lands a finished branch into the canonical branch (the [ship procedure](ship.md)'s landing step) is a per-repo choice — it reduces to **one question — can you write the target's `main` directly?** (yes ⇒ `landing=direct`, no ⇒ `landing=pr`). Record it once here.
 
 1. **Read three signals — all read-only; never probe by pushing to `main`.** Fork status alone isn't enough — a non-fork can still have a protected `main`. On GitHub, read `gh repo view --json isFork,viewerPermission,defaultBranchRef` plus the default branch's protection — `gh api repos/<owner>/<repo>/branches/<default-branch> --jq '.protected'` (readable without admin). Off GitHub or without `gh`, fall back to the fork signal alone (an `upstream` remote ⇒ treat as a fork).
 2. **Ask the user — *Can you write the target's `main` directly?*** — recommending the answer from the signals:

@@ -4,9 +4,7 @@ Run the **spec layer** — stages 1 → 2 → 3 → 4 — turning an idea into a
 
 **Focus** comes from the user's request — optional. A feature slug from `FEATURES.md` specs that one; a raw idea/topic starts from scratch; nothing given works from the conversation, or from the un-specced features already in `FEATURES.md`.
 
-Per-stage detail (including when to skip each) is in [REFERENCE.md](../REFERENCE.md).
-
-**AFK-friendly — but it pauses for you.** `grill-with-docs`, `to-features`, and `to-tickets` interview you intensively, yet each is AFK-friendly: when you're away it offers recommended answers and applies the `log-decisions` rules to decide or assume the determinable and reversible calls, recording them in the journal. What it **won't** settle alone is an **unsure HITL call** (irreversible, needs your context) — there it **pauses and escalates**, and waits. (Execution reacts to that same call differently — it persists rather than pauses; see [Driving the chain](../SKILL.md#driving-the-chain-stages-07).)
+**AFK-friendly — but it pauses for you.** `grill-with-docs`, `to-features`, and `to-tickets` interview you intensively, yet each is AFK-friendly: when you're away it offers recommended answers and applies the `log-decisions` rules to decide or assume the determinable and reversible calls, recording them in the journal. What it **won't** settle alone is an **unsure HITL call** (irreversible, needs your context) — there it **pauses and escalates**, and waits. (Execution reacts to that same call differently — it persists rather than pauses; see [Driving the chain](../SKILL.md#driving-the-chain).)
 
 ## Idempotent by design — do only what's missing
 Detect where the feature already is in the spec layer and resume; never clobber or duplicate. Each stage states its skip condition; run only the stages whose artifact is absent or stale.
@@ -20,8 +18,8 @@ Resolve the domain language → `CONTEXT.md` (+ ADRs under `docs/adr/` for subst
 The **product-manager** stage: `to-features` **invokes `/grill-with-docs` at a high level** to split the project into **coarse-grained** features, then writes `FEATURES.md`. (Files don't enumerate features — the set is elicited.) AFK-friendly and pausable; journals feature-scope calls via `log-decisions`. Run the [`to-features.md`](to-features.md) procedure — kept there as the single source; it's also the standalone `/swe-workflow:to-features` command.
 - **Idempotent**: if `FEATURES.md` exists, this is a **refinement** — propose additions / strikethroughs; never overwrite shipped (struck-through) lines.
 
-## Stage 3 — PRD one feature (`to-spec`, via the [`grill-feature.md`](grill-feature.md) procedure)
-The second **product-manager** stage: **grill the target feature** (`grill-with-docs`, feature-scoped, intensive) **then synthesize its PRD** (`to-spec`) → one PRD, published as a parent issue labeled `ready-for-agent`. Run the [`grill-feature.md`](grill-feature.md) procedure — kept there as the single source; it's also the standalone `/grill-feature` command.
+## Stage 3 — PRD one feature (the [`grill-feature.md`](grill-feature.md) procedure)
+The second **product-manager** stage: **grill the target feature** (feature-scoped, intensive) **then synthesize its PRD** → one PRD, published as a parent issue labeled `ready-for-agent`. Run the [`grill-feature.md`](grill-feature.md) procedure — kept there as the single source; it's also the standalone `/grill-feature` command.
 - **Skip if** a PRD already exists for this feature — don't create a duplicate parent.
 - If no feature is targeted yet, pick from `FEATURES.md`; ask the user which when it's ambiguous.
 
