@@ -27,7 +27,7 @@ Stages 0→7, split into two layers plus a parallel concern. Each **stage proced
 - **Parallel — `/triage`**: a state machine over *external* issues; **not** in the critical path (chain-created issues are auto-labeled `ready-for-agent`).
 - The **`swe-workflow` skill itself** is the conductor for the whole 0→7 chain when invoked without a specific stage.
 
-This suite **orchestrates external skills it does not bundle** — `planning-with-files`, `karpathy-guidelines`, `tdd`, and mattpocock's `setup-matt-pocock-skills` / `grill-with-docs` / `to-prd` / `to-issues` / `triage` — all themselves cross-agent Agent Skills. `swe-setup` auto-installs them. When editing, assume these are separate skills, not files in this repo.
+This suite **orchestrates external skills it does not bundle** — `planning-with-files`, `tdd`, and mattpocock's `setup-matt-pocock-skills` / `grill-with-docs` / `to-prd` / `to-issues` / `triage` — all themselves cross-agent Agent Skills. `swe-setup` auto-installs them. When editing, assume these are separate skills, not files in this repo.
 
 Five cross-cutting invariants hold the design together — internalize before editing:
 

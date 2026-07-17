@@ -98,7 +98,7 @@ The skill is **instructions-only** — there are no scripts. The agent performs 
 
 The numbered bootstrap — fetch → derive paths → create the worktree (with the **idempotent re-run check**) → seed `task_plan.md` / `findings.md` / `progress.md` → invoke `planning-with-files`' `plan` then `plan-goal` — is single-sourced in the [ship procedure](references/ship.md) (Stages 5–6). Don't restate the steps here; this file carries only the *why* and the edge cases below.
 
-The split enforces the **security boundary**: `task_plan.md` is re-injected by hooks every tool call, so it gets only structured fields; raw external content (issue body, fetched docs) goes to `findings.md` instead. `/karpathy-guidelines` also carries a repo-wide standing form in the agent-instructions file; `/tdd` stays scoped to `/ship`+`/ship-all` builds — see [Always-on engineering rules](#always-on-engineering-rules) for the split.
+The split enforces the **security boundary**: `task_plan.md` is re-injected by hooks every tool call, so it gets only structured fields; raw external content (issue body, fetched docs) goes to `findings.md` instead. `/tdd` stays scoped to `/ship`+`/ship-all` builds — see [Always-on engineering rules](#always-on-engineering-rules) for the scoping.
 
 ### Tracker selection
 
@@ -125,7 +125,7 @@ The selection algorithm (priority order), the normalized-issue schema, AGENT-BRI
 - **Decisions discovered mid-`/tdd`** split by the bar: reversible, spec-authorized ones (e.g., extracting a private helper) land in `task_plan.md`'s Decisions table; **bar-crossing** ones — and a public-interface change is a *deviation* — go to the **decision journal** (`DECISIONS.staged.md` → `DECISIONS.md`) per the `log-decisions` skill (look first → decide / assume / escalate).
 - **Errors during RED or GREEN** go in `task_plan.md`'s Errors table — same 3-strike protocol as any other error. Never silently retry a failed test in the same form.
 - **`/tdd`'s own per-phase planning step is light** (interface confirmation, test list, prior-art lookup). It's not a duplicate of `/planning-with-files:plan`'s issue-level interview — just a quick check-in at the top of each phase.
-- **Compile vs runtime.** Stage 5 *compiles* the plan (the interview bakes `/tdd` + `/karpathy-guidelines` into `task_plan.md`); Stage 6 *runs* it. In **AFK** builds `/tdd` does **not** interview the human — mid-build decisions are logged (`log-decisions`) — a grounded call or a flagged **assumption** — or escalated. **HITL** issues may pause at documented checkpoints.
+- **Compile vs runtime.** Stage 5 *compiles* the plan (the interview bakes `/tdd` into `task_plan.md`); Stage 6 *runs* it. In **AFK** builds `/tdd` does **not** interview the human — mid-build decisions are logged (`log-decisions`) — a grounded call or a flagged **assumption** — or escalated. **HITL** issues may pause at documented checkpoints.
 
 **Mental shorthand**: `/planning-with-files` is the project manager keeping the calendar; `/tdd` is the engineer at the keyboard. One PM, many keyboard sessions per issue.
 
@@ -313,15 +313,14 @@ A few skills apply to *every* run rather than to one stage. There's no framework
 | Skill | Scope | Injection site(s) |
 |---|---|---|
 | `log-decisions` | All stages (spec *and* build) | setup procedure §3 → `AGENTS.md`/`CLAUDE.md` sentinel block |
-| `andrej-karpathy-skills:karpathy-guidelines` | Any code-writing (ad-hoc *and* build) | setup §3 standing rule **+** ship Stage 5 planner → `task_plan.md` |
 | `/tdd` | ship + ship-all builds only | ship Stage 5 planner → `task_plan.md` (per-issue, so ship-all inherits it) |
 
 **The site follows the scope** — each is the file already loaded at the moment the rule applies:
 
-- **All-stages → the agent-instructions file** (`AGENTS.md`/`CLAUDE.md`). Agent-agnostic — Claude and Codex both read it through the `## Agent skills` block [stage 0](#stage-0-setup-matt-pocock-skills--how-is-this-repo-set-up) writes — persistent across features, and reloaded into every fresh context window. So `log-decisions` (fires during spec as readily as a build) and `karpathy-guidelines` (every code edit, ship or not) stay present throughout. Written once by the setup procedure, sentinel-wrapped so a re-run is a no-op.
+- **All-stages → the agent-instructions file** (`AGENTS.md`/`CLAUDE.md`). Agent-agnostic — Claude and Codex both read it through the `## Agent skills` block [stage 0](#stage-0-setup-matt-pocock-skills--how-is-this-repo-set-up) writes — persistent across features, and reloaded into every fresh context window. So `log-decisions` (fires during spec as readily as a build) stays present throughout. Written once by the setup procedure, sentinel-wrapped so a re-run is a no-op.
 - **Execution-only → `task_plan.md`.** `planning-with-files` re-injects it on every tool call, keeping the rule maximally salient through the build, and it dies with the worktree — the right lifetime for a rule that means nothing until code is being written. Only structured rules the executor wrote belong here (the **security boundary**); a named-skill activation qualifies, raw external text never does.
 
-**Karpathy sits in both sites; `/tdd` in one — by deliberate scope.** `karpathy-guidelines` is repo-wide: the setup standing rule states the policy (*keep every change surgical — ad-hoc edits included*), and the ship planner prompt re-names it in `task_plan.md` so it stays salient through a build (complementary, not double-tracked — one declares, the other re-fires at the keyboard). `/tdd` is scoped to ship and ship-all builds only — it lives **solely** in the planner prompt → `task_plan.md`, never in the standing block, so opening the repo for a quick edit doesn't force red → green → refactor. Flip either knob in one place: widen `/tdd` by adding it to the setup engineering-discipline block; narrow `karpathy` by dropping its standing rule.
+**`/tdd` sits in one site — by deliberate scope.** It applies to ship and ship-all builds only — it lives **solely** in the planner prompt → `task_plan.md`, never in the standing block (the setup engineering-discipline block states that scoping explicitly), so opening the repo for a quick edit doesn't force red → green → refactor. The knob flips in one place: widen `/tdd` by adding it to the setup engineering-discipline block.
 
 **Adding a rule later** — add a row, then route it to its site: all-stages → extend the [setup procedure](references/setup.md)'s §3 sentinel block; execution-only → extend the [ship procedure](references/ship.md)'s Stage 5 planner prompt (its single source, kept there so it can't drift). This table is the registry; those two sites are the only writers. The same property that lets a new *tracker* be one adapter doc lets a new *rule* be one row plus one injection site.
 

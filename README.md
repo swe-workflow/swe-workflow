@@ -35,7 +35,6 @@ npx skills add swe-workflow/swe-workflow
 The workflow orchestrates several skills this suite doesn't bundle. **The setup stage (`/swe-workflow:setup`) auto-installs the missing ones** (then restart to activate them); or install manually:
 
 - [`planning-with-files`](https://github.com/OthmanAdi/planning-with-files) — the `plan` / `plan-goal` / `status` engine the ship stage runs for each issue. Cross-agent.
-- [`andrej-karpathy-skills:karpathy-guidelines`](https://github.com/multica-ai/andrej-karpathy-skills) — code-quality guardrails (surgical, simple changes).
 - [`mattpocock/skills`](https://github.com/mattpocock/skills) — `tdd` (the red → green → refactor inner loop) plus the upstream spec layer: `setup-matt-pocock-skills`, `grill-with-docs`, `to-prd`, `to-issues`, and `triage`. Cross-agent.
 
 ## How it fits together

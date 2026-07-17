@@ -24,7 +24,7 @@ The idiomatic software-engineer workflow: clarify the idea → spec it → slice
 - **Claude Code** — invoke the seven `/swe-workflow:*` commands (thin `commands/` shims that run the matching procedure), or invoke this `swe-workflow` skill to drive the whole chain.
 - **Other agents** — invoke the `swe-workflow` skill and say what you want (*"ship issue 42"*); it routes to the right stage's reference file.
 
-**`log-decisions`** ships in the suite as a companion skill (the decision journal). Stage 2 — **`to-features`**, which splits the project into coarse features in `FEATURES.md` — is a stage of *this* skill (its [`references/to-features.md`](references/to-features.md) procedure + the `/swe-workflow:to-features` command), not a separate skill. The spec-layer skills (`grill-with-docs`, `to-prd`, `to-issues`, and the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`, `karpathy-guidelines`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; **spec** automates stages 1–4 of it and **ship** stages 5–7.
+**`log-decisions`** ships in the suite as a companion skill (the decision journal). Stage 2 — **`to-features`**, which splits the project into coarse features in `FEATURES.md` — is a stage of *this* skill (its [`references/to-features.md`](references/to-features.md) procedure + the `/swe-workflow:to-features` command), not a separate skill. The spec-layer skills (`grill-with-docs`, `to-prd`, `to-issues`, and the parallel `triage`) and the execution engine (`planning-with-files`, `tdd`) are **external skills this suite orchestrates** — the [setup procedure](references/setup.md) auto-installs them (see the [README](../../README.md)). The diagram below is the conceptual chain; **spec** automates stages 1–4 of it and **ship** stages 5–7.
 
 ## The workflow
 
@@ -74,7 +74,7 @@ The idiomatic software-engineer workflow: clarify the idea → spec it → slice
 │              (task_plan.md, findings.md, progress.md from AC)        │
 │                                                                      │
 │     /planning-with-files:plan ──► interview → make the plan          │
-│              (prompt bakes in /karpathy-guidelines + /tdd —          │
+│              (prompt bakes in /tdd —                                 │
 │               shapes phases, key questions, decisions to make)       │
 │                                                                      │
 │                    step 5 writes ▼                                   │
@@ -86,7 +86,7 @@ The idiomatic software-engineer workflow: clarify the idea → spec it → slice
 │  6. How do I build each issue?                                       │
 │     /planning-with-files:plan-goal ──► read task_plan.md,            │
 │              work each sub-task in order → commit                    │
-│              (sub-tasks already name /tdd + /karpathy-guidelines)    │
+│              (sub-tasks already name /tdd)                           │
 │                                                                      │
 │  7. How do I close out each issue?                                   │
 │     Adversarial review ──► fresh read-only diff-vs-AC check          │
@@ -170,7 +170,7 @@ Phase/issue/feature completion is a **fact** the toolchain verifies; project com
 
 ## Stages 5-7: worktree + planning-with-files
 
-The diagram above is the map. The procedure is single-sourced in [`references/ship.md`](references/ship.md) (one issue) and [`references/ship-all.md`](references/ship-all.md) (the backlog) — **instructions-only, no scripts**, **idempotent** (a re-run resumes or no-ops via ship.md's re-run check), carrying the single-source planner prompt (ship.md Stage 5, step 6) that bakes `/tdd` + `karpathy-guidelines` into `task_plan.md`. Per-stage detail — the `/tdd` inner loop, [clean context per issue](REFERENCE.md#clean-context-per-issue), discovered scope, the [adversarial review](REFERENCE.md#adversarial-review-before-close-out) gate before close-out, HITL, teardown commands, the decision journal — is in [REFERENCE.md](REFERENCE.md#stage-5-worktree--planning-with-files--build-it). The bootstrap enforces the [security boundary](#security-boundary) below: structured fields only in `task_plan.md`, raw external text in `findings.md`.
+The diagram above is the map. The procedure is single-sourced in [`references/ship.md`](references/ship.md) (one issue) and [`references/ship-all.md`](references/ship-all.md) (the backlog) — **instructions-only, no scripts**, **idempotent** (a re-run resumes or no-ops via ship.md's re-run check), carrying the single-source planner prompt (ship.md Stage 5, step 6) that bakes `/tdd` into `task_plan.md`. Per-stage detail — the `/tdd` inner loop, [clean context per issue](REFERENCE.md#clean-context-per-issue), discovered scope, the [adversarial review](REFERENCE.md#adversarial-review-before-close-out) gate before close-out, HITL, teardown commands, the decision journal — is in [REFERENCE.md](REFERENCE.md#stage-5-worktree--planning-with-files--build-it). The bootstrap enforces the [security boundary](#security-boundary) below: structured fields only in `task_plan.md`, raw external text in `findings.md`.
 
 ## Critical handoff rules
 

@@ -9,7 +9,6 @@ The workflow depends on external skills this suite doesn't bundle. Detect which 
 | Skill(s) | Source (GitHub repo) |
 |---|---|
 | `planning-with-files` | `OthmanAdi/planning-with-files` |
-| `karpathy-guidelines` | `multica-ai/andrej-karpathy-skills` |
 | `tdd`, `setup-matt-pocock-skills`, `grill-with-docs`, `to-prd`, `to-issues`, `triage` | `mattpocock/skills` |
 
 1. **Detect** what's already available to your agent and skip those.
@@ -26,7 +25,7 @@ If the `setup-matt-pocock-skills` skill is available, **invoke it** to wire this
 
 ## 3. Inject the always-on rules
 
-Write the standing rules into the repo's agent-instructions file — `AGENTS.md` if present, else `CLAUDE.md` (match where the repo keeps agent instructions; stage-0 uses the same target). These are the **all-stages** entries in the [always-on rules registry](../REFERENCE.md#always-on-engineering-rules) — two independently sentinel-wrapped blocks.
+Write the standing rules into the repo's agent-instructions file — `AGENTS.md` if present, else `CLAUDE.md` (match where the repo keeps agent instructions; stage-0 uses the same target). These are two independently sentinel-wrapped blocks (see the [always-on rules registry](../REFERENCE.md#always-on-engineering-rules) for how rules route to their injection sites).
 
 **Idempotency:** before writing **each** block, `grep` for its sentinel. If present → **no-op** for that block (report "already configured"; never duplicate or overwrite user edits). If absent → append it. The blocks are independent — a repo that has only the decision-logging block from an earlier run gets the engineering-discipline block added on the next.
 
@@ -45,8 +44,6 @@ When you make a decision on the user's behalf they'd want to review — auto-ans
 ```markdown
 <!-- swe-workflow:engineering-discipline -->
 ## Engineering discipline (swe-workflow)
-
-When writing or refactoring code in this repo — in a swe-workflow ship build or an ad-hoc edit — apply the **`andrej-karpathy-skills:karpathy-guidelines`** skill: keep changes surgical; smallest diff that works, no speculative abstractions, surface assumptions instead of guessing silently.
 
 Test-first development via the `tdd` skill is **not** a repo-wide rule — it is scoped to swe-workflow's ship and ship-all builds, where the plan names it in `task_plan.md`. Don't impose red → green → refactor on ad-hoc edits outside those flows.
 <!-- /swe-workflow:engineering-discipline -->
