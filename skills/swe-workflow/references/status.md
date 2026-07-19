@@ -1,6 +1,6 @@
 # Status
 
-Show the status for the current project or issue. **Read-only** — it never writes. On Claude Code this runs as `/swe-workflow:status`; on other agents, invoke the `swe-workflow` skill and ask for status.
+Show the status for the current project or issue. **Read-only** — it never writes.
 
 1. **In an issue worktree** — when `task_plan.md`, `progress.md`, and `findings.md` exist in the current directory — invoke the **`planning-with-files`** skill's `status` workflow (required; if it's not installed, say so and stop) and report:
    - **Where am I?** — the Current Phase.

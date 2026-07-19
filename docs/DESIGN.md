@@ -87,6 +87,10 @@ The [Pocock survey](https://x.com/mattpocockuk/status/2044029094942159126) flagg
 - **Framework-driven implementation** (`/speckit.implement`-style) — replaced by the layered worktree + `planning-with-files` + `tdd` execution stage. More moving pieces, each observable.
 - **Long-lived spec artifacts in the repo** — avoided. Planning files live in worktrees and die at PR merge; only the tracker and `CONTEXT.md`/ADRs/`FEATURES.md` survive across features.
 
+## Why the PM stages exist
+
+The upstream mattpocock chain is engineering-side — it assumes the feature set already exists, and `to-spec` deliberately doesn't interview (it synthesizes a PRD from a conversation). So the work of *eliciting what the features are* has no home upstream. The suite's two internal **PM stages** fill it: `to-features` grills the project at a high level and writes the coarse backlog (`FEATURES.md`); `grill-feature` pairs a feature-scoped grill with `to-spec` to produce each PRD. `to-features` reads engineering artifacts (`CONTEXT.md`, ADRs) but writes user-facing product language — the deliberate seam where product reasoning enters the chain.
+
 ## Session topology
 
 How to map the 0→7 chain onto agent CLI sessions — operator guidance, not mechanism. Files are the interface, so a session can end wherever a durable artifact exists and the next resumes from it. But artifacts are a *lossy* compression of the grilling conversation, so every cut trades **context warmth** (fidelity to intent) against **isolation** (clean context, observability, parallelism, a fresh reviewer). Three points on the spectrum:

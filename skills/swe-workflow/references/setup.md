@@ -1,6 +1,6 @@
 # Stage 0 — Setup
 
-Bootstrap this repo for the **swe-workflow** suite. One-time, **idempotent** setup — safe to re-run. On Claude Code this runs as `/swe-workflow:setup`; on other agents, invoke the `swe-workflow` skill and ask to bootstrap the repo.
+Bootstrap this repo for the **swe-workflow** suite. One-time, **idempotent** setup — safe to re-run.
 
 ## 1. Ensure prerequisite skills are installed
 
@@ -17,7 +17,7 @@ The workflow depends on external skills this suite doesn't bundle. Detect which 
    - **Claude Code plugins** (alternative) — `claude plugin marketplace add <github-repo>` then `claude plugin install <plugin>@<marketplace>`.
 3. **Activation may need a restart.** Newly installed skills/plugins are often inactive until the agent restarts. After installing, **report what you installed and tell the user to restart**, then re-run setup to verify. The rule injection in step 3 is a file write — live immediately, no restart needed.
 
-If no skill installer is available here, report it and skip installs (still do steps 2–4).
+If no skill installer is available here, report it, skip the installs, and continue with the remaining steps.
 
 ## 2. Wrap stage-0 setup (mattpocock)
 

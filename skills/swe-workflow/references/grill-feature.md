@@ -1,6 +1,6 @@
 # Stage 3 — Grill a feature → PRD
 
-Spec a **single feature** into a PRD — the **product-manager** stage. Grill that one feature, then synthesize its PRD. On Claude Code this runs as `/swe-workflow:grill-feature`; on other agents, invoke the `swe-workflow` skill and ask to grill a feature into its PRD.
+Spec a **single feature** into a PRD — the **product-manager** stage. Grill that one feature, then synthesize its PRD.
 
 This is **stage 3 of the [spec layer](spec.md)**: `/spec` runs it inline for the feature it's targeting; `/grill-feature` runs it **standalone, once per feature**. It pairs a feature-scoped `grill-with-docs` interview with `to-spec` — the grill supplies the conversation `to-spec` synthesizes from (on its own, `to-spec` doesn't interview).
 
@@ -16,8 +16,6 @@ This is **stage 3 of the [spec layer](spec.md)**: `/spec` runs it inline for the
 **Idempotent** — **skip** if a PRD already exists for this feature (don't create a duplicate parent). Re-run only to refine a PRD whose feature genuinely changed.
 
 **AFK-friendly and pausable** — the spec-layer posture ([spec.md](spec.md)): the grill offers recommended answers and applies the `log-decisions` rules to proceed on determinable/reversible calls (recording them), but an **unsure HITL call pauses** and asks rather than guessing. Bar-crossing feature decisions are journaled via `log-decisions`.
-
-**Runs per feature, not necessarily one conversation each.** Each feature gets its own PRD; whether you spec several in one sitting or one at a time is up to you.
 
 **Next:** slice the PRD into tracer-bullet issues (stage 4 of [spec.md](spec.md)), then `/ship` or `/ship-all`.
 

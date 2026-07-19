@@ -1,6 +1,6 @@
 # Stages 5–7 — Ship
 
-Run the **execution layer** — stages 5 → 6 → 7 — for a single issue: plan it, build it test-first, land it, tear down. On Claude Code this runs as `/swe-workflow:ship`; on other agents, invoke the `swe-workflow` skill and ask to ship an issue.
+Run the **execution layer** — stages 5 → 6 → 7 — for a single issue: plan it, build it test-first, land it, tear down.
 
 **The issue to ship** comes from the user's request — an issue slug such as a local-markdown path (`.scratch/feature-x/issues/02-foo.md`) or a tracker id (a GitHub `#number`, a Linear `TEAM-NN` key). If no issue is identified, ask which one and stop — don't guess.
 

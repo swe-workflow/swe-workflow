@@ -1,10 +1,10 @@
 # Stages 1–4 — Spec
 
-Run the **spec layer** — stages 1 → 2 → 3 → 4 — turning an idea into a `ready-for-agent` backlog. The mirror image of the **ship** stage ([`ship.md`](ship.md), stages 5–7): **spec produces the issues, ship builds them.** On Claude Code this runs as `/swe-workflow:spec`; on other agents, invoke the `swe-workflow` skill and ask to spec a feature.
+Run the **spec layer** — stages 1 → 2 → 3 → 4 — turning an idea into a `ready-for-agent` backlog. The mirror image of the **ship** stage ([`ship.md`](ship.md), stages 5–7): **spec produces the issues, ship builds them.**
 
 **Focus** comes from the user's request — optional. A feature slug from `FEATURES.md` specs that one; a raw idea/topic starts from scratch; nothing given works from the conversation, or from the un-specced features already in `FEATURES.md`.
 
-**AFK-friendly — but it pauses for you.** `grill-with-docs`, `to-features`, and `to-tickets` interview you intensively, yet each is AFK-friendly: when you're away it offers recommended answers and applies the `log-decisions` rules to decide or assume the determinable and reversible calls, recording them in the journal. What it **won't** settle alone is an **unsure HITL call** (irreversible, needs your context) — there it **pauses and escalates**, and waits. (Execution reacts to that same call differently — it persists rather than pauses; see [Driving the chain](../SKILL.md#driving-the-chain).)
+**AFK-friendly — but it pauses for you.** `grill-with-docs`, `to-features`, and `to-tickets` interview you intensively, yet each is AFK-friendly: when you're away it offers recommended answers and applies the `log-decisions` rules to decide or assume the determinable and reversible calls, recording them in the journal. What it **won't** settle alone is an **unsure HITL call** (irreversible, needs your context) — there it **pauses and escalates**, and waits.
 
 ## Idempotent by design — do only what's missing
 Detect where the feature already is in the spec layer and resume; never clobber or duplicate. Each stage states its skip condition; run only the stages whose artifact is absent or stale.
@@ -30,4 +30,4 @@ Break the PRD into **tracer-bullet** issues (thin vertical slices through every 
 ## Done
 You now have a `ready-for-agent` backlog. Hand off to **ship** ([`ship.md`](ship.md), one issue) or **ship-all** ([`ship-all.md`](ship-all.md), the batch).
 
-**Prerequisites** (not bundled): the `grill-with-docs`, `to-spec`, `to-tickets` skills (`mattpocock/skills`). (`to-features` and `grill-feature` are internal `swe-workflow` procedures, not separate installs.) If a prerequisite is missing, say so and stop rather than improvising.
+**Prerequisites** (not bundled): the `grill-with-docs`, `to-spec`, `to-tickets` skills (`mattpocock/skills`). If a prerequisite is missing, say so and stop rather than improvising.
