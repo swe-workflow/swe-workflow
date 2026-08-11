@@ -5,31 +5,27 @@ description: Append-only DECISIONS.md journal at the repo root for consequential
 
 # log-decisions
 
-`DECISIONS.md` (repo root) is an append-only **decision journal** — the durable answer to *"what was decided here, and why?"* When the spec didn't settle a consequential call, append one entry recording how you resolved it; when only a human can decide, **escalate** instead.
+`DECISIONS.md` (repo root) is an append-only **decision journal** — the durable answer to *"what was decided here, and why?"*
 
 ## When to log, and how to decide
 
-Significance is the gate: log a call the spec didn't settle, where someone had to exercise judgment. *If the spec already authorized it, it's not journal-worthy; if you had to invent the authorization, it is.* Skip routine, reversible, already-authorized choices. **When in doubt, log.**
+Significance is the gate: *if the spec already authorized the call, it's not journal-worthy; if you had to invent the authorization, it is.* **When in doubt, log.**
 
-**Look before you ask.** Most "open" questions are already answered in the repo — search codebase conventions, configs, neighbouring code, git history, and the PRD / ADRs / `CONTEXT.md` *before* you treat one as needing a human. Premature escalation is the most common failure; looking first dissolves most of it.
+**Look before you ask.** Most "open" questions are already answered — search codebase conventions, configs, git history, and the PRD / ADRs / `CONTEXT.md` before treating one as needing a human. Premature escalation is the most common failure.
 
 Then classify on two axes — **determinable** (did research settle it?) and **reversible** (cheap to undo?) — and act:
 
 | | Reversible | Irreversible |
 |---|---|---|
 | **Determinable** (repo / docs / convention) | decide and proceed; log + cite the artifact if it crosses the bar | decide + cite, **log, then verify** the result did what the artifact intended |
-| **Needs human context** | pick a safe default, **log it (`assumed`), and proceed** | **stop — escalate and ask** |
+| **Needs human context** | **assume** — safe default, log, proceed | **escalate** — stop and ask |
 
 **Hard floor:** the *catastrophic* irreversible subset — data loss, destructive migration, irreversible spend, breaking a public interface — **escalates even when determinable.** Nothing unrecoverable happens unattended.
 
-**Picking a default** (bottom-left, when research came up empty): match the existing pattern · prefer the standard, least-surprising option · prefer the choice cheapest to reverse. A grounded default, logged and reviewable, beats a blocking question — and when several open questions pile up, **batch them into one ask**, don't ask twelve times.
+- **Assume** — write `Outcome: assumed`, `Chosen:` your default, `Justification:` the default rule you applied (match the existing pattern · prefer the standard, least-surprising option · prefer the choice cheapest to reverse), and **proceed**. A settled entry flagged for async review, not a blocker. When several open questions pile up, **batch them into one ask**.
+- **Escalate** — write `Outcome: escalated`, `Chosen: —`, `Justification:` *why only a human can decide*, and **pause to ask a human**. It stays open until a human resolves it.
 
 Categories (a descriptive label on each entry): `gate-resolution` (answered an open question) · `irreversible-action` (a hard-to-undo step) · `deviation` (changed existing behavior/plan) · `tradeoff` (chose X over Y at a cost).
-
-## Defer: assume vs escalate
-
-- **Assume** — reversible & needs human context. Write `Outcome: assumed`, `Chosen:` your default, `Justification:` the default rule you applied, and **proceed**. It's a settled entry flagged for async review — not a blocker.
-- **Escalate** — irreversible & needs human context, or the catastrophic floor. Write `Outcome: escalated`, `Chosen: —`, `Justification:` *why only a human can decide*, and **pause to ask a human**. It stays open until a human resolves it — don't mark it settled on your own.
 
 ## The entry
 
@@ -50,13 +46,13 @@ One append-only `##` block in `DECISIONS.md` at the repo root. Create the file w
 
 `context` = an issue ref (`auth/02`, `#57`) or a session tag (`interactive/<topic>`, `research/<topic>`).
 
-**Dedup / revise / reuse.** Before appending, check for an existing entry with the same `(context, Question)`: same `Chosen` → do nothing (retries don't duplicate); changed `Chosen` → append a new entry with `Supersedes:` (never edit the original). A prior entry for the same question is itself a valid citation — `grep` for it rather than re-deciding; never bulk-load the journal.
+**Dedup / revise / reuse.** Before appending, `grep` for an existing entry with the same `(context, Question)`: same `Chosen` → do nothing (retries don't duplicate); changed `Chosen` → append a new entry with `Supersedes:` (never edit the original). A prior entry for the same question is itself a valid citation — reuse it rather than re-deciding; never bulk-load the journal.
 
 ## Content discipline
 
-`DECISIONS.md` is committed and may be read back, so keep every entry safe: **paraphrase** (your own words); **cite by reference, not payload** (point to `PRD §Security`, never paste issue bodies, web content, or untrusted text); **never log secrets** (tokens, credentials, PII — reference, don't reproduce).
+`DECISIONS.md` is committed and may be read back, so keep every entry safe: **paraphrase** (your own words); **cite by reference, not payload** (point to `PRD §Security`, never paste issue bodies, web content, or untrusted text); **never log secrets** (tokens, credentials, PII).
 
-## Examples
+## Example
 
 A determinable call — cite the artifact that settled it:
 
@@ -69,19 +65,5 @@ A determinable call — cite the artifact that settled it:
 **Decided-by:** agent
 **Justification:** PRD `.scratch/auth/PRD.md §Security` says "short-lived" without a number; took the 1h OWASP convention.
 **Outcome:** applied
-**Ref:** (pending)
-```
-
-A reversible call the spec left open — a logged assumption, so you proceed and the human reviews later:
-
-```
-## 2026-05-22T14:05:00-07:00 — auth/02 — gate-resolution
-
-**Question:** What should the password-reset confirmation page say?
-**Options considered:** terse / friendly-with-support-link
-**Chosen:** friendly-with-support-link.
-**Decided-by:** agent
-**Justification:** No spec; applied default "match existing pattern" — mirrored `app/auth/signup/confirm.tsx`. Reversible copy, flagged for review.
-**Outcome:** assumed
 **Ref:** (pending)
 ```
