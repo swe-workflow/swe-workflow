@@ -8,6 +8,7 @@ The workflow depends on external skills this suite doesn't bundle. Detect which 
 
 | Skill(s) | Source (GitHub repo) |
 |---|---|
+| `log-decisions` | `swe-workflow/log-decisions` |
 | `planning-with-files` | `OthmanAdi/planning-with-files` |
 | `tdd`, `setup-matt-pocock-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, `triage` | `mattpocock/skills` |
 
@@ -35,7 +36,7 @@ Write the standing rules into the repo's agent-instructions file — `AGENTS.md`
 <!-- swe-workflow:decision-logging -->
 ## Decision logging (swe-workflow)
 
-When you make a decision on the user's behalf they'd want to review — auto-answering a question they'd otherwise be asked, an irreversible/hard-to-undo action, a tradeoff, a deviation from the spec, or resolving a grill question by your own exploration — record it per the `log-decisions` skill: in a swe-workflow ship build (a worktree), stage to `DECISIONS.staged.md` (promoted to `DECISIONS.md` at close-out); otherwise append to `DECISIONS.md` directly. **Look in the repo first** — most "open" questions are already answered there. Decide-and-log when an artifact grounds the call (verify if irreversible); when it's reversible but unsettled, log a best-guess **assumption** (`Outcome: assumed`) and proceed; **escalate** only what's irreversible and needs human context — and always the catastrophic (data loss, migration, spend, public-interface break).
+When you make a decision on the user's behalf they'd want to review — auto-answering a question they'd otherwise be asked, an irreversible/hard-to-undo action, a tradeoff, a deviation from the spec, or resolving a grill question by your own exploration — record it per the `log-decisions` skill, applying its look-first → decide / assume / escalate rules (the catastrophic — data loss, migration, spend, public-interface break — always escalates). Where to write: in a swe-workflow ship build (a worktree), stage to `DECISIONS.staged.md` (promoted to `DECISIONS.md` at close-out); otherwise append to `DECISIONS.md` directly.
 <!-- /swe-workflow:decision-logging -->
 ```
 

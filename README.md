@@ -8,7 +8,7 @@ It ships as **[Agent Skills](https://agentskills.io)**, so it runs on **Claude C
 
 ### Claude Code
 
-Installs the plugin — both skills (`swe-workflow`, `log-decisions`) plus the `/swe-workflow:*` slash commands.
+Installs the plugin — the `swe-workflow` skill plus the `/swe-workflow:*` slash commands.
 
 ```text
 /plugin marketplace add swe-workflow/swe-workflow
@@ -19,7 +19,7 @@ Installs the plugin — both skills (`swe-workflow`, `log-decisions`) plus the `
 
 ### Other agents (universal)
 
-Installs both skills — `swe-workflow` and `log-decisions`.
+Installs the `swe-workflow` skill.
 
 ```text
 npx skills add swe-workflow/swe-workflow
@@ -34,6 +34,7 @@ npx skills add swe-workflow/swe-workflow
 
 The workflow orchestrates several skills this suite doesn't bundle. **The setup stage (`/swe-workflow:setup`) auto-installs the missing ones** (then restart to activate them); or install manually:
 
+- [`log-decisions`](https://github.com/swe-workflow/log-decisions) — the append-only `DECISIONS.md` decision journal every stage records into (the suite's own, in its own repo). Cross-agent.
 - [`planning-with-files`](https://github.com/OthmanAdi/planning-with-files) — the `plan` / `plan-goal` / `status` engine the ship stage runs for each issue. Cross-agent.
 - [`mattpocock/skills`](https://github.com/mattpocock/skills) — `tdd` (the red → green → refactor inner loop) plus the upstream spec layer: `setup-matt-pocock-skills`, `grill-with-docs`, `to-spec`, `to-tickets`, and `triage`. Cross-agent.
 

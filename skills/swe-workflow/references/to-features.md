@@ -25,7 +25,7 @@ Keep the *granularity* **coarse** — one big user-facing capability per feature
 
 ## AFK-friendly and pausable
 
-The **[spec-layer posture](spec.md)**: the high-level grill offers recommended answers and applies the **[`log-decisions`](../../log-decisions/SKILL.md)** rules (decide / assume) when you're away, but an unsure HITL call (e.g. committing the v1 scope a stakeholder owns) **pauses and escalates** rather than guess.
+The **[spec-layer posture](spec.md)**: the high-level grill offers recommended answers and applies the **`log-decisions`** rules (decide / assume) when you're away, but an unsure HITL call (e.g. committing the v1 scope a stakeholder owns) **pauses and escalates** rather than guess.
 
 **Record feature-scope decisions.** A coarse-feature call someone would want to review — **including or dropping** a feature, **splitting or merging**, **deferring to vNext** — is journal-worthy: log it via `log-decisions` (`gate-resolution` / `tradeoff`), citing the grill / `CONTEXT.md` / ADR that grounded it. **Rejecting** a feature → write the reason to `.out-of-scope/<concept>.md` *and* log a `deviation` / `tradeoff` pointing at it.
 
